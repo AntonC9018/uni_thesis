@@ -1,0 +1,1 @@
+..\..\Kari\build_folder\bin\Kari.Generator\Release\net6.0\Kari.Generator.exe
