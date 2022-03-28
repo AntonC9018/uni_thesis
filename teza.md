@@ -978,6 +978,7 @@ https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18
 
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.json
 
+
 Și codul generat:
 
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/FlagsAnnotations.cs
@@ -986,7 +987,7 @@ https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18
 
 
 
-### DataObject plugin
+### Plugin-ul DataObject
 
 DataObject este un plugin pentru Kari care permite generarea codului pentru tipuri care conceptual doar conțin datele.
 Codului generat va conține supraîncărcări triviale pentru operatorii de egalitate, supraîncărcarea metodei `Equals`, `GetHashCode`.
@@ -1014,12 +1015,79 @@ De exemplu, dacă tipul este o clasă, atunci operatorul `==` trebuie să verifi
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L48-L157
 
 Proiectul cu exemplul de utilizare are aceeași structură ca și proiectul pentru flaguri, doar că menționează plugin-ul `DataObject` în loc de `Flags`.
+Codul programului:
 
-### As part of a CLI usable in a CI/CD pipeline
+https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Program.cs
+
+Și codul generat:
+
+https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjects.cs
+
+https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjectAnnotations.cs
 
 
+### Operațiile cu Kari ca parte de un instrument centralizat de dezvoltare
 
-<!-- Concluziile finale caracterizează succint rezultatele obținute, valoarea lor, modalitățile de
-realizare a obiectivelor formulate în introducere, opiniile proprii și contribuția personală în studierea
-și elucidarea problemei abordate. În teza de licență vor fi evidențiate minimum 2-3 concluzii de
-bază, iar în teza de – master 3-5, cu un accent deosebit pe aprecierea elementelor noi și originale. -->
+În cadrul unui proiect al său, autorul a realizat un instrument în limbajul D care permite integrarea mai ușoară a lui Kari, fără a folosi fișiere de proiecte MSBuild.
+Codul definește două comenzi — una compilează Kari în configurația dată, iar a doua îl execută pe Kari, construind drumurile la DLL-urile plugin-urilor din denumirile lor.
+
+https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/dev_cli/source/commands/setup.d
+
+Restul configurației se ia din fișierul de configurație care se conține în mapa cu proiectul Unity al jocului:
+
+https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
+
+Instrumentul poate fi invocat din linia de comandă.
+Scriptul `setup.bat` arată compilarea instrumentului și invocarea comenzii setup.
+
+https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/setup.bat
+
+Se admite că numele executabilului generat este `dev`.
+Atunci, comanda de setup poate fi executată în felul următor:
+
+```
+dev setup
+```
+
+Aceasta ia ca argumentele și toate acele argumente definite în cod, deci este foarte ușor de configurat.
+De exemplu, se poate face:
+
+```
+dev setup -kariConfiguration Release
+```
+
+Pașii de compilare și de executare a generatorului de cod pot fi realizați aparte.
+
+```
+dev kari build -- arguments_to_dotnet_build
+dev kari run -- arguments_to_kari
+```
+
+Aceste comenzi definite într-un sistem centralizat sunt foarte utile în timpul dezvoltării, și pentru pipeline-uri CI/CD.
+Logica concretă a procesului de build poate fi delegată la acest program `dev` în loc de a defini toata complexitate de build asociată cu jocurile în scripturi shell.
+Programul `dev` este scris în limbajul de programare D, deci este foarte ușor de programat și de configurat, permite modalitățile avansate de programare, poate accesa librăria standartă excelentă Phobos, și este mult mai comod, ușor de menținut și portabil, decât scripturi shell.
+Un astfel de program poate ori să se integreze cu alte scripturi CI/CD, ori să le înlocuiască complet.
+
+
+### Rezumat
+
+În acest capitol s-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
+S-a demonstrat cum generarea codului poate fi incorporată într-un instrument centralizat care poate fi utilizat pentru automatizarea proceselor de dezvoltare a unui sistem informatic.
+
+
+## Concluziile finale și Recomandările
+
+În lucrarea aceasta, s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C#, care este des folosit pentru dezvoltarea jocurilor.
+S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
+A fost demonstrată utilizarea generatorului de cod în două proiecte demonstrative, precum și în cadrul unui instrument centralizat în limbajul D, pe care autorul l-a utilizat în cadrul dezvoltării unui joc în Unity. 
+
+
+Au fost discutate și unele direcții potențiale de îmbunătățire a proiectului:
+
+- Divizarea lui Kari la mai multe etape, pentru a acomoda utilizarea generatorului de cod ca librărie, și pentru a putea testa fiecare etapă aparte;
+- Profilarea mai sigură a codului legat cu sălvarea conținutului a fișierelor generate, și simplificarea lui dacă codul curent nu aduce beneficii din punct de vedere a vitezei de execuție;
+- Explorarea posibilității de a stabili și de a optimiza timpul de execuție pe baza dependențelor fiecărui plugin, adică ce tipuri sau ce fișiere contribuie la codul generat;
+- Mai multe idei care nu au fost discutate în această lucrare.
+
+Însă, Kari deja a fost folosit cu succes în dezvoltarea jocurilor, și instrumentul a ieșit foarte ușor de utilizat, deschizând posibilități mari din punct de vedere a complexității analizei codului și a codului generat.
+
