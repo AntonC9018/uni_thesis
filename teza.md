@@ -814,7 +814,7 @@ Acestea pot fi folosite pentru a accelera generatorul de cod și mai departe, da
 
 ## IV. Programarea Plugin-urilor și Exemple de Utilizare
 
-### CodeBuiler
+### CodeBuilder
 
 Când se realizează generarea codului, se dorește ca codul generat să fie formatat conform standardelor.
 Formatarea corectă face codul mai ușor de citit și de înțeles pentru persoana care îl citește.
@@ -963,52 +963,57 @@ Acestea includ următoarele:
 - `Set` și `Unset` care funcționează ca `WithSet` și `WithUnset`, doar că modifică argumentul;
 - `Set` cu un argument boolean, care setează sau șterge un flag sau o combinație de flaguri, indicat de valoarea acestui argument.
 
-Pentru demonstrare, se va crea un proiect nou test în care se va defini un tip de enum flag.
+Pentru demonstrare, se va crea un proiect nou în care se va folosi generatorul de cod Kari cu acest plugin.
 Acest proiect este un proiect console fără dependențe pe .NET 6.
-Fișierul principal conține următorul cod sursă, foarte asemănător cu exemplul din :
+Fișierul principal conține următorul cod sursă, foarte asemănător cu exemplul din capitolul 1:
 
-```csharp
-using System.Diagnostics;
-using Kari.Plugins.Flags;
-using Root.Generated;
+https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Program.cs
 
-namespace FlagsExample;
 
-[NiceFlags]
-public enum Flags
-{
-    Shy = 1 << 0,
-    Brave = 1 << 1,
-    Strong = 1 << 2,
-    Beautiful = 1 << 3,
-}
+Înainte de compilare trebuie să se ruleze generatorul de cod.
+Pentru aceasta se invocă Kari cu drumul la fișierul de configurare `kari.json` care conține drumul la DLL-ul plugin-ului Flags.
+Acesta poate fi dat lui Kari și direct, însă utilizarea unui fișier de configurare este mai comod.
 
-public static class Program
-{
-    public static void Main(string[] args)
-    {
-        Flags flags = Flags.Shy | Flags.Brave;
+https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.bat
 
-        // Check if it has the Shy flag
-        Debug.Assert(flags.Has(Flags.Shy));
+https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.json
 
-        // Check if it has both the Shy and the Brave flags
-        Debug.Assert(flags.Has(Flags.Shy | Flags.Brave));
+Și codul generat:
 
-        // Check it's neither Strong nor Beautiful
-        Debug.Assert(flags.DoesNotHaveEither(Flags.Strong | Flags.Beautiful));
+https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/FlagsAnnotations.cs
 
-        // Clear the Shy flag
-        flags.Unset(Flags.Shy);
+https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/Flags.cs
 
-        // Conditionally set/unset the Beautiful flag
-        flags.Set(Flags.Beautiful, true);
-    }
-}
-```
 
 
 ### DataObject plugin
+
+DataObject este un plugin pentru Kari care permite generarea codului pentru tipuri care conceptual doar conțin datele.
+Codului generat va conține supraîncărcări triviale pentru operatorii de egalitate, supraîncărcarea metodei `Equals`, `GetHashCode`.
+
+De fapt, aceasta a fost implementat în versiunele noi de C#, anume C# 9 și C# 10 din .NET 5 și .NET 6 respectiv, în forma de *records* și *record structs*, însă acestea nu sunt accesibile în Unity.
+
+https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/records
+
+Administratorul acestui plugin are aceeași structură ca și administratorul plugin-ului Flags:
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs
+
+Informațiile colectate au mai multe chestii, ca simbolul tipului, simbolurile pentru câmpurile instance, etc.
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L160-L180
+
+Metoda `CollectSymbols` tot așa colectează simbolurile necesare și le pune în aceste obiecte cu informații suplimentare extrase.
+Se mai fac niște verificări pentru a avertiza utilizatorul despre problemele cu tipul: trebuie să nu fie static, trebuie să fie parțial, trebuie să aibă un modificator de acces.
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L14-L46
+
+Metoda pentru generarea codului este puțin mai complicată decât cea a plugin-ului Flags, deoarece codul generat depinde de detaliile tipului mai mult.
+De exemplu, dacă tipul este o clasă, atunci operatorul `==` trebuie să verifice cazul când unul sau ambele argumente sunt nule. 
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L48-L157
+
+Proiectul cu exemplul de utilizare are aceeași structură ca și proiectul pentru flaguri, doar că menționează plugin-ul `DataObject` în loc de `Flags`.
 
 ### As part of a CLI usable in a CI/CD pipeline
 
