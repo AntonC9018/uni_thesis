@@ -20,7 +20,7 @@ C# nu este un limbaj perfect.
 Este dificil să se scrie codul declarativ fără să se utilizeze reflexie runtime care este lentă și alocă multă memorie excesivă.
 Uneori necesită mai mult cod boilerplate sau cod mai puțin eficient sau care să consume mai multă memorie chiar pentru a atinge lucruri simple.
 
-În mai multe cazuri, însă, acest cod poate fi generat pe baza fișierilor de sursă inițiale.
+În mai multe cazuri, însă, acest cod poate fi generat pe baza fișierelor de sursă inițiale.
 Codul care să genereze acest boilerplate dorit poate fi mai ușor de înțeles decât codul băzat pe reflexie runtime, și trebuie să fie scris doar o singură dată, eliminând codul boilerplate dat pentru întotdeauna.
 Codul generat va fi echivalent cu acel cod boilerplate, însă nu trebuie fi scris de mână de fiecare dată, și nu trebuie să fie sincronizat cu codul inițial — acestea se vor face automat de către generatorul de cod.
 
@@ -99,7 +99,7 @@ Cel mai important moment pentru autor este posibilitatea executării sau generă
 posibilitatea performării reflexiei asupra tipurilor în timpul compilării.
 Să se menționeze, că C# deja permite reflexia asupra tipurilor și generarea codului, însă abordarea lui este că deleghează totul la timpul rulării, deci reflexia runtime și emisia codurilor IL, respectiv.
 Aceste tehnici, însă, sunt dificile de utilizat și codul care le folosește este predispus la erori.
-Însă, dacă s-ar putea să se genereze fișieri în timpul compilării, sau înainte de compilare, și ca aceste fișieri să conțină codul regular, sigur de tip, aceste erori ar fi prinși în timpul compilării.
+Însă, dacă s-ar putea să se genereze fișiere în timpul compilării, sau înainte de compilare, și ca aceste fișiere să conțină codul regular, sigur de tip, aceste erori ar fi prinși în timpul compilării.
 Adică, codul pur și simplu nu s-ar compila, cu indicarea concretă a erorii, în loc de a da crash în timpul rulării.
 
 Analiza tipurilor în timpul compilării (sau înainte de compilare, într-un pas aparte), în loc de aceasta în timpul rulării, permite și analiza mai profundă a tipurilor, folosirea structurilor de date mai avansate, ca grafuri, lucrul cu informații mai bogate despre simboluri în codul sursă, etc.
@@ -316,10 +316,10 @@ Cel mai des, Roslyn este utilizat pentru analizatori, adică programe care anali
 De fapt, repertoriul Roslyn conține o mulțime de analizatori gata pentru folosire.
 
 Însă Roslyn a fost demult utilizat și pentru generatori de cod ad hoc, adică unele programe care produc codul sursă adaugător, des generat pe baza codului sursă inițial, create pentru un lucru specific.
-Așa programe manual citesc fișierile sursă, manual le parsează conținuturile, manual le analizează și le produc output-ul.
+Așa programe manual citesc fișierele sursă, manual le parsează conținuturile, manual le analizează și le produc output-ul.
 Deci așa programe de fapt fac următoarele lucruri:
-- Configurarea - din ce mapă sau proiect să fie citite fișierile;
-- Parsarea - citirea fișierilor sursă și generarea obiectului de compilare;
+- Configurarea - din ce mapă sau proiect să fie citite fișierele;
+- Parsarea - citirea fișierelor sursă și generarea obiectului de compilare;
 - Analiza la nivel sintactic sau semantic al codului sursă;
 - Generarea codului.
 
@@ -433,7 +433,7 @@ Ultima cerință se obține prin paralelizare.
 
 În primul rând se dorește să se precizeze încă o dată etapele concrete de funcționare a sistemei propuse care reies în mod natural din analiza superficială a cerințelor:
 
-- Configurarea - parsarea argumentelor liniei de comandă, sau a fișierilor de configurare; validarea lor.
+- Configurarea - parsarea argumentelor liniei de comandă, sau a fișierelor de configurare; validarea lor.
 - Descoperirea fișierelor sursă și clasificarea lor între subproiecte (de exemplu, după asmdef-uri în Unity, sau după mape).
 - Citirea conținutului fișierelor sursă, convertarea textului în reprezentarea abstractă a codului.
 - Analiza codului.
