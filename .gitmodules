@@ -1,3 +1,6 @@
 [submodule "Kari"]
 	path = Kari
 	url = https://github.com/AntonC9018/Kari
+[submodule "race"]
+	path = race
+	url = https://github.com/AntonC9018/race
