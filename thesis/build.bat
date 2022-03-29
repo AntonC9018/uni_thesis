@@ -1,1 +1,1 @@
-texify teza.tex
+texify teza_processed.tex
