@@ -1,0 +1,1478 @@
+\documentclass{report}
+
+% Romanian language support
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[romanian]{babel}
+
+% Code blocks
+\usepackage{listings}
+\usepackage{color}
+
+\lstloadlanguages{csh}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  firstnumber=1000,                % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=csh,               % the language of the code
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=4	                       % sets default tabsize to 4 spaces
+}
+
+
+% Start
+\begin{document}
+
+\chapter*{Abstract}
+
+\textbf{Actualitatea si importanta temei.}
+
+Dezvoltarea jocurilor video este un domeniu important in ziua de azi.
+Dezvoltarea lor practica si eficienta necesita mai multe instrumente, ca
+o modalitate de rendering a mesh-elor sau a imaginilor pe ecran, o
+modalitate de user input, scripting etc.
+
+Motorul de joc Unity a facut limbajul C\# popular pentru scripting in
+jocuri video. Asadar, usurarea programarii in C\# poate aduce la un
+proces de dezvoltare mai placut si mai productiv pentru programatori de
+jocuri in Unity, sau in alte medii unde se foloseste acest limbaj de
+programare.
+
+C\# nu este un limbaj perfect. Este dificil sa se scrie codul declarativ
+fara sa se utilizeze reflexie runtime care este lenta si aloca multa
+memorie excesiva. Uneori necesita mai mult cod boilerplate sau cod mai
+putin eficient sau care sa consume mai multa memorie chiar pentru a
+atinge lucruri simple.
+
+In mai multe cazuri, insa, acest cod poate fi generat pe baza fisierelor
+de sursa initiale. Codul care sa genereze acest boilerplate dorit poate
+fi mai usor de inteles decat codul bazat pe reflexie runtime, si trebuie
+sa fie scris doar o singura data, eliminand codul boilerplate dat pentru
+intotdeauna. Codul generat va fi echivalent cu acel cod boilerplate,
+insa nu trebuie fi scris de mana de fiecare data, si nu trebuie sa fie
+sincronizat cu codul initial --- acestea se vor face automat de catre
+generatorul de cod.
+
+\textbf{Scopul si obiectivele.}
+
+In aceasta lucrare autorul proiecteaza, explica si elaboreaza un astfel
+generator de cod. Generatorul final poate fi utilizat usor in mai multe
+proiecte, poate fi extins dinamic utilizand plugin-uri care sa contina
+logica specifica de analiza a codului sursa si de generare a codului
+nou. Se demonstreaza niste exemple de utilizare a generatorului de cod.
+Se arata inca cum generatorul de cod poate fi integrat intr-o aplicatie
+de linie de comanda centralizata care sa se utilizeze intr-un pipeline
+CI/CD.
+
+\textbf{Suportul metodologic.}
+
+Generatorul de cod este un instrument realizat in limbajul C\#, pe baza
+platformei .NET 6 si a lui Roslyn care este un set de librarii si
+instrumente pentru analiza codului sursa C\#. Generatorul de cod a fost
+testat si utilizat in practica in Unity. Instrumentul a fost elaborat
+dupa necesitate in dezvoltare si reiese intreg din experimentare si
+experienta autorului.
+
+\textbf{Noutatea stiintifica/originalitatea.}
+
+In general, generatorul de cod a fost proiectat si elaborat dupa
+necesitatile autorului. Autorul utilizeaza acest instrument in
+proiectele proprii si planifica sa-l perfectioneze si sa-l faca mai
+modular si mai usor de utilizat.
+
+\textbf{Valoarea aplicativa.}
+
+Produsul obtinut poate fi utilizat pentru generarea codului in orice
+proiect ce urmeaza, cu posibilitatea de a crea plugin-uri personalizate,
+destinate unui proiect concret, pentru a usura realizarea scopurilor
+specifice acestuia.
+
+\textbf{Sumarul tezei.}
+
+In aceasta lucrare se argumenteaza si se elaboreaza un generator de cod
+C\# flexibil si extensibil care poate fi utilizat pentru a usura si a
+face mai placuta programarea in C\#, si pentru a spori eficienta
+programatorului in implementarea unelor solutii.
+
+
+\chapter{Sumarul Generarii Codului in C}
+
+\section{Capacitatile si deficientele lui C}
+
+C\# este un limbaj de programare modern, poseda caracteristici utile si
+practice, printre care: - Tipizarea statica; - Un runtime inteligent; -
+Un colector de gunoi integrat, util pentru programarea de uz general; -
+O librarie de clase extinsa si testata in timp; - etc.
+
+Cu toate ca C\# este ``mediul'' acestei lucrari, nu se va descrie in
+intregime, deoarece importanta este esenta problemei care consta in
+faptul ca, cu toate ca limbajul acesta este destul de capabil, este si
+destul de limitat.
+
+Cel mai important moment pentru autor este posibilitatea executarii sau
+generarii codului, posibilitatea performarii reflexiei asupra tipurilor
+in timpul compilarii. Sa se mentioneze, ca C\# deja permite reflexia
+asupra tipurilor si generarea codului, insa abordarea lui este ca
+delegheaza totul la timpul rularii, deci reflexia runtime si emisia
+codurilor IL, respectiv. Aceste tehnici, insa, sunt dificile de utilizat
+si codul care le foloseste este predispus la erori. Insa, daca s-ar
+putea sa se genereze fisiere in timpul compilarii, sau inainte de
+compilare, si ca aceste fisiere sa contina codul regular, sigur de tip,
+aceste erori ar fi prinsi in timpul compilarii. Adica, codul pur si
+simplu nu s-ar compila, cu indicarea concreta a erorii, in loc de a da
+crash in timpul rularii.
+
+Analiza tipurilor in timpul compilarii (sau inainte de compilare,
+intr-un pas aparte), in loc de aceasta in timpul rularii, permite si
+analiza mai profunda a tipurilor, folosirea structurilor de date mai
+avansate, ca grafuri, lucrul cu informatii mai bogate despre simboluri
+in codul sursa, etc. Daca aceasta analiza nu este delegata la timpul
+rularii ci este executata in prealabil, salveaza timpul de executie si
+memoria RAM valoroasa in timpul rularii, care sunt in special importante
+in jocuri video.
+
+Generarea codului poate fi folosita si pentru a elimina codul
+boilerplate, sau pentru a genera wrapper-uri sau functii ajutatoare.
+
+\section{Exemplu: implementarea interfetelor prin compozitie}
+
+Urmeaza o instanta posibila de aparitia codului boilerplate, unde dorim
+sa implementam o interfata prin compozitie. Deci fie o astfel de
+interfata:
+
+\begin{lstlisting}
+public interface IExample
+{
+    void A();
+    void B();
+    void C();
+    void D();
+    // ...
+}
+\end{lstlisting}
+
+Acum fie ca dorim sa cream o structura, unde sa avem o implementare a
+acestei interfete. Deoarece trebuie sa fie o structura, dorim numaidecat
+sa folosim compozitia, si nu putem folosi mostenirea. Inca dorim ca
+aceasta structura sa implementeze si ea interfata aceasta, ca sa poata
+fi folosita in generics.
+
+In alte cuvinte:
+
+\begin{lstlisting}
+public struct Composition : IExample
+{
+    private IExample _impl;
+}
+\end{lstlisting}
+
+Este clar ca acum trebuie sa implementam aceasta interfata. Deci, unica
+solutie care C\# ne propune este urmatoarea:
+
+\begin{lstlisting}
+  public struct Composition : IExample
+{
+    private IExample _impl;
+
+    void A() { _impl.A(); }
+    void B() { _impl.B(); }
+    void C() { _impl.C(); }
+    void D() { _impl.D(); }
+    // ...
+}
+\end{lstlisting}
+
+Este clar, ca asa abordare in primul rand este o repetare proasta a
+codului, aducerea zgomotului fara sens in cod. Insa cel mai rau aspect
+este ca, acum, daca s-ar schimba interfata \texttt{IExample}, s-ar
+trebui sa fie schimbat si acest tip. Da, nu e nimic daca este doar un
+singur astfel de tip, dar aceste lucruri se acumuleaza si pot face codul
+mai anevoios de modificat, sporesc frictia intre limbajul de programare
+si programatorul.
+
+\footnote{
+  O alta solutie aici ar putea fi supraincarcarea castului implicit in
+  acest tip integrat, insa supraincarcarea casturilor implicite in
+  interfete nu este permisa in C\#.
+}
+
+Cu generarea codului, ar putea fi posibila o astfel de solutie, simpla,
+clara, usoara de utilizat, si rezistenta la schimbari ale interfetei:
+
+\begin{lstlisting}
+public partial struct Composition : IExample
+{
+    [ForwardMethodCalls]
+    private IExample _impl;
+}
+\end{lstlisting}
+
+Iar codul generat deja sa contina aceste implementari, intr-un fisier
+aparte:
+
+\begin{lstlisting}
+public partial struct Composition
+{
+    void A() { _impl.A(); }
+    void B() { _impl.B(); }
+    void C() { _impl.C(); }
+    void D() { _impl.D(); }
+    // ...
+}
+\end{lstlisting}
+
+
+\section{Exemplu: metodele ajutatoare pentru enumuri flag}
+
+Fie un astfel de enum cu flaguri:
+
+\begin{lstlisting}
+  public enum Flags
+{
+    Shy = 1 << 0,
+    Brave = 1 << 1,
+    Strong = 1 << 2,
+    Beautiful = 1 << 3,
+}
+\end{lstlisting}
+
+Si folosirea lui in cod tipica:
+
+\begin{lstlisting}
+Flags flags = Flags.Shy | Flags.Brave;
+
+// Check if it has the Shy flag
+assert((flags & Flags.Shy) != 0);
+
+// Check if it has both the Shy and the Brave flags
+assert((flags & (Flags.Shy | Flags.Brave)) == (Flags.Shy | Flags.Brave));
+
+// Check it's neither Strong nor Beautiful
+assert((flags & (Flags.Strong | Flags.Beautiful)) == 0);
+
+// Clear the Shy flag
+flags &= ~Flags.Shy;
+
+// Conditionally set/unset the Beautiful flag
+if (true)
+    flags |= Flags.Beautiful;
+else
+    flags &= ~Flags.Beautiful;
+\end{lstlisting}
+
+
+\begin{lstlisting}
+Flags flags = Flags.Shy | Flags.Brave;
+
+// Check if it has the Shy flag
+assert(flags.Has(Flags.Shy));
+
+// Check if it has both the Shy and the Brave flags
+assert(flags.Has(Flags.Shy | Flags.Brave));
+
+// Check it's neither Strong nor Beautiful
+assert(flags.DoesNotHaveEither(Flags.Strong | Flags.Beautiful));
+
+// Clear the Shy flag
+flags.Unset(Flags.Shy);
+
+// Conditionally set/unset the Beautiful flag
+flags.Set(Flags.Beautiful, true);
+
+// ...
+
+public static class FlagsExtensions
+{
+    public static Flags Has(this Flags source, Flags flags)
+    {
+        return (source & flags) == flags;
+    }
+    public static Flags DoesNotHaveEither(this Flags source, Flags flags)
+    {
+        return (source & flags) == 0;
+    }
+    public static void Unset(this ref Flags source, Flags target)
+    {
+        source &= ~target;
+    }
+    public static void Set(this ref Flags source, Flags target, bool isOn)
+    {
+        if (isOn)
+            source |= target;
+        else
+            source &= ~target;
+    }
+}
+\end{lstlisting}
+
+Problema este ca trebuie sa se scrie aceste metode pentru toate tipurile
+flag care sunt in cod. Cand apare un nou astfel de tip, trebuie sa se
+copieze acest cod, si sa se plaseze undeva, cu denimirea tipului de
+intrare schimbata. C\# nu propune o solutie pentru aceasta problema:
+este pur si simplu imposibil sa scrieti astfel de metode care sa lucreze
+cu orice tip enum flag. Aceasta este posibil de realizat cu IL emission,
+dar nu cred ca merita.
+
+Autorul propune urmatoarea solutie declarativa, explicata mai bine in
+capitolul 3:
+
+\begin{lstlisting}
+[NiceFlags]
+public enum Flags
+{
+    // ...
+}
+\end{lstlisting}
+
+Aceasta genereaza toate acele metode automat.
+
+\section{Mai multe exemple}
+
+Cele doua exemple clar arata capacitatile generarii codului in
+eliminarea boilerplate-ului. Insa acesta nu este singurul lor caz de
+utilizare. Sa se mentioneze aceasta prezentare
+https://youtu.be/j6ow-UemzBc unde autorul demonstreaza cum compania lui
+genereaza codul pentru endpoint-uri API din fisiere agnostice de
+configurare. Protobuf https://developers.google.com/protocol-buffers
+care genereaza codul pentru mai multe limbaje, realizand protocolul
+personalizat dintr-o descriere intr-un DSL. Message Pack
+https://github.com/neuecc/MessagePack-CSharp care permite emiterea
+codului IL pentru serializarea eficienta a datelor, dar permite si
+generarea codului AOT. Vedeti in special
+https://github.com/neuecc/MessagePack-CSharp\#aot Inca un exemplu:
+consola si comenzile integrate in joc, mentionat si in capitolul 3.
+https://github.com/AntonC9018/command\_terminal
+
+\section{Istoriografia problemei}
+
+Dupa ce autorul a inceput sa studieze si sa practice programarea
+independenta in C\#, si anume in proiectul Hopper descris in teza de an,
+au devenit evidente deficientele acestui limbaj. Folosind o abordare
+directa, a fost conceput si creat un prototip al generatorului de cod,
+cuplat cu proiectul in care a fost utilizat. Acest generator de cod s-a
+descris pe scurt in teza de an al autorului.
+
+Dupa teza de an, autorul a continuat sa experiementeze cu aceste
+concepte, implementand baza unui alt joc, conceput cu doua ani inainte
+de perfectarea tezei de an. In timp de aproape o luna si jumatate, a
+fost creat un proiect-sablon in Unity cu toate instrumentele necesare:
+generatorul de cod, divizarea modulara a asamblelor C\# in Unity,
+integrarea unui terminal virtual in joc, o interfata de consola
+centrala. https://github.com/PunkyIANG/a-particular-project Deci,
+generatorul de cod a fost initial adaptat la nevoile acestui proiect,
+insa autorul a vazut oportunitatea sa-l modularizeze printr-o
+arhitectura pe baza plugin-urilor, ceea ce si se explica in aceasta
+lucrare.
+
+\section{Roslyn}
+
+Roslyn este un ansamblu de librarii si instrumente pentru analiza si
+compilarea codului C\#, pentru C\#. De fapt, insusi compilatorul C\#
+este implementat pe baza acestor librarii Roslyn. Roslyn combina
+intregul pipeline de compilare: tokenizarea, analiza sintactica, analiza
+semantica, generarea codului executabil, expuzand toate aceste operatii.
+
+Cel mai des, Roslyn este utilizat pentru analizatori, adica programe
+care analizeaza codul sursa si detecteaza erori logice, posibil
+propunand o remediere (code fix), sau adaugand operatii utile in
+IDE-urile (de exemplu, ``implement methods'', ``extract into a local
+function''). De fapt, repertoriul Roslyn contine o multime de
+analizatori gata pentru folosire.
+
+Insa Roslyn a fost demult utilizat si pentru generatori de cod ad hoc,
+adica unele programe care produc codul sursa adaugator, des generat pe
+baza codului sursa initial, create pentru un lucru specific. Asa
+programe manual citesc fisierele sursa, manual le parseaza
+continuturile, manual le analizeaza si le produc output-ul. Deci asa
+programe de fapt fac urmatoarele lucruri: - Configurarea - din ce mapa
+sau proiect sa fie citite fisierele; - Parsarea - citirea fisierelor
+sursa si generarea obiectului de compilare; - Analiza la nivel sintactic
+sau semantic al codului sursa; - Generarea codului.
+
+Un exemplu este generatorul de cod Message-Pack
+https://github.com/neuecc/MessagePack-CSharp. Kari, generatorul de cod
+descris in aceasta lucrare, a fost scris initial dupa aceeasi
+arhitectura ca si codul acestui proiect, insa autorul a prins
+oportunitatea sa-l generalizeze.
+
+Decizia sa faca generatorul de cod in C\# a fost o decizie evidenta,
+deoarece nu exista nici o alta librarie care este asemanator de
+capabila.
+
+\section{Source Generators in .NET}
+
+.NET 5 a introdus un concept nou - Source Generators (generatori de
+sursa).
+https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview
+Acestea sunt de fapt analizatorii care primesc la intrare arborele
+sintactic, si returneaza codul sursa generat. Acestea integreaza cu
+compilatorul, deci functioneaza pe baza arborelui sintactic al
+compilatorului.
+
+Generatorii de sursa permit accelerarea generatorilor de cod
+personalizate, prin reutilizarea configuratiei si a datelor despre cod
+deja existente in timpul compilarii in memoria compilatorului. Aceasta
+permite generatorilor de cod personalizate sa faca mai putin lucru
+irelevant, si sa lucreze cu abstractiunile corespunzatoare.
+
+Insa ei au si mai multe limitatii:
+
+\begin{itemize}
+\item
+  Dupa experienta autorului, ele pot fi folosite doar cu MSBuild,
+  sistemul de build al lui Microsoft. MSBuild este renumit pentru
+  scalabilitatea proasta - un proces de build chiar putin netrivial
+  devine aproape imposibil de suportat.
+\item
+  Generatorii de sursa trebuie sa foloseasca si ele fisiere MSBuild
+  pentru a-si specifica configuratia (n-am sursa) si pentru a fi
+  distribuite ca pachete NuGet, insa in experienta autorului crearea de
+  asa fisiere MSBuild pentru integrarea usoara in alte proiecte devine
+  foarte complicata si este predispusa la erori.
+\item
+  Nu se poate folosi toate capacitatile framework-ului - sunt dintr-o
+  cauza limitate la .NET Standard 2.0.
+\item
+  Sunt considerate o capacitate avansata si experimentala, si nu sunt
+  documentate bine.
+\item
+  Sunt destul de dificile de setat si de utilizat.
+\item
+  Clar ca sunt suportate doar pe versiunile cele mai noi ale
+  compilatorului, si clar ca nu pot fi utilizate in Unity.
+\end{itemize}
+
+Asadar, dupa opinia autorului, acestea nu sunt practice la moment.
+
+Crearea unei solutii personale ar fi mai usor si mai practic:
+
+\begin{itemize}
+\item
+  S-ar avea mai mult control asupra intregului proces, deoarece codul ar
+  fi simplu si usor de modificat.
+\item
+  Realizarea unei solutii destul de bune din punct de vedere al uzului
+  practic nu este atat de complicata.
+\item
+  Solutia ar putea fi utilizata in Unity, precum si in orice alt proiect
+  C\#, indiferent de daca foloseste sau nu MSBuild si indifirent de
+  versiunea compilatorului utilizata in acel proiect.
+\item
+  Reutilizarea configuratiei tot poate fi asigurata (cel putin partial,
+  descris si in continuare).
+\end{itemize}
+
+\section{Rezumat}
+
+In acest capitol s-a discutat si s-a exemplificat valoarea practica a
+generatorilor de cod, si s-a argumentat de ce solutiile existente nu
+sunt practice. A fost introdusa si ideea de fluidizare a procesului
+utilizand un sistem care sa reutilizeze o singura sursa de informatie
+despre structura codului, facand mai putin lucru in total, asadar
+intregul proces sa devina mai rapid in general.
+
+\chapter{Sumarul Arhitecturii}
+
+\section{Concretizarea cerintelor pentru generator de cod}
+
+Este clar ca pentru a putea realiza un produs software trebuie sa se
+stie ce exact se cere de el. In cazul unui generator de cod, se poate
+formaliza cerintele functionale de baza la nivel inalt in urmatorul mod:
+
+\begin{enumerate}
+\item
+  Se cere ca generatorul de cod sa citeasca fisierele sursa cu codul de
+  intrare.
+\item
+  Se cere ca sa se genereze codul de iesire, pe baza unei logici
+  specifice. Ca un exemplu concret, enumuri flag.
+\item
+  Se cere ca generatorul de cod sa nu fie prea lent. Cu toate ca aici nu
+  sunt date concrete, aceasta cerinta se considera functionala, deoarece
+  este foarte importanta.
+\end{enumerate}
+
+Prima cerinta poate fi concretizata mai tare:
+
+\begin{itemize}
+\item
+  Trebuie sa se poata controla ce fisiere sursa vor fi procesate. De
+  exemplu, toate fisierele dintr-o mapa.
+\item
+  Daca codul logicii de generare necesita parametrizarea suplimentara,
+  trebuie sa fie posibil de a o furniza.
+\item
+  Configurarea sa se faca prin linia de comanda sau prin fisiere de
+  configurare.
+\item
+  Se cere sa se integreze cu sistemul de structurare a subproiectelor
+  folosit de Unity, anume asmdef-uri.
+\item
+  Se cere ca fisierele sursa sa fie interpretate corect, si ca codul
+  generat sa fie parametrizat de catre codul de intrare. In alte
+  cuvinte, se doreste o modalitate de a putea procesa codul de intrare
+  intr-un mod standardizat.
+\end{itemize}
+
+Se concretizeaza a doua cerinta in modul urmator:
+
+\begin{itemize}
+\item
+  Codul de analiza si de generare a codului sa fie scris in limbajul C\#
+  pe baza platformei .NET 6, sa poata accesa toate API-urile specifice
+  acestuia.
+\item
+  Aceasta logica trebuie sa poata analiza o reprezentare abstracta a
+  codului sursa de intrare si sa poata genera output-ul, ca text.
+\item
+  Se cere ca sa fie usor de creat fisiere cu codul care sa conforme
+  formatarii corecte si care sa nu lupte cu simboluri din codul initial.
+  In alte cuvinte, se cere ca libraria generatorului de cod sa ofere
+  API-uri utile pentru generarea codului si lucrul cu simboluri din cod.
+\item
+  Deoarece se doreste ca codul de intrare sa fie declarativ, sa
+  foloseasca extensiv atribute aplicate la tipuri si la membrii lor, ar
+  fi foarte comod daca codul generat sa poata automat contina definitii
+  pentru aceste atribute, partajate intre codul de intrare care sa le
+  foloseasca drept atribute, si logica de analiza si generare care sa le
+  caute in reprezentarea abstracta a codului sursa si sa le inspecteze.
+\item
+  Logica acestui analizator se va schimba des, si analizatorii noi vor
+  fi adaugati, de aceea se cere ca acest nivel sa fie cat mai flexibil,
+  sa fie posibil sa se modifice si sa se augmenteze usor.
+\end{itemize}
+
+Ultima cerinta se obtine prin paralelizare.
+
+\section{Schita arhitecturii}
+
+In primul rand se doreste sa se precizeze inca o data etapele concrete
+de functionare a sistemei propuse care reies in mod natural din analiza
+superficiala a cerintelor:
+
+\begin{itemize}
+\item
+  Configurarea - parsarea argumentelor liniei de comanda, sau a
+  fisierelor de configurare; validarea lor.
+\item
+  Descoperirea fisierelor sursa si clasificarea lor intre subproiecte
+  (de exemplu, dupa asmdef-uri in Unity, sau dupa mape).
+\item
+  Citirea continutului fisierelor sursa, convertarea textului in
+  reprezentarea abstracta a codului.
+\item
+  Analiza codului.
+\item
+  Generarea codului.
+\end{itemize}
+
+Se poate usor observa ca primele 3 puncte vor fi aceeasi pentru orice
+logica de analiza si de generare a codului, si corespunda la prima
+cerinta din lista adusa anterior. Analog, ultimele doua sunt legate la a
+doua cerinta. Sa se tina minte ca se cere ca acest nivel sa fie cat mai
+flexibil.
+
+Aceasta natural aduce la urmatoarea arhitectura:
+
+\begin{itemize}
+\item
+  Sa existe un orchestrator, care sa accepte configuratia din linia de
+  comanda, sa citeasca fisierele sursa si sa le converteze in
+  reprezentarea codului abstracta.
+\item
+  Sa existe mai multe plugin-uri, care sa analizeze si sa genereze
+  output-ul pentru aceasta reprezentare abstracta.
+\item
+  Orchestratorul va incarca plugin-urile in timpul rularii, conform
+  configuratiei, le va initializa, iarasi, conform configuratiei, si le
+  va da codul ca datele de intrare. El va primi output-ul generat de
+  catre ele si il va scrie in fisiere corespunzatoare.
+\end{itemize}
+
+Arhitectura propusa poate fi eventual subdivizata si la mai multe etape,
+prin divizarea orchestratorului la mai multe parti. Insa, nu este
+numaidecat necesar de facut acest lucru, deoarece asa arhitectura deja
+corespunde cerintelor.
+
+O divizare utila insa ar fi cel putin sa se extraga etapa de citire a
+configurarii din orchestrator intr-un modul ce tine de interpretarea
+comenzilor din linie de comanda si/sau fisierelor de configurare. Acest
+modul ar putea fi reutilizat in alte locuri in cod, sau poate fi
+substituit cu o librarie.
+
+\section{Plugin-uri}
+
+Ideea principala a sistemelor bazate pe plugin-uri este ca sa fie
+posibil sa se augmenteze logica sistemului in timpul rularii, adica fara
+sa se schimbe codul acestei sisteme. Acesta presupune ca trebuie sa
+existe o modalitate de a descoperi in timpul rularii codul logicii care
+trebuie sa fie executat. Acest cod atunci ar putea sa se schimbe fara a
+afecta logica sistemei originale.
+
+In alte cuvinte, totul ce sistemul va trebui sa faca va fi administrarea
+si integrarea acestor plugin-uri. Insasi logica va fi continuta in
+aceste plugin-uri si nu va fi partea integrala a sistemei.
+
+Utilizarea plugin-urilor reprezinta o solutie care foarte bine
+corespunde cerintelor: in primul rand, restul sistemului este decuplat
+din nivelul plugin-urilor, iar acesta este foarte flexibil, adica usor
+de modificat si de augmentat.
+
+In C\#, exista DLL-uri - librarii care permit sa incarce codul in timpul
+rularii, sa linkeze toate functiile necesare, sa descopere tipurile
+prezente in aceasta librarie si sa faca ceva cu ele. In cazul
+generatorului de cod dat, dorim ca aceste plugin-uri sa poata fi
+initializate, sa analizeze codul sursa si sa genereze codul nou. Cea mai
+usoara modalitate de a asigura acest lucru este de a defini o interfata
+cu toate aceste actiuni ca metode, iar in timpul rularii de a cauta
+toate tipurile care implementeaza aceasta interfata, dupa ce poate fi
+instantiate si utilizate, executand metodele acestei interfete.
+
+In plus, deoarece se presupune ca plugin-urile sunt independente, putem
+paraleliza in mod trivial executarea lor. (Pot fi si dependente, insa
+aceasta problema tot poate fi solutionata fara a anula utilizarea
+plugin-urilor si argumentul dat.)
+
+\section{Fluxul de lucru cu generatorul de cod}
+
+Generatorul de cod trebuie sa fie usor de utilizat. Configurarea nu
+trebuie sa ia mult timp si trebuie sa fie simpla. De aceea s-a decis ca
+generatorul de cod trebuie sa functioneze ca o aplicatie de consola
+tipica: sa fie invocata la consola, unde utilizatorul ar da toate
+argumentele si optiunile. Este clar ca aceste optiuni de obicei vor fi
+ascunse intr-un script executabil, de exemplu, ca un fisier bat pe
+Windows.
+
+Inca, configuratia generala pentru un anumit proiect poate fi pusa
+intr-un fisier json. Asa fisier poate contine configuratia parametrilor
+concrete pentru plugin-uri, sau configuratia de felul care proiect din
+acestea este principal, cum sa fie numita mapa de iesire, etc. Exemplu
+(https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json):
+
+\begin{lstlisting}
+{
+    "inputFolder": "Assets/Source",
+    // The plugin paths are passed via the cli tool
+    "generatedNamespaceSuffix": "Generated",
+    "rootNamespace": "Race",
+    "outputMode": "NestedDirectory",
+    "inputMode": "UnityAsmdefs",
+    "commonProjectName": "Common",
+
+    // UnityHelpers
+    "engineCommon": "EngineCommon",
+
+    // CommandTerminal
+    "terminalProject": "CommandTerminal"
+}
+\end{lstlisting}
+
+S-a decis ca toate plugin-urile sa fie importate ori dintr-o singura
+directorie, ori individual dupa cale catre DLL-uri. Inca se admite
+instalarea prin NuGet, pentru a putea sa le impartaseasca usor cu lumea,
+insa procesul de lucru cu NuGet gol este mult mai complicat decat
+folosirea submodulelor git si setarea individuala a calelor la DLL-uri
+intr-un script, de aceea aceasta functionalitate nu se foloseste la
+moment.
+
+Configurarea plugin-urilor tot se face prin consola. Ei primesc
+argumente in acelasi fel ca si orchestratorul.
+
+Din punct de vedere a integrarii cu instrumente, invocarea directa ar fi
+mai buna, ca de exemplu linkarea la librarii C, insa invocarea unui
+proces la consola tot este destul de usor.
+
+Deci, comanda exemplu de invocare ar putea fi urmatoarea:
+
+\begin{verbatim}
+kari -configurationFile kari.json -pluginPaths plugin1.dll,plugin2.dll,plugin3.dll
+\end{verbatim}
+
+Aceasta ar invoca generatorul de cod cu plugin-uri plugin1, plugin2 si
+plugin3, unde restul configuratiei se ia din fisierul kari.json. Dupa
+aceasta, programul genereaza codul, ori arata erori, posibil cu mesajul
+de ajutor care arata toate optiunile.
+
+\section{Rezumat}
+
+In acest capitol s-au stabilit cerintele principale pentru generatorul
+de cod si s-a discutat arhitectura generala a sistemului. S-a decis ca o
+arhitectura bazata pe plugin-uri, unde orchestratorul dirijeaza o
+multime de plugin-uri solutioneaza problema conform cerintelor. S-a
+discutat si fluxul de lucru dorit, mai precis, faptul ca va fi o
+aplicatie din linia de comanda.
+
+
+\chapter{Implementarea generatorului de cod}
+
+\section{Configurarea}
+
+Dupa cum s-a mentionat, configurarea se va face din linia de comanda
+si/sau prin fisiere json de configurare. Autorul a decis sa creeze codul
+propriu pentru lucrul acesta, cu toate ca deja exista mai multe librarii
+care fac acelasi lucru. Autorul ori nu a fost satisfacut cu API-ul lor,
+ori cu lipsa optiunilor dorite.
+
+Deci a fost realizat un API declarativ pentru specificarea optiunilor
+particulare care o clasa specifica va lua: Exemplu (a se vede codul
+sursa pentru un exemplu complet
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs):
+
+Urmatorul cod transmite argumentele primite la consola la parser, care
+isi completeaza structura de date interna cu toate optiunile prinse,
+pentru o mapare mai eficienta in continuare:
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs\#L126-L132
+
+\begin{lstlisting}
+ArgumentParser parser = new ArgumentParser();
+var result = parser.ParseArguments(args);
+if (result.IsError)
+{
+    argumentLogger.LogError(result.Error);
+    return (int) ExitCode.OptionSyntaxError;
+}
+\end{lstlisting}
+
+Aici se arata codul partial al clasei ce va primi argumentele din
+consola, mapate la tipurile campurilor. Cum se poate observa, este
+utilizat atributul \texttt{Option} pentru a atinge un API declarativ.
+Acestea sunt scanate in timpul rularii de catre parser, utilizand
+reflexie runtime, pentru a obtine informatii despre obiect la care sa
+fie bindate valorile argumentelor.
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs\#L21-L87
+
+\begin{lstlisting}
+public class KariOptions
+{
+    public string HelpMessage => "Use Kari to generate code for a C# project.";
+
+    [Option("Input path to the directory containing source files or projects.", 
+        IsPath = true)] 
+    public string inputFolder = ".";
+
+    [Option("Plugins folder or paths to individual plugin dlls.",
+        // Can be sometimes inferred from input, aka NuGet's packages.config
+        IsRequired = false,
+        IsPath = true)]
+    public string[] pluginPaths = null;
+
+    [Option("The suffix added to the project namespace to generate the output namespace.")]
+    public string generatedNamespaceSuffix = "Generated";
+    // ...
+}
+\end{lstlisting}
+
+Urmeaza un exemplu de utilizare in codul generatorului de cod. Metoda
+\texttt{FillObjectWithOptionValues} umple obiectul dat cu valorile din
+structura de date interna, si returneaza o lista cu toate erorile care
+s-au imtamplat in timpul bindarii parametrilor.
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs\#L147-L155
+
+\begin{lstlisting}
+  var ops = new KariOptions();
+var result1 = parser.FillObjectWithOptionValues(ops);
+
+if (result1.IsError)
+{
+    foreach (var e in result1.Errors)
+        argumentLogger.LogError(e);
+    return (int) ExitCode.BadOptionValue;
+}
+\end{lstlisting}
+
+Aceeasi metoda este utilizata si pentru bindarea valorilor la campurile
+``administratorilor'' plugin-urilor. Administratorii sunt obiecte care
+dirijeaza procesul de executie a plugin-urilor.
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L208-L221
+
+\begin{lstlisting}
+foreach (var admin in Administrators)
+{
+    var result = parser.FillObjectWithOptionValues(admin.GetArgumentObject());
+    if (result.IsError)
+    {
+        foreach (var err in result.Errors)
+        {
+            Logger.LogError(err);
+        }
+    }
+}
+\end{lstlisting}
+
+Interesant este momentul ca, cand vreo optiune este mentionata in
+parser, ea este marcata cu un flag. Dupa ce toate optiunile au fost
+colectate, se poate obtine toate optiunile care nu au fost marcate cu un
+astfel de flag - argumentele superfluoase. Opinia autorului este ca
+prezenta argumentelor superfluoase mereu trebuie sa fie considerata ca o
+eroare critica. In plus, toate asa erori trebuie sa fie explicit
+afisate.
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs\#L446-L460
+
+\begin{lstlisting}
+var unrecognizedOptions = parser.GetUnrecognizedOptions();
+var unrecognizedConfigOptions = parser.GetUnrecognizedOptionsFromConfigurations();
+if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
+{
+    foreach (var arg in unrecognizedOptions)
+    {
+        _logger.LogError($"Unrecognized option: `{arg}`");
+    }
+    foreach (var arg in unrecognizedConfigOptions)
+    {
+        // TODO: This can contain more info, like the line number.
+        _logger.LogError($"Unrecognized option: `{parser.GetPropertyPathOfOption(arg)}`");
+    }
+    return ExitCode.UnknownOptions;
+}
+\end{lstlisting}
+
+Un exemplu de output:
+
+\begin{verbatim}
+kari -helloworld -mynameisanton
+[Master]: Unrecognized option: `helloworld`
+[Master]: Unrecognized option: `mynameisanton`
+\end{verbatim}
+
+Mesajele de ajutor au fost implementate utilizand libraria
+https://github.com/spectreconsole/spectre.console, in particular,
+functionalitatea de creare a tabelelor. Deci, o parte a mesajul de
+ajutor arata cam in modul urmator:
+
+\begin{verbatim}
+                                      Use Kari to generate code for a C# project.
+┌--------------------------┬--------┬-----------------------┬----------------------------------------------------------┐
+│          Option          │  Type  │    Default/Config     │ Description                                              │
+├--------------------------┼--------┼-----------------------┼----------------------------------------------------------┤
+│        inputFolder       │  Path  │ E:\Coding\CSharp\race │ Input path to the directory containing source files or   │
+│                          │        │                       │ projects.                                                │
+│                          │        │                       │                                                          │
+│        pluginPaths       │ Path[] │          ---          │ Plugins folder or paths to individual plugin dlls.       │
+│                          │        │                       │                                                          │
+│   pluginConfigFilePath   │  Path  │          ---          │ Path to `packages.*.config` that you're using to manage  │
+│                          │        │                       │ packages. The plugins mentioned in that file will be     │
+│                          │        │                       │ imported.                                                │
+│                          │        │                       │                                                          │
+│ generatedNamespaceSuffix │ String │       Generated       │ The suffix added to the project namespace to generate    │
+│                          │        │                       │ the output namespace.                                    │
+│                          │        │                       │                                                          │
+\end{verbatim}
+
+Codul parser-ului este foarte simplu.
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Arguments/ArgumentParsing.cs
+Pe scurt:
+
+\begin{itemize}
+\item
+  Toate optiunile sunt colectate si pastrate intr-un tablou asociativ,
+  numele -\textgreater{} valoarea.
+\item
+  Toate fisierele mentionate prin optiunea \texttt{configurationFile}
+  sunt incarcate si salvate intr-o lista.
+\item
+  Metoda \texttt{FillObjectWithOptionValues} primeste la intrare un
+  obiect de orice tip, ii inspecteaza campurile, utilizand reflexia
+  runtime, si performa conversiunile din tip sir in tipul campului
+  corespunzator.
+\item
+  Metoda \texttt{GetHelpFor} consruieste un tabel, utilizand aceeasi
+  reflexie runtime.
+\item
+  Metodele \texttt{GetUnrecognizedOptions} si
+  \texttt{GetUnrecognizedOptionsFromConfigurations} itereaza prin toate
+  optiunele nemarcate si le returneaza numele.
+\end{itemize}
+
+Sa se noteze ca API-ul nu este final. A fost realizat in durata de
+aproape o zi si in continuare ceva modificat dupa necesitatile
+aplicatiei.
+
+\section{Incarcarea plugin-urilor}
+
+Dupa cum s-a mentionat anterior, codul plugin-urilor este distribuit si
+incarcat prin DLL-uri. Pentru aceasta, se folosesc functiile
+\texttt{Assembly.LoadFile} si \texttt{GetExportedTypes}, dupa ce se
+realizeaza filtrarea tuturor tipurilor, anume cautarea tipurilor care
+implementeaza interfata \texttt{IAdministrator}. Aceste tipuri deja pot
+fi instantiate prin reflexie.
+
+https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs
+
+Dupa ce s-au incarcat plugin-urile, nu sunt initializate imediat. La
+inceput, ele iau argumentele de linie de comanda, iar dupa aceasta sunt
+incarcate toate proiectele cu codul sursa de intrare. Plugin-urile
+realizeaza initializarea suplimentara dupa ce devin accesibile toate
+proiectele cu codul sursa si dupa ce au primit toate argumentele,
+deoarece validarea argumentelor deseori se face pe baza proiectelor sau
+tipurilor existente in compilatie. De exemplu, unele plguin-uri
+genereaza un fel de output agnostic, de aceea doresc sa stiu care este
+proiectul comun, pentru a scrie fisierele acolo, insa denumirea
+proiectului comun nu se cunoaste inainte ca proiectele utilizatorului au
+fost descoperite.
+
+\section{Descoperirea fisierelor sursa}
+
+Kari permite mai multe moduri de intrare (de descoperire a fisierelor
+sursa):
+
+\begin{itemize}
+\item
+  \texttt{UnityAsmdef}. Unity are formatul sau pentru definirea
+  subproiectelor, numit asmdef. Este un fisier JSON care contine
+  metadatele despre subproiectul dat, precum si dependentele lui.
+  Divizarea fisierelor de sursa intre mai multe asa proiecte este
+  benefica pentru proiecte mari, deoarece reduce timpul de compilare
+  incrementala. Acest mod de intrare descopera toate fisierele cu
+  extensiunea \texttt{asmdef} imbricate intr-o directorie data, si
+  prescrie toate fisierele in acelasi folder acestui subproiect.
+\item
+  \texttt{ByDirectory}. Acest mod de intrare presupune gruparea
+  fisierelor de intrare dupa subdirectorii imediate ale directorii de
+  intrare.
+\item
+  \texttt{Monolithic}. Toate directoriile sunt considerate ca un singur
+  proiect.
+\item
+  \texttt{Autodetect}. Ghiceste modul de intrare din structura
+  sistemului de fisiere.
+\end{itemize}
+
+Aceasta logica se contine intr-o singura functie, cu mai multe functii
+locale imbricate. Codul este foarte simplu, operand cu API-urile
+sistemei de fisiere si in cea mai mare parte contine validari. In
+dependenta de cerintele urmatoare pentru proiect, acest cod poate fi
+extras in inca o etapa optionala de descoperire.
+
+https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L285-L598
+
+Acest cod inca gestioneaza cautarea acelor doua proiecte, anume
+proiectului \texttt{Common} care reprezinta un proiect cu cod agnostic
+care conceptual nu poate sa se refere la nici un alt proiect, si a
+proiectului \texttt{Root}, adica proiectului care sa contine functii de
+initializare si care conceptual poate referi la orice alt proiect.
+Fiecare mod de intrare are logica sa de cautare a proiectelor acestea,
+selectata in asa fel ca sa aiba cat mai mult sens in scopul modului de
+intrare selectat.
+
+\section{Pornirea plugin-urilor cu codul sursa ca parametri de intrare}
+
+Obiectul care permite reprezentarea abstracta a codului sursa in Roslyn
+se numeste o compilatie. Acest obiect poate fi creat din arbori
+sintactici care la randul sau sunt creati din codul sursa, citit din
+fisiere sursa. Crearea compilatiei nu poate fi paralelizata pe mai multe
+fire, insa generarea arborilor din textul sursa poate fi paralelizata.
+Acesta paralelizare nu aduce un beneficiu mare, insa din testele
+autorului a accelerat timpul executiei cu aproape 10\%.
+
+https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L604-L664
+
+Dupa ce totii arbori s-au incarcat, se creeaza obiectul de compilatie.
+Acest obiect este dupa intelegerea autorului in mare parte lenes, adica
+nu cacheaza atatea multe simboluri.
+
+https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L666-L697
+
+Plugin-urile de obicei lucreaza la nivelul tipurilor sau al membrii lor.
+De obicei se cere ca aceste simboluri (tipuri sau membrii) sa fie
+anotate cu atributele folosite pentru configurarea codului generat
+pentru acest simbol, fiind descoperite si interpretate de catre
+plugin-uri. Cel mai importat simbol sunt tipurile definite de
+utilizator, de aceea ele sunt mereu cachate din arborii sintactici, ca
+sa nu le faca pe plugin-uri sa realizeze acest lucru. Cacharea de face
+in mod paralel. Aceasta operatie este destul de constisitoare. Dupa
+intelegerea autorului, cere destul de multe resurse din acea cauza ca
+crearea compilatiei este lenesa, deci analiza tuturor arborilor
+sintactice necesita cacharea lenesa a mai multor simboluri.
+
+https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L699-L727
+
+Fiecare plugin, in randul sau, face filtrarea proprie a tipurilor,
+colectand datele necesare. Aceasta se face in metoda
+\texttt{IAdministrator.Collect} scopul careia este sa initializeze toate
+datele necesare pentru generarea consecutiva a codului. Deoarece
+procesarea mai multor simboluri ia destul de mult timp, acest proces
+este paralelizat intre plugin-uri, care pot paraleliza procesul mai
+departe cum ele consider rezonabil.
+
+Dupa ce toate plugin-urile au terminat cacharea simbolurilor, are loc
+generarea codului prin invocarea metodei
+\texttt{IAdministrator.Generate} la toate plugin-urile. Sirurile cu
+codul sursa de iesire la inceput sunt generate aparte in memorie, adica
+nu sunt scrise imediat in fisiere. Paralelizarea se face in acelasi mod
+ca si la colectarea simbolurilor.
+
+\section{Salvarea output-ului}
+
+Plugin-urile scriu codul de output al lor direct intr-un UTF-8 bufer ca
+sa fie posibil sa scrie textul de iesire direct in fisiere. Se
+utilizeaza libraria https://github.com/Cysharp/ZString, cu toate ca se
+planifica sa se foloseasca capacitatile noi de interpolare a sirurilor
+fara alocarile memoriei adaugate in .NET 6
+https://devblogs.microsoft.com/dotnet/string-interpolation-in-c-10-and-net-6/
+
+Plugin-urile selecteaza explicit denumirile fisierelor in care doresc sa
+scrie output-ul lor, insa aceste denumiri sunt doar hint-uri, si
+proiectul in care se doreste sa fie generat fisierul. Sistemul este
+liber sa foloseasca alte denumiri pentru aceste fisiere, in functie de
+\emph{modul de output} selectat.
+
+Sunt 4 moduri de output:
+
+\begin{itemize}
+\item
+  \texttt{CentralFile}. Output-ul este concatenat intre toate
+  proiectele, si scris intr-un singur fisier.
+  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L1114-L1129
+\item
+  \texttt{CentralDirectory}. Output-ul este divizat intre proiecte si
+  put intr-un folder de iesire comun. Fiecare subfolder al acestui
+  folder are denumirea proiectului pentru care a fost generat fisierul,
+  si contine toate fisierele, ca solicitat de plugin-uri.
+  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L1064-L1080
+\item
+  \texttt{NestedFile}. Output-ul fiecarui proiect in parte este
+  concatenat si scris in cate un fisier pentru fiecare proiect.
+  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L1131-L1145
+\item
+  \texttt{NestedDirectory}. Output-ul este divizat intre proiecte si
+  generat in cate un subfolder, cu denumirile fisierelor ca solicitat de
+  plugin-uri.
+  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L1040-L1057
+\end{itemize}
+
+Inainte de a fi scris in fisier, codul generat este comparat cu
+continutul fisierului existent, daca un fisier cu aceeasi denumire deja
+exista. Daca continuturile se difera, continutul fisierului existent se
+inlocuieste cu cel generat. Aceasta se face, deoarece instrumentele ca
+MSBuild si Unity, cel putin in unele versiuni, determina daca trebuie sa
+recompileze proiectul pe baza timestamp-urilor de modificare salvate in
+metadatele fisierelor. Chiar daca se inlocuieste continutul unui fisier
+cu continutul nou egal, timestamp-ul se schimba, ce invoca o
+recompilare. Din aceasta cauza, daca se admite ca generatorul de cod sa
+nu aiba aceasta verificare, rularea generatorului de cod de a doua data
+va invoca o recompilare. Deoarece recompilarea in Unity este foarte
+lenta, luand pana la 10 secunde, se castiga destul de multe resurse daca
+se foloseste aceasta verificare.
+
+https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs\#L950-L972
+
+Se poate observa ca se foloseste cod asincron de scriere a datelor in
+fisiere, si codul este la un nivel destul de scazut. Acestea sunt in cea
+mai mare parte experimentarile autorului si de fapt nu accelereaza
+executarea. Deci acest cod probabil va fi schimbat cand autorul va gasi
+timpul pentru refactoring.
+
+\section{Rezumat}
+
+In acest capitol s-au discutat detaliile referitor la implementarea
+sistemei: cum se configureaza sistemul, cum el interactioneaza cu
+plugin-urile, cum codul sursa este citit si cum sunt scrise fisierele de
+iesire. In acest capitol nu s-a discutat logica generarii codului,
+deoarece aceasta deja vine din plugin-uri concrete.
+
+Este clar ca nu sunt considerate dependentele intre proiecte si orice
+schimbare forteaza codul pentru fiecare proiect sa fie regenerat. Inca,
+dependentele de fiecare plugin din punct de vedere a tipurilor cu
+atribute specifice, sau a tipului de output (dependent de totul input,
+sau pentru un proiect aparte) nu au fost explorate. Acestea pot fi
+folosite pentru a accelera generatorul de cod si mai departe, dar
+necesita si mai mult cod si timp pentru a le implementa.
+
+\chapter{Programarea Plugin-urilor si Exemple de Utilizare}
+
+\section{CodeBuilder}
+
+Cand se realizeaza generarea codului, se doreste ca codul generat sa fie
+formatat conform standardelor. Formatarea corecta face codul mai usor de
+citit si de inteles pentru persoana care il citeste. Pentru acest lucru
+a fost creat tipul \texttt{CodeBuilder} care simplifica procesul de
+indentare. El are un contor pentru indentarea curenta, si o adauga de
+atatea ori, cand codul se scrie pe o linie noua.
+
+Esenta acestei utilitati poate fi ilustrata in urmatorul cod:
+
+\begin{lstlisting}
+// UTF-8
+public byte[] IndentationBytes { get; }
+
+public int CurrentIndentationCount;
+public void IncreaseIndent() => CurrentIndentationCount++;
+public void DecreaseIndent() => CurrentIndentationCount--;
+
+public void Indent()
+{
+    for (int i = 0; i < CurrentIndentationCount; i++)
+        StringBuilder.AppendLiteral(IndentationBytes);
+}
+
+public void AppendLine() 
+{ 
+    Indent();
+    NewLine();
+}
+\end{lstlisting}
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Utils/CodeBuilder.cs\#L19-L184
+
+Mai jos se vede niste exemple de utilizare.
+
+\section{Anotatiile}
+
+Urmatorul caz de utilizare comun pentru majoritatea plugin-urilor sunt
+anotatiile (sau atributele). Atributele sunt acel lucru care permite
+design-ul unor API-uri declarative. Este comod pentru ele sa fie
+partajate intre codul sursa al plugin-ului si cel al consumatorului.
+Plugin-ul le-ar utiliza ca containeri pentru datele extrase din codul
+consumatorului, iar acela le-ar folosi pentru a stabili aceste date.
+Astfel, acelasi container este utilizat si pentru definirea datelor, si
+pentru manipularea lor.
+
+Deci s-ar dori sa se partajeze codul legat cu anotatiile intre plugin-ul
+si consumatorul, insa cum sa se realizeze acest lucru? O solutie poate
+fi sa se copieze fisierul sursa din sursa plugin-ului in codul
+consumatorului, dar nu ar fi comod sa se faca aceasta manual, deoarece
+ar fi nevoie ca el sa schimbe si in codul sursa al consumatorului cand
+se schimba interfata plugin-ului, si este inca un pas de setup, si
+trebuie sa fie urmarit de source control, etc. O solutie mult mai comoda
+ar fi ca plugin-ul sa genereze acest fisier drept un fisier de iesire al
+sau. Atunci, daca plugin-ul a fost utilizat cu totul, acest fisier cu
+anotatiile va fi prezent numaidecat in proiectul consumatorului. In
+plus, plugin-ul acum are posbilitatea sa schimbe continutul fisierului
+sau cu anotatiile.
+
+Problema este ca C\# nu poate citi fisiere ca siruri in timpul
+compilarii, de aceea a trebuit sa se realizeze un program aparte care sa
+citeasca acest fisier cu anotatiile si sa genereze un nou fisier cu o
+singura clasa statica, cu o singura constanta statica cu continutul
+acestui fisier. Deoarece acum este un program aparte si este posibil de
+facut mai multe lucruri decat doar generarea acestei constante, a fost
+implementata si generarea boilerplate-ului asociat cu cautarea
+simbolurilor acestor anotatii in codul de intrare analizat de
+plugin-uri. I s-a dat denumirea \emph{Annotator}, deoarece lucreaza cu
+anotatiile.
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Annotator/Annotator.cs
+
+Acest instrument ori se integreaza in procesul de build al
+plugin-urilor, ori fisierele generate sunt incluse in source control.
+Fisierele targets si props din MSBuild distribuite cu Kari realizeaza
+integrarea acestui instrument in procesul de build al plugin-ului, insa
+sistemul de build urmeaza sa fie schimbat la ceva mai usor de mentinut.
+
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Plugins/InternalPlugin.props
+
+Referitor la cautarea tuturor simboluri cu un anumit atribut aplicat la
+ele, a se vede discutia mai detaliata a solutiilor. Codul generat de
+catre anotator creeaza instante de wrapper-uri asupra atributelor
+interesante si le pastreaza in campuri.
+https://stackoverflow.com/questions/67539903/converting-attributedata-into-a-known-attribute-type-roslyn
+
+Urmeaza un exemplu al unui fisier generat. Clasa
+\texttt{DummyDataObjectAnnotations} contine membrul Text cu codul sursa
+al fisierului, din care acest fisier a fost generat, iar clasa
+\texttt{DataObjectSymbols} reprezinta acel boilerplate ce tine de
+wrapper-uri pentru atributele.
+
+\begin{lstlisting}
+namespace Kari.Plugins.DataObject
+{
+    using Kari.GeneratorCore.Workflow;
+    using Kari.Utils;
+    internal static class DummyDataObjectAnnotations
+    {
+        internal const string Text = @"namespace Kari.Plugins.DataObject
+{
+    using System;
+    using System.Diagnostics;
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+    [Conditional(""CodeGeneration"")]
+    public class DataObjectAttribute : Attribute
+    {
+    }
+}
+";
+    }
+    internal static partial class DataObjectSymbols
+    {
+        internal static AttributeSymbolWrapper<DataObjectAttribute> DataObjectAttribute { get; private set; }
+
+        internal static void Initialize(NamedLogger logger)
+        {
+            var compilation = MasterEnvironment.Instance.Compilation;
+            DataObjectAttribute = new AttributeSymbolWrapper<DataObjectAttribute>(compilation, logger);
+        }
+    }
+}
+\end{lstlisting}
+
+\section{Cum lucreaza plugin-urile, mai detaliat}
+
+Fiecare plugin, dupa cum s-a mentionat anterior, trebuie sa defineasca
+cel putin o clasa publica de \emph{administrator} care sa implementeze
+interfata \texttt{IAdministrator}. De obicei, administratorii definesc
+un tablou de \emph{analizori} care contine cate un analizor pentru
+fiecare proiect. Administratorii delegheaza deciziile concrete referitor
+la analiza tipurilor si generarea codului pentru ele la analizorii
+acestia.
+
+https://github.com/AntonC9018/Kari/blob/1e103379417c3a268e1891ab94acb0cc81eb9489/source/Kari.Plugins/Flags/FlagsAdministrator.cs
+
+Aceasta este codul administratorului plugin-ului pentru generarea
+codului pentru enumuri flag. Dupa cum se poate vedea, se utilizeaza
+functiile statice ale clasei \texttt{AdministratorHelpers}. Aceste
+functii acomodeaza exact cazul acesta de utilizare: lucrul printr-un
+tablou de analizori, cate o instanta pentru fiecare proiect.
+
+https://github.com/AntonC9018/Kari/blob/1e103379417c3a268e1891ab94acb0cc81eb9489/source/Kari.GeneratorCore/Workflow/Administrator.cs\#L67-L163
+
+\begin{itemize}
+\item
+  In metoda \texttt{Initialize()} tabloul cu analizorii se umple, cate
+  un analizor pentru fiecare proiect;
+\item
+  In metoda \texttt{Collect()}, lucrul de colectare a simbolurilor pur
+  si simplu se delegheaza la analizori;
+\item
+  In metoda \texttt{Generate()}, se realizeaza generarea codului, aparte
+  pentru fiecare proiect.
+\item
+  Metoda \texttt{GetAnnotations()} returneaza textul acelui fisier cu
+  anotatiile.
+\end{itemize}
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/Flags/FlagsAnalyzer.cs
+
+In acest exemplu, se poate vedea ce de obicei se face in metoda
+\texttt{CollectSymbols()} al fiecarui analizor. In acest caz, sunt
+colectate unele informatii despre toate simbolurile cu atributul
+\texttt{NiceFlags}.
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/Flags/FlagsAnalyzer.cs\#L159-L170
+
+Metoda \texttt{GenerateCode()} foloseste aceste date pentru a formata un
+sir cu codul boilerplate si scrie rezultatul intr-un
+\texttt{CodeBuilder}. Early exit-ul
+\texttt{if\ (\_infos.Count\ ==\ 0)\ return;} garanteaza ca daca nici un
+tip nu a fost anotat cu atributul \texttt{NiceFlags}, nimic nu va fi
+generat.
+
+\section{Plugin-ul Flags}
+
+Cu toate ca plugin-ul pentru generarea codului pentru enumuri flag deja
+a fost mentionat in lucrare de mai multe ori, merita a vedea intreaga
+imagine. Deci, plugin-ul Flags este un plugin pentru generatorul de cod
+Kari care permite generarea metodelor utile pentru lucrul cu enumuri
+flag. Acestea includ urmatoarele:
+
+\begin{itemize}
+\item
+  \texttt{Has} si \texttt{DoesNotHave} care verifica prezenta unui flag
+  sau a unei combinatii de flaguri in valoarea data;
+\item
+  \texttt{HasEither} si \texttt{DoesNotHaveEither} care verifica
+  intersectia a doua seturi de flaguri;
+\item
+  \texttt{WithSet} si \texttt{WithUnset} care seteaza sau sterge un flag
+  sau o combinatie de flaguri, returnand valoarea modificata;
+\item
+  \texttt{Set} si \texttt{Unset} care functioneaza ca \texttt{WithSet}
+  si \texttt{WithUnset}, doar ca modifica argumentul;
+\item
+  \texttt{Set} cu un argument boolean, care seteaza sau sterge un flag
+  sau o combinatie de flaguri, indicat de valoarea acestui argument.
+\end{itemize}
+
+Pentru demonstrare, se va crea un proiect nou in care se va folosi
+generatorul de cod Kari cu acest plugin. Acest proiect este un proiect
+console fara dependente pe .NET 6. Fisierul principal contine urmatorul
+cod sursa, foarte asemanator cu exemplul din capitolul 1:
+
+https://github.com/AntonC9018/uni\_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Program.cs
+
+Inainte de compilare trebuie sa se ruleze generatorul de cod. Pentru
+aceasta se invoca Kari cu drumul la fisierul de configurare
+\texttt{kari.json} care contine drumul la DLL-ul plugin-ului Flags.
+Acesta poate fi dat lui Kari si direct, insa utilizarea unui fisier de
+configurare este mai comod.
+
+https://github.com/AntonC9018/uni\_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.bat
+
+https://github.com/AntonC9018/uni\_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.json
+
+Si codul generat:
+
+https://github.com/AntonC9018/uni\_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/FlagsAnnotations.cs
+
+https://github.com/AntonC9018/uni\_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/Flags.cs
+
+\section{Plugin-ul DataObject}
+
+DataObject este un plugin pentru Kari care permite generarea codului
+pentru tipuri care conceptual doar contin datele. Codului generat va
+contine supraincarcari triviale pentru operatorii de egalitate,
+supraincarcarea metodei \texttt{Equals}, \texttt{GetHashCode}.
+
+De fapt, aceasta a fost implementat in versiunele noi de C\#, anume C\#
+9 si C\# 10 din \.NET 5 si \.NET 6 respectiv, in forma de \emph{records}
+si \emph{record structs}, insa acestea nu sunt accesibile in Unity.
+
+https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/records
+
+Administratorul acestui plugin are aceeasi structura ca si
+administratorul plugin-ului Flags:
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs
+
+Informatiile colectate au mai multe chestii, ca simbolul tipului,
+simbolurile pentru campurile instance, etc.
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs\#L160-L180
+
+Metoda \texttt{CollectSymbols} tot asa colecteaza simbolurile necesare
+si le pune in aceste obiecte cu informatii suplimentare extrase. Se mai
+fac niste verificari pentru a avertiza utilizatorul despre problemele cu
+tipul: trebuie sa nu fie static, trebuie sa fie partial, trebuie sa aiba
+un modificator de acces.
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs\#L14-L46
+
+Metoda pentru generarea codului este putin mai complicata decat cea a
+plugin-ului Flags, deoarece codul generat depinde de detaliile tipului
+mai mult. De exemplu, daca tipul este o clasa, atunci operatorul
+\texttt{==} trebuie sa verifice cazul cand unul sau ambele argumente
+sunt nule.
+
+https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs\#L48-L157
+
+Proiectul cu exemplul de utilizare are aceeasi structura ca si proiectul
+pentru flaguri, doar ca mentioneaza plugin-ul \texttt{DataObject} in loc
+de \texttt{Flags}. Codul programului:
+
+https://github.com/AntonC9018/uni\_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Program.cs
+
+Si codul generat:
+
+https://github.com/AntonC9018/uni\_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjects.cs
+
+https://github.com/AntonC9018/uni\_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjectAnnotations.cs
+
+\section{Operatiile cu Kari ca parte de un instrument centralizat de dezvoltare}
+
+In cadrul unui proiect al sau, autorul a realizat un instrument in
+limbajul D care permite integrarea mai usoara a lui Kari, fara a folosi
+fisiere de proiecte MSBuild. Codul defineste doua comenzi --- una
+compileaza Kari in configuratia data, iar a doua il executa pe Kari,
+construind drumurile la DLL-urile plugin-urilor din denumirile lor.
+
+https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/dev\_cli/source/commands/setup.d
+
+Restul configuratiei se ia din fisierul de configuratie care se contine
+in mapa cu proiectul Unity al jocului:
+
+https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
+
+Instrumentul poate fi invocat din linia de comanda. Scriptul
+\texttt{setup.bat} arata compilarea instrumentului si invocarea comenzii
+setup.
+
+https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/setup.bat
+
+Se admite ca numele executabilului generat este \texttt{dev}. Atunci,
+comanda de setup poate fi executata in felul urmator:
+
+\begin{verbatim}
+dev setup
+\end{verbatim}
+
+Aceasta ia ca argumentele si toate acele argumente definite in cod, deci
+este foarte usor de configurat. De exemplu, se poate face:
+
+\begin{verbatim}
+dev setup -kariConfiguration Release
+\end{verbatim}
+
+Pasii de compilare si de executare a generatorului de cod pot fi
+realizati aparte.
+
+\begin{verbatim}
+dev kari build -- arguments_to_dotnet_build
+dev kari run -- arguments_to_kari
+\end{verbatim}
+
+Aceste comenzi definite intr-un sistem centralizat sunt foarte utile in
+timpul dezvoltarii, si pentru pipeline-uri CI/CD. Logica concreta a
+procesului de build poate fi delegata la acest program \texttt{dev} in
+loc de a defini toata complexitate de build asociata cu jocurile in
+scripturi shell. Programul \texttt{dev} este scris in limbajul de
+programare D, deci este foarte usor de programat si de configurat,
+permite modalitatile avansate de programare, poate accesa libraria
+standarta excelenta Phobos, si este mult mai comod, usor de mentinut si
+portabil, decat scripturi shell. Un astfel de program poate ori sa se
+integreze cu alte scripturi CI/CD, ori sa le inlocuiasca complet.
+
+\section{Rezumat}
+
+In acest capitol s-a discutat structura interna a plugin-urilor, si s-a
+exemplificat modul de utilizare a generatorului de cod cu plugin-uri
+particulare. S-a demonstrat cum generarea codului poate fi incorporata
+intr-un instrument centralizat care poate fi utilizat pentru
+automatizarea proceselor de dezvoltare a unui sistem informatic.
+
+\chapter{Concluziile finale si Recomandarile}
+
+In lucrarea aceasta, s-a argumentat necesitatea unui generator de cod
+general, creata din cauza limitatiilor limbajului C\#, care este des
+folosit pentru dezvoltarea jocurilor. S-a discutat detaliile de
+implementare a generatorului de cod Kari, si au fost date unele exemple
+de plugin-uri utilizate pentru generarea codului. A fost demonstrata
+utilizarea generatorului de cod in doua proiecte demonstrative, precum
+si in cadrul unui instrument centralizat in limbajul D, pe care autorul
+l-a utilizat in cadrul dezvoltarii unui joc in Unity.
+
+Au fost discutate si unele directii potentiale de imbunatatire a
+proiectului:
+
+\begin{itemize}
+\item
+  Divizarea lui Kari la mai multe etape, pentru a acomoda utilizarea
+  generatorului de cod ca librarie, si pentru a putea testa fiecare
+  etapa aparte;
+\item
+  Profilarea mai sigura a codului legat cu salvarea continutului a
+  fisierelor generate, si simplificarea lui daca codul curent nu aduce
+  beneficii din punct de vedere a vitezei de executie;
+\item
+  Explorarea posibilitatii de a stabili si de a optimiza timpul de
+  executie pe baza dependentelor fiecarui plugin, adica ce tipuri sau ce
+  fisiere contribuie la codul generat;
+\item
+  Mai multe idei care nu au fost discutate in aceasta lucrare.
+\end{itemize}
+
+Insa, Kari deja a fost folosit cu succes in dezvoltarea jocurilor, si
+instrumentul a iesit foarte usor de utilizat, deschizand posibilitati
+mari din punct de vedere a complexitatii analizei codului si a codului
+generat.
+
+\end{document}

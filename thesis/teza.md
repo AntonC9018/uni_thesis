@@ -1,12 +1,3 @@
-(actualitatea și importanța temei;
-scopul și obiectivele;
-suportul metodologic;
-baza experimentală;
-noutatea științifică;
-semnificația teoretică;
-valoarea aplicativă;
-sumarul)
-
 
 **Actualitatea și importanța temei.**
 
