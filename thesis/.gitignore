@@ -1,4 +1,5 @@
 *.pdf
-teza.aux
-teza.dvi
-teza.log
+*.aux
+*.dvi
+*.log
+errors.txt

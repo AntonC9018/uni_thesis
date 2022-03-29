@@ -5,6 +5,9 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[romanian]{babel}
 
+% Format urls in the bibliography
+\usepackage{url}
+
 % Code blocks
 \usepackage{listings}
 \usepackage{color}
@@ -89,8 +92,9 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 
 \section{Capacitățile si deficiențele lui C\#}
 
-<!-- https://docs.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/ -->
-C\# este un limbaj de programare modern, posedă caracteristici utile și practice, printre care:
+% https://docs.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/
+
+{C\# este un limbaj de programare modern, posedă caracteristici utile și practice}\cite{tour_of_csharp}, printre care:
 \begin{itemize}
   \item Tipizarea statică;
   \item Un runtime inteligent;
@@ -116,7 +120,7 @@ Generarea codului poate fi folosită și pentru a elimina codul boilerplate, sau
 
 \section{Exemplu: implementarea interfețelor prin compoziție}
 
-Urmează o instanță posibilă de apăriția codului boilerplate, unde dorim să implementăm o interfață prin compoziție.
+Urmează o instanță posibilă de apăriția codului boilerplate, unde dorim să implementăm o interfață prin compoziție\cite{composition_interface_boilerplate}.
 Deci fie o astfel de interfață:
 
 \begin{lstlisting}
@@ -142,8 +146,6 @@ public struct Composition : IExample
     private IExample _impl;
 }
 \end{lstlisting}
-
-<!-- https://softwareengineering.stackexchange.com/questions/288066/reducing-boilerplate-in-class-that-implements-interfaces-through-composition -->
 
 Este clar că acum trebuie să implementăm această interfață.
 Deci, unica soluție care C\# ne propune este următoarea:
@@ -299,10 +301,10 @@ Aceasta generează toate acele metode automat.
 
 Cele două exemple clar arată capacitățile generării codului în eliminarea boilerplate-ului.
 Însă acesta nu este singurul lor caz de utilizare.
-Să se menționeze această prezentare https://youtu.be/j6ow-UemzBc unde autorul demonstrează cum compania lui generează codul pentru endpoint-uri API din fișiere agnostice de configurare.
-Protobuf https://developers.google.com/protocol-buffers care generează codul pentru mai multe limbaje, realizând protocolul personalizat dintr-o descriere într-un DSL.
-Message Pack https://github.com/neuecc/MessagePack-CSharp care permite emiterea codului IL pentru serializarea eficientă a datelor, dar permite și generarea codului AOT. Vedeți în special https://github.com/neuecc/MessagePack-CSharp#aot 
-Încă un exemplu: consola și comenzile integrate în joc, menționat și în capitolul 3. https://github.com/AntonC9018/command_terminal
+Să se menționeze această prezentare\cite{microservices_code_generation} unde autorul demonstrează cum compania lui generează codul pentru endpoint-uri API din fișiere agnostice de configurare.
+Protobuf\cite{protobuf} care generează codul pentru mai multe limbaje, realizând protocolul personalizat dintr-o descriere într-un DSL.
+Message Pack\cite{message_pack_github} care permite emiterea codului IL pentru serializarea eficientă a datelor, dar permite și generarea codului AOT.
+Încă un exemplu: consola și comenzile integrate în joc\cite{command_terminal}.
 
 
 \section{Istoriografia problemei}
@@ -312,8 +314,7 @@ Folosind o abordare directă, a fost conceput și creat un prototip al generator
 Acest generator de cod s-a descris pe scurt în teza de an al autorului.
 
 După teza de an, autorul a continuat să experiementeze cu aceste concepte, implementând baza unui alt joc, conceput cu două ani înainte de perfectarea tezei de an.
-În timp de aproape o lună și jumătate, a fost creat un proiect-șablon în Unity cu toate instrumentele necesare: generatorul de cod, divizarea modulară a asamblelor C\# în Unity, integrarea unui terminal virtual în joc, o interfață de consolă centrală.
-https://github.com/PunkyIANG/a-particular-project
+În timp de aproape o lună și jumătate, a fost creat un proiect-șablon în Unity cu toate instrumentele necesare: generatorul de cod, divizarea modulară a asamblelor C\# în Unity, integrarea unui terminal virtual în joc, o interfață de consolă centrală\cite{particular_project}.
 Deci, generatorul de cod a fost inițial adaptat la nevoile acestui proiect, însă autorul a văzut oportunitatea să-l modularizeze printr-o arhitectură pe baza plugin-urilor, ceea ce și se explică în această lucrare.
 
 \section{Roslyn}
@@ -323,7 +324,7 @@ Roslyn este un ansamblu de librării și instrumente pentru analiza și compilar
 De fapt, însuși compilatorul C\# este implementat pe baza acestor librării Roslyn.
 Roslyn combină întregul pipeline de compilare: tokenizarea, analiza sintactică, analiza semantică, generarea codului executabil, expuzând toate aceste operații.
 
-Cel mai des, Roslyn este utilizat pentru analizatori, adică programe care analizează codul sursă și detectează erori logice, posibil propunând o remediere (code fix), sau adaugând operații utile în IDE-urile (de exemplu, `\texttt{implement methods'', }`extract into a local function'').
+Cel mai des, Roslyn este utilizat pentru analizatori, adică programe care analizează codul sursă și detectează erori logice, posibil propunând o remediere (code fix), sau adaugând operații utile în IDE-urile (de exemplu, ``implement methods'', ``extract into a local function'').
 De fapt, repertoriul Roslyn conține o mulțime de analizatori gata pentru folosire.
 
 Însă Roslyn a fost demult utilizat și pentru generatori de cod ad hoc, adică unele programe care produc codul sursă adaugător, des generat pe baza codului sursă inițial, create pentru un lucru specific.
@@ -337,14 +338,14 @@ Deci așa programe de fapt fac următoarele lucruri:
   \item Generarea codului.
 \end{itemize}
 
-Un exemplu este generatorul de cod Message-Pack https://github.com/neuecc/MessagePack-CSharp.
+Un exemplu este generatorul de cod Message-Pack\cite{message_pack_github}.
 Kari, generatorul de cod descris în această lucrare, a fost scris inițial după aceeași arhitectură ca și codul acestui proiect, însă autorul a prins oportunitatea să-l generalizeze.
 
 Decizia să facă generatorul de cod în C\# a fost o decizie evidentă, deoarece nu există nici o altă librărie care este asemănător de capabilă.
 
 \section{Source Generators in \. NET}
 
-\. NET 5 a introdus un concept nou --- Source Generators (generatori de sursă). https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview
+\. NET 5 a introdus un concept nou --- Source Generators (generatori de sursă)\cite{source_generators}.
 Acestea sunt de fapt analizatorii care primesc la intrare arborele sintactic, și returnează codul sursă generat.
 Acestea integrează cu compilatorul, deci funcționează pe baza arborelui sintactic al compilatorului.
 
@@ -487,7 +488,7 @@ De aceea s-a decis că generatorul de cod trebuie să funcționeze ca o aplicaț
 Este clar că aceste opțiuni de obicei vor fi ascunse într-un script executabil, de exemplu, ca un fișier bat pe Windows.
 
 Încă, configurația generală pentru un anumit proiect poate fi pusă într-un fișier json.
-Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc. Exemplu (https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json):
+Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc. Exemplu\footnote{\url{https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json}}:
 
 \begin{lstlisting}
 {
@@ -541,7 +542,7 @@ Autorul a decis să creeze codul propriu pentru lucrul acesta, cu toate că deja
 Autorul ori nu a fost satisfăcut cu API-ul lor, ori cu lipsa opțiunilor dorite.
 
 Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua:
-Exemplu (a se vede codul sursă pentru un exemplu complet https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs):
+Exemplu\footnote{a se vede codul sursă pentru un exemplu complet \url{https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs}}:
 
 Următorul cod transmite argumentele primite la consolă la parser, care își completează structura de date internă cu toate opțiunile prinse, pentru o mapare mai eficientă în continuare:
 
@@ -656,7 +657,7 @@ kari -helloworld -mynameisanton
 \end{verbatim}
 
 
-Mesajele de ajutor au fost implementate utilizând librăria https://github.com/spectreconsole/spectre.console, în particular, funcționalitatea de creare a tabelelor.
+Mesajele de ajutor au fost implementate utilizând librăria Spectre Console\cite{spectre_console_github}, în particular, funcționalitatea de creare a tabelelor.
 Deci, o parte a mesajul de ajutor arată cam în modul următor:
 
 Codul parser-ului este foarte simplu.
@@ -751,7 +752,7 @@ Paralelizarea se face în același mod ca și la colectarea simbolurilor.
 \section{Salvarea output-ului}
 
 Plugin-urile scriu codul de output al lor direct într-un UTF-8 bufer ca să fie posibil să scrie textul de ieșire direct în fișiere.
-Se utilizează librăria https://github.com/Cysharp/ZString, cu toate că se planifică să se folosească capacitățile noi de interpolare a șirurilor fără alocările memoriei adăugate în .NET 6 https://devblogs.microsoft.com/dotnet/string-interpolation-in-c-10-and-net-6/
+Se utilizează librăria ZString\cite{zstring_github}, cu toate că se planifică să se folosească capacitățile noi de interpolare a șirurilor fără alocările memoriei adăugate în .NET 6.\cite{string_interpolation_csharp_10}
 
 Plugin-urile selectează explicit denumirile fișierelor în care doresc să scrie output-ul lor, însă aceste denumiri sunt doar hint-uri, și proiectul în care se dorește să fie generat fișierul.
 Sistemul este liber să folosească alte denumiri pentru aceste fișiere, în funcție de \emph{modul de output} selectat.
@@ -860,8 +861,7 @@ https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587
 
 
 Referitor la căutarea tuturor simboluri cu un anumit atribut aplicat la ele, a se vede discuția mai detaliată a soluțiilor.
-Codul generat de către anotator creează instanțe de wrapper-uri asupra atributelor interesante și le păstrează în câmpuri.
-https://stackoverflow.com/questions/67539903/converting-attributedata-into-a-known-attribute-type-roslyn
+Codul generat de către anotator creează instanțe de wrapper-uri asupra atributelor interesante și le păstrează în câmpuri.\cite{converting_attributes_roslyn}
 
 
 Urmează un exemplu al unui fișier generat.
@@ -975,9 +975,7 @@ https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18
 DataObject este un plugin pentru Kari care permite generarea codului pentru tipuri care conceptual doar conțin datele.
 Codului generat va conține supraîncărcări triviale pentru operatorii de egalitate, supraîncărcarea metodei \texttt{Equals}, \texttt{GetHashCode}.
 
-De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C\# 10 din \. NET 5 și \. NET 6 respectiv, în forma de \emph{records} și \emph{record structs}, însă acestea nu sunt accesibile în Unity.
-
-https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/records
+De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C\# 10 din \. NET 5 și \. NET 6 respectiv, în forma de \emph{records} și \emph{record structs}, însă acestea nu sunt accesibile în Unity.\cite{records_in_csharp}
 
 Administratorul acestui plugin are aceeași structură ca și administratorul plugin-ului Flags:
 
@@ -1072,5 +1070,8 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 \end{itemize}
 
 Însă, Kari deja a fost folosit cu succes în dezvoltarea jocurilor, și instrumentul a ieșit foarte ușor de utilizat, deschizând posibilități mari din punct de vedere a complexității analizei codului și a codului generat.
+
+\bibliographystyle{plain}
+\bibliography{bibliography}
 
 \end{document}
