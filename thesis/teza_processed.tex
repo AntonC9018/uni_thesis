@@ -45,10 +45,10 @@
 Dezvoltarea jocurilor video este un domeniu important în ziua de azi.
 Dezvoltarea lor practică și eficientă necesită mai multe instrumente, ca o modalitate de rendering a mesh-elor sau a imaginilor pe ecran, o modalitate de user input, scripting etc.
 
-Motorul de joc Unity a făcut limbajul C# popular pentru scripting în jocuri video.
-Așadar, ușurarea programării în C# poate aduce la un proces de dezvoltare mai plăcut și mai productiv pentru programatori de jocuri în Unity, sau în alte medii unde se folosește acest limbaj de programare.
+Motorul de joc Unity a făcut limbajul C\# popular pentru scripting în jocuri video.
+Așadar, ușurarea programării în C\# poate aduce la un proces de dezvoltare mai plăcut și mai productiv pentru programatori de jocuri în Unity, sau în alte medii unde se folosește acest limbaj de programare.
 
-C# nu este un limbaj perfect.
+C\# nu este un limbaj perfect.
 Este dificil să se scrie codul declarativ fără să se utilizeze reflexie runtime care este lentă și alocă multă memorie excesivă.
 Uneori necesită mai mult cod boilerplate sau cod mai puțin eficient sau care să consume mai multă memorie chiar pentru a atinge lucruri simple.
 
@@ -66,7 +66,7 @@ Se arată încă cum generatorul de cod poate fi integrat într-o aplicație de 
 
 \textbf{Suportul metodologic.}
 
-Generatorul de cod este un instrument realizat în limbajul C#, pe baza platformei \. NET 6 și a lui Roslyn care este un set de librării și instrumente pentru analiza codului sursă C#.
+Generatorul de cod este un instrument realizat în limbajul C\#, pe baza platformei \. NET 6 și a lui Roslyn care este un set de librării și instrumente pentru analiza codului sursă C\#.
 Generatorul de cod a fost testat și utilizat în practică în Unity.
 Instrumentul a fost elaborat după necesitate în dezvoltare și reiese întreg din experimentare și experiența autorului.
 
@@ -83,14 +83,14 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 
 \textbf{Sumarul tezei.}
 
-În această lucrare se argumentează și se elaborează un generator de cod C# flexibil și extensibil care poate fi utilizat pentru a ușura și a face mai plăcută programarea în C#, și pentru a spori eficiența programatorului în implementarea unelor soluții.
+În această lucrare se argumentează și se elaborează un generator de cod C\# flexibil și extensibil care poate fi utilizat pentru a ușura și a face mai plăcută programarea în C\#, și pentru a spori eficiența programatorului în implementarea unelor soluții.
 
 \chapter{Sumarul Generării Codului in C\#}
 
 \section{Capacitățile si deficiențele lui C\#}
 
 <!-- https://docs.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/ -->
-C# este un limbaj de programare modern, posedă caracteristici utile și practice, printre care:
+C\# este un limbaj de programare modern, posedă caracteristici utile și practice, printre care:
 \begin{itemize}
   \item Tipizarea statică;
   \item Un runtime inteligent;
@@ -99,12 +99,12 @@ C# este un limbaj de programare modern, posedă caracteristici utile și practic
   \item etc.
 \end{itemize}
 
-Cu toate că C# este ``mediul'' acestei lucrări, nu se va descrie în întregime,
+Cu toate că C\# este ``mediul'' acestei lucrări, nu se va descrie în întregime,
 deoarece importanta este esența problemei care constă în faptul că, cu toate că limbajul acesta este destul de capabil, este și destul de limitat.
 
 Cel mai important moment pentru autor este posibilitatea executării sau generării codului,
 posibilitatea performării reflexiei asupra tipurilor în timpul compilării.
-Să se menționeze, că C# deja permite reflexia asupra tipurilor și generarea codului, însă abordarea lui este că deleghează totul la timpul rulării, deci reflexia runtime și emisia codurilor IL, respectiv.
+Să se menționeze, că C\# deja permite reflexia asupra tipurilor și generarea codului, însă abordarea lui este că deleghează totul la timpul rulării, deci reflexia runtime și emisia codurilor IL, respectiv.
 Aceste tehnici, însă, sunt dificile de utilizat și codul care le folosește este predispus la erori.
 Însă, dacă s-ar putea să se genereze fișiere în timpul compilării, sau înainte de compilare, și ca aceste fișiere să conțină codul regular, sigur de tip, aceste erori ar fi prinși în timpul compilării.
 Adică, codul pur și simplu nu s-ar compila, cu indicarea concretă a erorii, în loc de a da crash în timpul rulării.
@@ -146,7 +146,7 @@ public struct Composition : IExample
 <!-- https://softwareengineering.stackexchange.com/questions/288066/reducing-boilerplate-in-class-that-implements-interfaces-through-composition -->
 
 Este clar că acum trebuie să implementăm această interfață.
-Deci, unica soluție care C# ne propune este următoarea:
+Deci, unica soluție care C\# ne propune este următoarea:
 
 \begin{lstlisting}
   public struct Composition : IExample
@@ -167,7 +167,7 @@ Da, nu e nimic dacă este doar un singur astfel de tip, dar aceste lucruri se ac
 
 \footnote{
   O altă soluție aici ar putea fi supraîncărcarea castului implicit în acest tip integrat,
-  însă supraîncarcarea casturilor implicite în interfețe nu este permisă în C#.
+  însă supraîncarcarea casturilor implicite în interfețe nu este permisă în C\#.
 }
 
 Cu generarea codului, ar putea fi posibilă o astfel de soluție, simplă, clară, ușoară de utilizat, și rezistentă la schimbări ale interfeței:
@@ -280,7 +280,7 @@ public static class FlagsExtensions
 
 Problema este că trebuie să se scrie aceste metode pentru toate tipurile flag care sunt în cod.
 Când apare un nou astfel de tip, trebuie să se copieze acest cod, și să se plaseze undeva, cu denimirea tipului de intrare schimbată.
-C# nu propune o soluție pentru această problemă: este pur și simplu imposibil să scrieți astfel de metode care să lucreze cu orice tip enum flag.
+C\# nu propune o soluție pentru această problemă: este pur și simplu imposibil să scrieți astfel de metode care să lucreze cu orice tip enum flag.
 Aceasta este posibil de realizat cu IL emission, dar nu cred că merită.
 
 Autorul propune următoarea soluție declarativă, explicată mai bine în capitolul 3:
@@ -307,20 +307,20 @@ Message Pack https://github.com/neuecc/MessagePack-CSharp care permite emiterea 
 
 \section{Istoriografia problemei}
 
-După ce autorul a început să studieze și să practice programarea independentă în C#, și anume în proiectul Hopper descris în teza de an, au devenit evidente deficiențele acestui limbaj.
+După ce autorul a început să studieze și să practice programarea independentă în C\#, și anume în proiectul Hopper descris în teza de an, au devenit evidente deficiențele acestui limbaj.
 Folosind o abordare directă, a fost conceput și creat un prototip al generatorului de cod, cuplat cu proiectul în care a fost utilizat.
 Acest generator de cod s-a descris pe scurt în teza de an al autorului.
 
 După teza de an, autorul a continuat să experiementeze cu aceste concepte, implementând baza unui alt joc, conceput cu două ani înainte de perfectarea tezei de an.
-În timp de aproape o lună și jumătate, a fost creat un proiect-șablon în Unity cu toate instrumentele necesare: generatorul de cod, divizarea modulară a asamblelor C# în Unity, integrarea unui terminal virtual în joc, o interfață de consolă centrală.
+În timp de aproape o lună și jumătate, a fost creat un proiect-șablon în Unity cu toate instrumentele necesare: generatorul de cod, divizarea modulară a asamblelor C\# în Unity, integrarea unui terminal virtual în joc, o interfață de consolă centrală.
 https://github.com/PunkyIANG/a-particular-project
 Deci, generatorul de cod a fost inițial adaptat la nevoile acestui proiect, însă autorul a văzut oportunitatea să-l modularizeze printr-o arhitectură pe baza plugin-urilor, ceea ce și se explică în această lucrare.
 
 \section{Roslyn}
 
 
-Roslyn este un ansamblu de librării și instrumente pentru analiza și compilarea codului C#, pentru C#.
-De fapt, însuși compilatorul C# este implementat pe baza acestor librării Roslyn.
+Roslyn este un ansamblu de librării și instrumente pentru analiza și compilarea codului C\#, pentru C\#.
+De fapt, însuși compilatorul C\# este implementat pe baza acestor librării Roslyn.
 Roslyn combină întregul pipeline de compilare: tokenizarea, analiza sintactică, analiza semantică, generarea codului executabil, expuzând toate aceste operații.
 
 Cel mai des, Roslyn este utilizat pentru analizatori, adică programe care analizează codul sursă și detectează erori logice, posibil propunând o remediere (code fix), sau adaugând operații utile în IDE-urile (de exemplu, `\texttt{implement methods'', }`extract into a local function'').
@@ -340,7 +340,7 @@ Deci așa programe de fapt fac următoarele lucruri:
 Un exemplu este generatorul de cod Message-Pack https://github.com/neuecc/MessagePack-CSharp.
 Kari, generatorul de cod descris în această lucrare, a fost scris inițial după aceeași arhitectură ca și codul acestui proiect, însă autorul a prins oportunitatea să-l generalizeze.
 
-Decizia să facă generatorul de cod în C# a fost o decizie evidentă, deoarece nu există nici o altă librărie care este asemănător de capabilă.
+Decizia să facă generatorul de cod în C\# a fost o decizie evidentă, deoarece nu există nici o altă librărie care este asemănător de capabilă.
 
 \section{Source Generators in \. NET}
 
@@ -380,7 +380,7 @@ Crearea unei soluții personale ar fi mai ușor și mai practic:
 
   \item Realizarea unei soluții destul de bune din punct de vedere al uzului practic nu este atât de complicată.
   
-  \item Soluția ar putea fi utilizată în Unity, precum și în orice alt proiect C#, indiferent de dacă folosește sau nu MSBuild și indifirent de versiunea compilatorului utilizată în acel proiect.
+  \item Soluția ar putea fi utilizată în Unity, precum și în orice alt proiect C\#, indiferent de dacă folosește sau nu MSBuild și indifirent de versiunea compilatorului utilizată în acel proiect.
   
   \item Reutilizarea configurației tot poate fi asigurată (cel puțin parțial, descris și în continuare). 
 \end{itemize}
@@ -418,7 +418,7 @@ Prima cerință poate fi concretizată mai tare:
 Se concretizează a doua cerință în modul următor:
 
 \begin{itemize}
-  \item Codul de analiză și de generare a codului să fie scris în limbajul C# pe baza platformei \. NET 6, să poată accesa toate API-urile specifice acestuia.
+  \item Codul de analiză și de generare a codului să fie scris în limbajul C\# pe baza platformei \. NET 6, să poată accesa toate API-urile specifice acestuia.
   \item Această logică trebuie să poată analiza o reprezentare abstractă a codului sursă de intrare și să poată genera output-ul, ca text.
   \item Se cere ca să fie ușor de creat fișiere cu codul care să conforme formatării corecte și care să nu lupte cu simboluri din codul inițial.
   În alte cuvinte, se cere ca librăria generatorului de cod să ofere API-uri utile pentru generarea codului și lucrul cu simboluri din cod.
@@ -472,7 +472,7 @@ Acest cod atunci ar putea să se schimbe fără a afecta logica sistemei origina
 
 Utilizarea plugin-urilor reprezintă o soluție care foarte bine corespunde cerințelor: în primul rând, restul sistemului este decuplat din nivelul plugin-urilor, iar acesta este foarte flexibil, adică ușor de modificat și de augmentat.
 
-În C#, există DLL-uri --- librării care permit să încarce codul în timpul rulării, să linkeze toate funcțiile necesare, să descopere tipurile prezente în această librărie și să facă ceva cu ele.
+În C\#, există DLL-uri --- librării care permit să încarce codul în timpul rulării, să linkeze toate funcțiile necesare, să descopere tipurile prezente în această librărie și să facă ceva cu ele.
 În cazul generatorului de cod dat, dorim ca aceste plugin-uri să poată fi inițializate, să analizeze codul sursă și să genereze codul nou.
 Cea mai ușoară modalitate de a asigura acest lucru este de a defini o interfață cu toate aceste acțiuni ca metode, iar în timpul rulării de a căuta toate tipurile care implementează această interfață, după ce poate fi instanțiate și utilizate, executând metodele acestei interfețe. 
 
@@ -567,7 +567,7 @@ https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587
 \begin{lstlisting}
 public class KariOptions
 {
-    public string HelpMessage => ``Use Kari to generate code for a C# project.'';
+    public string HelpMessage => ``Use Kari to generate code for a C\# project.'';
 
     [Option(``Input path to the directory containing source files or projects.'', 
         IsPath = true)] 
@@ -845,7 +845,7 @@ O soluție mult mai comodă ar fi ca plugin-ul să genereze acest fișier drept 
 Atunci, dacă plugin-ul a fost utilizat cu totul, acest fișier cu anotațiile va fi prezent numaidecât în proiectul consumatorului.
 În plus, plugin-ul acum are posbilitatea să schimbe conținutul fișierului său cu anotațiile.
 
-Problema este că C# nu poate citi fișiere ca șiruri în timpul compilării, de aceea a trebuit să se realizeze un program aparte care să citească acest fișier cu anotațiile și să genereze un nou fișier cu o singură clasă statică, cu o singură constantă statică cu conținutul acestui fișier.
+Problema este că C\# nu poate citi fișiere ca șiruri în timpul compilării, de aceea a trebuit să se realizeze un program aparte care să citească acest fișier cu anotațiile și să genereze un nou fișier cu o singură clasă statică, cu o singură constantă statică cu conținutul acestui fișier.
 Deoarece acum este un program aparte și este posibil de făcut mai multe lucruri decât doar generarea acestei constante, a fost implementată și generarea boilerplate-ului asociat cu căutarea simbolurilor acestor anotații în codul de intrare analizat de plugin-uri.
 I s-a dat denumirea \emph{Annotator}, deoarece lucrează cu anotațiile.
 
@@ -975,7 +975,7 @@ https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18
 DataObject este un plugin pentru Kari care permite generarea codului pentru tipuri care conceptual doar conțin datele.
 Codului generat va conține supraîncărcări triviale pentru operatorii de egalitate, supraîncărcarea metodei \texttt{Equals}, \texttt{GetHashCode}.
 
-De fapt, aceasta a fost implementat în versiunele noi de C#, anume C# 9 și C# 10 din \. NET 5 și \. NET 6 respectiv, în forma de \emph{records} și \emph{record structs}, însă acestea nu sunt accesibile în Unity.
+De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C\# 10 din \. NET 5 și \. NET 6 respectiv, în forma de \emph{records} și \emph{record structs}, însă acestea nu sunt accesibile în Unity.
 
 https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/records
 
@@ -1057,7 +1057,7 @@ S-a demonstrat cum generarea codului poate fi incorporată într-un instrument c
 
 \chapter{Concluziile finale si Recomandarile}
 
-În lucrarea aceasta, s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C#, care este des folosit pentru dezvoltarea jocurilor.
+În lucrarea aceasta, s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
 S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
 A fost demonstrată utilizarea generatorului de cod în două proiecte demonstrative, precum și în cadrul unui instrument centralizat în limbajul D, pe care autorul l-a utilizat în cadrul dezvoltării unui joc în Unity. 
 
