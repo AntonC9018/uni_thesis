@@ -456,7 +456,7 @@ Ultima cerință se obține prin paralelizare.
 \item Generarea codului.
 \end{itemize}
 
-Se poate ușor observa că primele 3 puncte vor fi aceleași pentru orice logică de analiză și de generare a codului, și corespundă la prima cerință din lista adusă anterior.
+Se poate ușor observa că primele 3 puncte vor fi aceeași pentru orice logică de analiză și de generare a codului, și corespundă la prima cerință din lista adusă anterior.
 Analog, ultimele două sunt legate la a doua cerință.
 Să se țină minte că se cere ca acest nivel să fie cât mai flexibil.
 
@@ -502,7 +502,7 @@ Este clar că aceste opțiuni de obicei vor fi ascunse într-un script executabi
 Încă, configurația generală pentru un anumit proiect poate fi pusă într-un fișier json.
 Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc. Exemplu:
 
-https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
+\lstinputlisting{../race/game/kari.json}
 
 
 S-a decis ca toate plugin-urile să fie importate ori dintr-o singură directorie, ori individual după cale către DLL-uri.
@@ -540,13 +540,13 @@ Autorul ori nu a fost satisfăcut cu API-ul lor, ori cu lipsa opțiunilor dorite
 
 Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua:
 Exemplu\footnote{a se vede codul sursă pentru un exemplu complet:
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs
+\ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}
 }
 
 Următorul cod transmite argumentele primite la consolă la parser, care își completează structura de date internă cu toate opțiunile prinse, pentru o mapare mai eficientă în continuare:
 
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L126-L132
+\lstinputlisting[firstline=126, lastline=132]{../Kari/source/Kari.Generator/KariCompiler.cs}
 
 \begin{lstlisting}
 ArgumentParser parser = new ArgumentParser();
@@ -562,7 +562,7 @@ Aici se arată codul parțial al clasei ce va primi argumentele din consolă, ma
 Cum se poate observa, este utilizat atributul \texttt{Option} pentru a atinge un API declarativ.
 Acestea sunt scanate în timpul rulării de către parser, utilizând reflexie runtime, pentru a obține informații despre obiect la care să fie bindate valorile argumentelor. 
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L21-L87
+\ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler_21_87}
 
 \begin{lstlisting}
 public class KariOptions
@@ -588,7 +588,7 @@ public class KariOptions
 Urmează un exemplu de utilizare în codul generatorului de cod.
 Metoda \texttt{FillObjectWithOptionValues} umple obiectul dat cu valorile din structura de date internă, și returnează o listă cu toate erorile care s-au îmtâmplat în timpul bindării parametrilor. 
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L147-L155
+\lstinputlisting[firstline=147, lastline=155]{../Kari/source/Kari.Generator/KariCompiler.cs}
 
 \begin{lstlisting}
   var ops = new KariOptions();
@@ -606,7 +606,7 @@ Aceeași metodă este utilizată și pentru bindarea valorilor la câmpurile ``a
 Administratorii sunt obiecte care dirijează procesul de execuție a plugin-urilor.
 
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L208-L221
+\lstinputlisting[firstline=208, lastline=221]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \begin{lstlisting}
 foreach (var admin in Administrators)
@@ -627,7 +627,7 @@ După ce toate opțiunile au fost colectate, se poate obține toate opțiunile c
 Opinia autorului este că prezența argumentelor superfluoase mereu trebuie să fie considerată ca o eroare critică.
 În plus, toate așa erori trebuie să fie explicit afișate.
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L446-L460
+\lstinputlisting[firstline=446, lastline=460]{../Kari/source/Kari.Generator/KariCompiler.cs}
 
 \begin{lstlisting}
 var unrecognizedOptions = parser.GetUnrecognizedOptions();
@@ -660,7 +660,7 @@ Mesajele de ajutor au fost implementate utilizând librăria Spectre Console\cit
 Deci, o parte a mesajul de ajutor arată cam în modul următor:
 
 Codul parser-ului este foarte simplu.
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Arguments/ArgumentParsing.cs
+\ref{appendix:Kari____Kari_source_Kari_Arguments_ArgumentParsing}
 Pe scurt:
 
 \begin{itemize}
@@ -683,7 +683,7 @@ După cum s-a menționat anterior, codul plugin-urilor este distribuit și înc�
 Pentru aceasta, se folosesc funcțiile \texttt{Assembly.LoadFile} și \texttt{GetExportedTypes}, după ce se realizează filtrarea tuturor tipurilor, anume căutarea tipurilor care implementează interfața \texttt{IAdministrator}.
 Aceste tipuri deja pot fi instanțiate prin reflexie.
 
-https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs
+\ref{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_AdministratorFinder}
 
 După ce s-au încărcat plugin-urile, nu sunt inițializate imediat.
 La început, ele iau argumentele de linie de comanda, iar după aceasta sunt încărcate toate proiectele cu codul sursă de intrare.
@@ -712,7 +712,7 @@ Această logică se conține într-o singură funcție, cu mai multe funcții lo
 Codul este foarte simplu, operând cu API-urile sistemei de fișiere și în cea mai mare parte conține validări.
 În dependența de cerințele următoare pentru proiect, acest cod poate fi extras în încă o etapă opțională de descoperire.
 
-https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L285-L598
+\ref{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_285_598}
 
 Acest cod încă gestionează căutarea acelor două proiecte, anume proiectului \texttt{Common} care reprezintă un proiect cu cod agnostic care conceptual nu poate să se refere la nici un alt proiect, și a proiectului \texttt{Root}, adică proiectului care să conține funcții de inițializare și care conceptual poate referi la orice alt proiect.
 Fiecare mod de intrare are logica sa de căutare a proiectelor acestea, selectată în așa fel ca să aibă cât mai mult sens în scopul modului de intrare selectat.
@@ -724,12 +724,12 @@ Acest obiect poate fi creat din arbori sintactici care la rândul său sunt crea
 Crearea compilației nu poate fi paralelizată pe mai multe fire, însă generarea arborilor din textul sursă poate fi paralelizată.
 Acestă paralelizare nu aduce un beneficiu mare, însă din testele autorului a accelerat timpul execuției cu aproape 10%.
 
-https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L604-L664
+\ref{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_604_664}
 
 După ce toții arbori s-au încărcat, se creează obiectul de compilație.
 Acest obiect este după înțelegerea autorului în mare parte leneș, adică nu cachează atâtea multe simboluri.
 
-https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L666-L697
+\ref{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_666_697}
 
 Plugin-urile de obicei lucrează la nivelul tipurilor sau al membrii lor.
 De obicei se cere ca aceste simboluri (tipuri sau membrii) să fie anotate cu atributele folosite pentru configurarea codului generat pentru acest simbol, fiind descoperite și interpretate de către plugin-uri.
@@ -738,7 +738,7 @@ Cacharea de face în mod paralel.
 Această operație este destul de constisitoare.
 După înțelegerea autorului, cere destul de multe resurse din acea cauză că crearea compilației este leneșă, deci analiza tuturor arborilor sintactice necesită cacharea leneșă a mai multor simboluri.
 
-https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L699-L727
+\lstinputlisting[firstline=699, lastline=727]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 Fiecare plugin, în rândul său, face filtrarea proprie a tipurilor, colectând datele necesare.
 Aceasta se face în metoda \texttt{IAdministrator.Collect} scopul căreia este să inițializeze toate datele necesare pentru generarea consecutivă a codului.
@@ -760,17 +760,17 @@ Sunt 4 moduri de output:
 
 \begin{itemize}
 \item \texttt{CentralFile}. Output-ul este concatenat între toate proiectele, și scris într-un singur fișier.
-  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L1114-L1129
+\lstinputlisting[firstline=1114, lastline=1129]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \item \texttt{CentralDirectory}. Output-ul este divizat între proiecte și put într-un folder de ieșire comun.
   Fiecare subfolder al acestui folder are denumirea proiectului pentru care a fost generat fișierul, și conține toate fișierele, ca solicitat de plugin-uri.
-  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L1064-L1080
+\lstinputlisting[firstline=1064, lastline=1080]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \item \texttt{NestedFile}. Output-ul fiecărui proiect în parte este concatenat și scris în câte un fișier pentru fiecare proiect.
-  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L1131-L1145
+\lstinputlisting[firstline=1131, lastline=1145]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \item \texttt{NestedDirectory}. Output-ul este divizat între proiecte și generat în căte un subfolder, cu denumirile fișierelor ca solicitat de plugin-uri.
-  https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L1040-L1057
+\lstinputlisting[firstline=1040, lastline=1057]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 \end{itemize}
 
 Înainte de a fi scris în fișier, codul generat este comparat cu conținutul fișierului existent, dacă un fișier cu aceeași denumire deja există.
@@ -780,7 +780,7 @@ Chiar dacă se înlocuiește conținutul unui fișier cu conținutul nou egal, t
 Din această cauză, dacă se admite ca generatorul de cod să nu aibă această verificare, rularea generatorului de cod de a două dată va invoca o recompilare.
 Deoarece recompilarea în Unity este foarte lentă, luând pănă la 10 secunde, se câștigă destul de multe resurse dacă se folosește această verificare.
 
-https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L950-L972
+\lstinputlisting[firstline=950, lastline=972]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 Se poate observa că se folosește cod asincron de scriere a datelor în fișiere, și codul este la un nivel destul de scăzut.
 Acestea sunt în cea mai mare parte experimentările autorului și de fapt nu accelerează executarea.
@@ -827,7 +827,7 @@ public void AppendLine()
 }
 \end{lstlisting}
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Utils/CodeBuilder.cs#L19-L184
+\ref{appendix:Kari____Kari_source_Kari_Utils_CodeBuilder_19_184}
 
 Mai jos se vede niște exemple de utilizare.
 
@@ -849,13 +849,13 @@ Problema este că C\# nu poate citi fișiere ca șiruri în timpul compilării, 
 Deoarece acum este un program aparte și este posibil de făcut mai multe lucruri decât doar generarea acestei constante, a fost implementată și generarea boilerplate-ului asociat cu căutarea simbolurilor acestor anotații în codul de intrare analizat de plugin-uri.
 I s-a dat denumirea \emph{Annotator}, deoarece lucrează cu anotațiile.
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Annotator/Annotator.cs
+\ref{appendix:Kari____Kari_source_Kari_Annotator_Annotator}
 
 Acest instrument ori se integrează în procesul de build al plugin-urilor, ori fișierele generate sunt incluse în source control.
 Fișierele targets și props din MSBuild distribuite cu Kari realizează integrarea acestui instrument în procesul de build al plugin-ului,
 însă sistemul de build urmează să fie schimbat la ceva mai ușor de menținut. 
 
-https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Plugins/InternalPlugin.props
+\ref{appendix:Kari____Kari_source_Kari_Plugins_InternalPlugin}
 
 
 
@@ -906,13 +906,13 @@ Fiecare plugin, după cum s-a menționat anterior, trebuie să definească cel p
 De obicei, administratorii definesc un tablou de \emph{analizori} care conține câte un analizor pentru fiecare proiect.
 Administratorii deleghează deciziile concrete referitor la analiza tipurilor și generarea codului pentru ele la analizorii aceștia.
 
-https://github.com/AntonC9018/Kari/blob/1e103379417c3a268e1891ab94acb0cc81eb9489/source/Kari.Plugins/Flags/FlagsAdministrator.cs
+\ref{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAdministrator}
 
 Aceasta este codul administratorului plugin-ului pentru generarea codului pentru enumuri flag.
 După cum se poate vedea, se utilizează funcțiile statice ale clasei \texttt{AdministratorHelpers}.
 Aceste funcții acomodează exact cazul acesta de utilizare: lucrul printr-un tablou de analizori, câte o instanță pentru fiecare proiect.
 
-https://github.com/AntonC9018/Kari/blob/1e103379417c3a268e1891ab94acb0cc81eb9489/source/Kari.GeneratorCore/Workflow/Administrator.cs#L67-L163 
+\ref{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_Administrator_67_163}
 
 \begin{itemize}
   \item În metoda \texttt{Initialize\(\)} tabloul cu analizorii se umple, câte un analizor pentru fiecare proiect;
@@ -921,13 +921,13 @@ https://github.com/AntonC9018/Kari/blob/1e103379417c3a268e1891ab94acb0cc81eb9489
   \item Metoda \texttt{GetAnnotations\(\)} returnează textul acelui fișier cu anotațiile.
 \end{itemize}
 
-https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/Flags/FlagsAnalyzer.cs
+\ref{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAnalyzer}
 
 În acest exemplu, se poate vedea ce de obicei se face în metoda \texttt{CollectSymbols()} al fiecărui analizor.
 În acest caz, sunt colectate unele informații despre toate simbolurile cu atributul \texttt{NiceFlags}.
 
 
-https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/Flags/FlagsAnalyzer.cs#L159-L170
+\lstinputlisting[firstline=159, lastline=170]{../Kari/source/Kari.Plugins/Flags/FlagsAnalyzer.cs}
 
 Metoda \texttt{GenerateCode\(\)} folosește aceste date pentru a formata un șir cu codul boilerplate și scrie rezultatul într-un \texttt{CodeBuilder}.
 Early exit-ul garantează că dacă nici un tip nu a fost anotat cu atributul \texttt{NiceFlags}, nimic nu va fi generat.
@@ -951,23 +951,23 @@ Pentru demonstrare, se va crea un proiect nou în care se va folosi generatorul 
 Acest proiect este un proiect console fără dependențe pe .NET 6.
 Fișierul principal conține următorul cod sursă, foarte asemănător cu exemplul din capitolul 1:
 
-https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Program.cs
+\ref{appendix:uni_thesis____examples_flags_Program}
 
 
 Înainte de compilare trebuie să se ruleze generatorul de cod.
 Pentru aceasta se invocă Kari cu drumul la fișierul de configurare \texttt{kari.json} care conține drumul la DLL-ul plugin-ului Flags.
 Acesta poate fi dat lui Kari și direct, însă utilizarea unui fișier de configurare este mai comod.
 
-https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.bat
+\lstinputlisting{../examples/flags/kari.bat}
 
-https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.json
+\lstinputlisting{../examples/flags/kari.json}
 
 
 Și codul generat:
 
-https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/FlagsAnnotations.cs
+\lstinputlisting{../examples/flags/Generated/FlagsAnnotations.cs}
 
-https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/Flags.cs
+\ref{appendix:uni_thesis____examples_flags_Generated_Flags}
 
 \section{Plugin-ul DataObject}
 
@@ -978,48 +978,48 @@ De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C
 
 Administratorul acestui plugin are aceeași structură ca și administratorul plugin-ului Flags:
 
-https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs
+\ref{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAdministrator}
 
 Informațiile colectate au mai multe chestii, ca simbolul tipului, simbolurile pentru câmpurile instance, etc.
 
-https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L160-L180
+\lstinputlisting[firstline=160, lastline=180]{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
 
 Metoda \texttt{CollectSymbols} tot așa colectează simbolurile necesare și le pune în aceste obiecte cu informații suplimentare extrase.
 Se mai fac niște verificări pentru a avertiza utilizatorul despre problemele cu tipul: trebuie să nu fie static, trebuie să fie parțial, trebuie să aibă un modificator de acces.
 
-https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L14-L46
+\ref{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_14_46}
 
 Metoda pentru generarea codului este puțin mai complicată decât cea a plugin-ului Flags, deoarece codul generat depinde de detaliile tipului mai mult.
 De exemplu, dacă tipul este o clasă, atunci operatorul \texttt{==} trebuie să verifice cazul când unul sau ambele argumente sunt nule. 
 
-https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L48-L157
+\ref{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_48_157}
 
 Proiectul cu exemplul de utilizare are aceeași structură ca și proiectul pentru flaguri, doar că menționează plugin-ul \texttt{DataObject} în loc de \texttt{Flags}.
 Codul programului:
 
-https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Program.cs
+\ref{appendix:uni_thesis____examples_dataobject_Program}
 
 Și codul generat:
 
-https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjects.cs
+\ref{appendix:uni_thesis____examples_dataobject_Generated_DataObjects}
 
-https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjectAnnotations.cs
+\lstinputlisting{../examples/dataobject/Generated/DataObjectAnnotations.cs}
 
 \section{Operatiile cu Kari ca parte de un instrument centralizat de dezvoltare}
 
 În cadrul unui proiect al său, autorul a realizat un instrument în limbajul D care permite integrarea mai ușoară a lui Kari, fără a folosi fișiere de proiecte MSBuild.
 Codul definește două comenzi — una compilează Kari în configurația dată, iar a doua îl execută pe Kari, construind drumurile la DLL-urile plugin-urilor din denumirile lor.
 
-https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/dev_cli/source/commands/setup.d
+\ref{appendix:race____race_dev_cli_source_commands_setup}
 
 Restul configurației se ia din fișierul de configurație care se conține în mapa cu proiectul Unity al jocului:
 
-https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
+\lstinputlisting{../race/game/kari.json}
 
 Instrumentul poate fi invocat din linia de comandă.
 Scriptul \texttt{setup.bat} arată compilarea instrumentului și invocarea comenzii setup.
 
-https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/setup.bat
+\lstinputlisting{../race/setup.bat}
 
 Se admite că numele executabilului generat este \texttt{dev}.
 Atunci, comanda de setup poate fi executată în felul următor:
@@ -1072,6 +1072,71 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 
 \bibliographystyle{plain}
 \bibliography{bibliography}
+
+
+\appendix
+\chapter{KariCompiler.cs}\label{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}
+\lstinputlisting{../Kari/source/Kari.Generator/KariCompiler.cs}
+
+\chapter{KariCompiler.cs, rândurile 21--87}\label{appendix:Kari____Kari_source_Kari_Generator_KariCompiler_21_87}
+\lstinputlisting[firstline=21, lastline=87]{../Kari/source/Kari.Generator/KariCompiler.cs}
+
+\chapter{ArgumentParsing.cs}\label{appendix:Kari____Kari_source_Kari_Arguments_ArgumentParsing}
+\lstinputlisting{../Kari/source/Kari.Arguments/ArgumentParsing.cs}
+
+\chapter{AdministratorFinder.cs}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_AdministratorFinder}
+\lstinputlisting{../Kari/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs}
+
+\chapter{MasterEnvironment.cs, rândurile 285--598}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_285_598}
+\lstinputlisting[firstline=285, lastline=598]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+
+\chapter{MasterEnvironment.cs, rândurile 604--664}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_604_664}
+\lstinputlisting[firstline=604, lastline=664]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+
+\chapter{MasterEnvironment.cs, rândurile 666--697}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_666_697}
+\lstinputlisting[firstline=666, lastline=697]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+
+\chapter{CodeBuilder.cs, rândurile 19--184}\label{appendix:Kari____Kari_source_Kari_Utils_CodeBuilder_19_184}
+\lstinputlisting[firstline=19, lastline=184]{../Kari/source/Kari.Utils/CodeBuilder.cs}
+
+\chapter{Annotator.cs}\label{appendix:Kari____Kari_source_Kari_Annotator_Annotator}
+\lstinputlisting{../Kari/source/Kari.Annotator/Annotator.cs}
+
+\chapter{InternalPlugin.props}\label{appendix:Kari____Kari_source_Kari_Plugins_InternalPlugin}
+\lstinputlisting{../Kari/source/Kari.Plugins/InternalPlugin.props}
+
+\chapter{FlagsAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAdministrator}
+\lstinputlisting{../Kari/source/Kari.Plugins/Flags/FlagsAdministrator.cs}
+
+\chapter{Administrator.cs, rândurile 67--163}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_Administrator_67_163}
+\lstinputlisting[firstline=67, lastline=163]{../Kari/source/Kari.GeneratorCore/Workflow/Administrator.cs}
+
+\chapter{FlagsAnalyzer.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAnalyzer}
+\lstinputlisting{../Kari/source/Kari.Plugins/Flags/FlagsAnalyzer.cs}
+
+\chapter{Program.cs}\label{appendix:uni_thesis____examples_flags_Program}
+\lstinputlisting{../examples/flags/Program.cs}
+
+\chapter{Flags.cs}\label{appendix:uni_thesis____examples_flags_Generated_Flags}
+\lstinputlisting{../examples/flags/Generated/Flags.cs}
+
+\chapter{DataObjectAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAdministrator}
+\lstinputlisting{../Kari/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs}
+
+\chapter{DataObjectAnalyzer.cs, rândurile 14--46}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_14_46}
+\lstinputlisting[firstline=14, lastline=46]{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
+
+\chapter{DataObjectAnalyzer.cs, rândurile 48--157}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_48_157}
+\lstinputlisting[firstline=48, lastline=157]{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
+
+\chapter{Program.cs}\label{appendix:uni_thesis____examples_dataobject_Program}
+\lstinputlisting{../examples/dataobject/Program.cs}
+
+\chapter{DataObjects.cs}\label{appendix:uni_thesis____examples_dataobject_Generated_DataObjects}
+\lstinputlisting{../examples/dataobject/Generated/DataObjects.cs}
+
+\chapter{setup.d}\label{appendix:race____race_dev_cli_source_commands_setup}
+\lstinputlisting{../race/dev_cli/source/commands/setup.d}
 
 
 \end{document}

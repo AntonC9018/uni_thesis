@@ -149,44 +149,60 @@ void main()
             return format!`\lstinputlisting[firstline=%d, lastline=%d]{%s}`(startLine, endLine, filePath);
         }
 
+        void doInlineFileRangeCase(int[2] range)
+        {
+            newLineContent = formatInputListing(completedFilePath, range[0], range[1]);
+            labelString = "";
+        }
+
         // Entire file
         if (link.range[0] == -1)
         {
-            formattedWrite!`\chapter{%s}`(app, filename);
-            labelString = format!`appendix:%s_%s`(link.repo, friendlyFileName);
-            newLineContent = format!`\ref{%s}`(labelString);
-            
-            appendLabel(labelString);
-
-            formattedWrite!`\lstinputlisting{%s}`(app, completedFilePath);
-            app ~= "\n";
-            app ~= "\n";
-        }
-        // A single line
-        else if (link.range[1] == -1)
-        {
-            newLineContent = formatInputListing(completedFilePath, link.range[0], link.range[0]);
-            labelString = "";
-        }
-        // Multiple lines
-        else
-        {
-            const rangeLength = link.range[1] - link.range[0] + 1;
-            if (rangeLength > maxLineCountInline)
+            const lineCountInThatFile = File(completedFilePath, "r").byLine.count;
+            if (lineCountInThatFile <= maxLineCountInline)
             {
-                formattedWrite!`\chapter{%s, rândurile %d--%d}`(app, filename, link.range[0], link.range[1]);
-                labelString = format!`appendix:%s_%s_%d_%d`(link.repo, friendlyFileName, link.range[0], link.range[1]);
-                newLineContent = format!`\ref{%s}`(labelString);
-
-                appendLabel(labelString);
-                app ~= formatInputListing(completedFilePath, link.range[0], link.range[1]);
-                app ~= "\n";
-                app ~= "\n";
+                newLineContent = format!`\lstinputlisting{%s}`(completedFilePath);
+                labelString = "";
             }
             else
             {
-                labelString = "";
-                newLineContent = formatInputListing(completedFilePath, link.range[0], link.range[1]);
+                formattedWrite!`\chapter{%s}`(app, filename);
+                labelString = format!`appendix:%s_%s`(link.repo, friendlyFileName);
+                newLineContent = format!`\ref{%s}`(labelString);
+                
+                appendLabel(labelString);
+
+                formattedWrite!`\lstinputlisting{%s}`(app, completedFilePath);
+                app ~= "\n";
+                app ~= "\n";
+            }
+        }
+
+        // A single line
+        else if (link.range[1] == -1)
+        {
+            doInlineFileRangeCase([link.range[0], link.range[0]]);
+        }
+
+        // Multiple lines
+        else
+        {
+            const range = link.range;
+            const rangeLength = range[1] - range[0] + 1;
+            if (rangeLength <= maxLineCountInline)
+            {
+                doInlineFileRangeCase(range);
+            }
+            else
+            {
+                formattedWrite!`\chapter{%s, rândurile %d--%d}`(app, filename, range[0], range[1]);
+                labelString = format!`appendix:%s_%s_%d_%d`(link.repo, friendlyFileName, range[0], range[1]);
+                newLineContent = format!`\ref{%s}`(labelString);
+
+                appendLabel(labelString);
+                app ~= formatInputListing(completedFilePath, range[0], range[1]);
+                app ~= "\n";
+                app ~= "\n";
             }
         }
         
