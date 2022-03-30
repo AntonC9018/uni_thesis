@@ -5,6 +5,9 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[romanian]{babel}
 
+% Appendices
+% \usepackage[toc,page]{appendix}
+
 % Format urls in the bibliography
 \usepackage{url}
 
@@ -488,25 +491,10 @@ De aceea s-a decis că generatorul de cod trebuie să funcționeze ca o aplicaț
 Este clar că aceste opțiuni de obicei vor fi ascunse într-un script executabil, de exemplu, ca un fișier bat pe Windows.
 
 Încă, configurația generală pentru un anumit proiect poate fi pusă într-un fișier json.
-Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc. Exemplu\footnote{\url{https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json}}:
+Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc. Exemplu:
 
-\begin{lstlisting}
-{
-    ``inputFolder'': ``Assets/Source'',
-    // The plugin paths are passed via the cli tool
-    ``generatedNamespaceSuffix'': ``Generated'',
-    ``rootNamespace'': ``Race'',
-    ``outputMode'': ``NestedDirectory'',
-    ``inputMode'': ``UnityAsmdefs'',
-    ``commonProjectName'': ``Common'',
+https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
 
-    // UnityHelpers
-    ``engineCommon'': ``EngineCommon'',
-
-    // CommandTerminal
-    ``terminalProject'': ``CommandTerminal''
-}
-\end{lstlisting}
 
 S-a decis ca toate plugin-urile să fie importate ori dintr-o singură directorie, ori individual după cale către DLL-uri.
 Încă se admite instalarea prin NuGet, pentru a putea să le împărtășească ușor cu lumea, însă procesul de lucru cu NuGet gol este mult mai complicat decât folosirea submodulelor git și setarea individuală a calelor la DLL-uri într-un script, de aceea această funcționalitate nu se folosește la moment.
@@ -542,7 +530,9 @@ Autorul a decis să creeze codul propriu pentru lucrul acesta, cu toate că deja
 Autorul ori nu a fost satisfăcut cu API-ul lor, ori cu lipsa opțiunilor dorite.
 
 Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua:
-Exemplu\footnote{a se vede codul sursă pentru un exemplu complet \url{https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs}}:
+Exemplu\footnote{a se vede codul sursă pentru un exemplu complet:
+https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs
+}
 
 Următorul cod transmite argumentele primite la consolă la parser, care își completează structura de date internă cu toate opțiunile prinse, pentru o mapare mai eficientă în continuare:
 
@@ -568,20 +558,20 @@ https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587
 \begin{lstlisting}
 public class KariOptions
 {
-    public string HelpMessage => ``Use Kari to generate code for a C\# project.'';
+    public string HelpMessage => "Use Kari to generate code for a C\# project.";
 
-    [Option(``Input path to the directory containing source files or projects.'', 
+    [Option("Input path to the directory containing source files or projects.", 
         IsPath = true)] 
-    public string inputFolder = ``.'';
+    public string inputFolder = ".";
 
-    [Option(``Plugins folder or paths to individual plugin dlls.'',
+    [Option("Plugins folder or paths to individual plugin dlls.",
         // Can be sometimes inferred from input, aka NuGet's packages.config
         IsRequired = false,
         IsPath = true)]
     public string[] pluginPaths = null;
 
-    [Option(``The suffix added to the project namespace to generate the output namespace.'')]
-    public string generatedNamespaceSuffix = ``Generated'';
+    [Option("The suffix added to the project namespace to generate the output namespace.")]
+    public string generatedNamespaceSuffix = "Generated";
     // ...
 }
 \end{lstlisting}
@@ -637,12 +627,12 @@ if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
 {
     foreach (var arg in unrecognizedOptions)
     {
-        _logger.LogError($``Unrecognized option: \texttt{{arg}}'');
+        _logger.LogError($"Unrecognized option: `{arg}`");
     }
     foreach (var arg in unrecognizedConfigOptions)
     {
         // TODO: This can contain more info, like the line number.
-        _logger.LogError($``Unrecognized option: \texttt{{parser.GetPropertyPathOfOption(arg)}}'');
+        _logger.LogError($"Unrecognized option: `{parser.GetPropertyPathOfOption(arg)}`);
     }
     return ExitCode.UnknownOptions;
 }
@@ -665,7 +655,7 @@ https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587
 Pe scurt:
 
 \begin{itemize}
-  \item Toate opțiunile sunt colectate și păstrate într-un tablou asociativ, numele \rightarrow valoarea.
+  \item Toate opțiunile sunt colectate și păstrate într-un tablou asociativ, numele $\rightarrow$ valoarea.
   \item Toate fișierele menționate prin opțiunea \texttt{configurationFile} sunt încărcate și sălvate într-o listă.
   \item Metoda \texttt{FillObjectWithOptionValues} primește la intrare un obiect de orice tip, îi inspectează câmpurile, utilizând reflexia runtime, și performă conversiunile din tip șir în tipul câmpului corespunzător.
   \item Metoda \texttt{GetHelpFor} consruiește un tabel, utilizând aceeași reflexie runtime.
@@ -881,7 +871,7 @@ namespace Kari.Plugins.DataObject
     using System.Diagnostics;
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    [Conditional("``CodeGeneration''")]
+    [Conditional(""CodeGeneration"")]
     public class DataObjectAttribute : Attribute
     {
     }
@@ -931,7 +921,7 @@ https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/Flags/FlagsAnalyzer.cs#L159-L170
 
 Metoda \texttt{GenerateCode\(\)} folosește aceste date pentru a formata un șir cu codul boilerplate și scrie rezultatul într-un \texttt{CodeBuilder}.
-Early exit-ul \texttt{if (_infos.Count == 0) return;} garantează că dacă nici un tip nu a fost anotat cu atributul \texttt{NiceFlags}, nimic nu va fi generat.
+Early exit-ul garantează că dacă nici un tip nu a fost anotat cu atributul \texttt{NiceFlags}, nimic nu va fi generat.
 
 
 \section{Plugin-ul Flags}
@@ -1073,13 +1063,6 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 
 \bibliographystyle{plain}
 \bibliography{bibliography}
-
-
-\appendix
-
-\chapter{Codul sursă al lui Kari menționat}
-\chapter{Codul sursă al lui  menționat}
-\chapter{Codul sursă al lui Kari menționat}
 
 
 \end{document}

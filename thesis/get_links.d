@@ -63,14 +63,14 @@ static struct Link
 {
     int lineIndex;
     string repo;
-    string path;
+    string filePath;
     int[2] range;
 }
 
 void main()
 {
     auto f = std.file.readText("teza.tex");
-    auto lines = f.split("\n");
+    auto lines = f.splitter("\r\n").array;
 
     // http...AntonC9018/RepoName/blob/hashstring/file/path.ext[#lineFrom-lineTo]
     auto linkRegex = regex(`https://github.com/[^/]+/([^/]+)/blob/[^/]+/([^\#^\}]+)(\#[^\}]+)?`);
@@ -116,13 +116,95 @@ void main()
             return Link(index, repoName, filePath, range);
         });
     
+    
+    auto app = appender!string;
 
-    writeln(links.map!(a => a.to!string).joiner("\n"));
+    const pathsToStart = [
+        "Kari": "../Kari",
+        "race": "../race",
+        "uni_thesis": ".."   
+    ];
 
-    // writeln(makeAppendixChapter("Kari", "../Kari", links));
-    // writeln(makeAppendixChapter("race", "../race", links));
-    // writeln(makeAppendixChapter("uni_thesis", "..", links));
+    foreach (link; links)
+    {
+        const completedFilePath = pathsToStart[link.repo] ~ "/" ~ link.filePath;
+        const filename = baseName(link.filePath);
+        string labelString;
+        string newLineContent;
+        enum maxLineCountInline = 30;
 
-    // auto r = regex("AntonC9018/([^/]+)/");
-    // links.map!((a) => std.regex.matchFirst(a, r)).tee!writeln.array;
+        void appendLabel(string label)
+        {
+            app.formattedWrite!`\label{%s}`(label);
+            app ~= "\n";
+        }
+
+        string friendlyFileName()
+        {
+            return stripExtension(completedFilePath).replace("\\", "_").replace("/", "_").replace(".", "_");
+        }
+
+        static string formatInputListing(string filePath, int startLine, int endLine)
+        {
+            return format!`\lstinputlisting[firstline=%d, lastline=%d]{%s}`(startLine, endLine, filePath);
+        }
+
+        // Entire file
+        if (link.range[0] == -1)
+        {
+            formattedWrite!`\chapter{%s}`(app, filename);
+            labelString = format!`appendix:%s_%s`(link.repo, friendlyFileName);
+            newLineContent = format!`\ref{%s}`(labelString);
+            
+            appendLabel(labelString);
+
+            formattedWrite!`\lstinputlisting{%s}`(app, completedFilePath);
+            app ~= "\n";
+            app ~= "\n";
+        }
+        // A single line
+        else if (link.range[1] == -1)
+        {
+            newLineContent = formatInputListing(completedFilePath, link.range[0], link.range[0]);
+            labelString = "";
+        }
+        // Multiple lines
+        else
+        {
+            const rangeLength = link.range[1] - link.range[0] + 1;
+            if (rangeLength > maxLineCountInline)
+            {
+                formattedWrite!`\chapter{%s, rândurile %d--%d}`(app, filename, link.range[0], link.range[1]);
+                labelString = format!`appendix:%s_%s_%d_%d`(link.repo, friendlyFileName, link.range[0], link.range[1]);
+                newLineContent = format!`\ref{%s}`(labelString);
+
+                appendLabel(labelString);
+                app ~= formatInputListing(completedFilePath, link.range[0], link.range[1]);
+                app ~= "\n";
+                app ~= "\n";
+            }
+            else
+            {
+                labelString = "";
+                newLineContent = formatInputListing(completedFilePath, link.range[0], link.range[1]);
+            }
+        }
+        
+        lines[link.lineIndex] = newLineContent;
+    }
+
+    auto lastLine = lines[$ - 1];
+    const prevLength = lines.length;
+    auto toAdd = [
+        `\appendix`,
+        // `\begin{appendices}`,
+        // `\chapter{Codul sursă menționat}`,
+        app[],
+        // `\end{appendices}`,
+    ];
+    lines.length += toAdd.length;
+    lines[prevLength - 1 .. $ - 1] = toAdd[];
+    lines[$ - 1] = lastLine;
+
+    copy(lines.joiner("\n"), File("teza_processed.tex", "w").lockingTextWriter);
 }
