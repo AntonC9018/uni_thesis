@@ -847,9 +847,7 @@ Atunci, dacă plugin-ul a fost utilizat cu totul, acest fișier cu anotațiile v
 
 Problema este că C\# nu poate citi fișiere ca șiruri în timpul compilării, de aceea a trebuit să se realizeze un program aparte care să citească acest fișier cu anotațiile și să genereze un nou fișier cu o singură clasă statică, cu o singură constantă statică cu conținutul acestui fișier.
 Deoarece acum este un program aparte și este posibil de făcut mai multe lucruri decât doar generarea acestei constante, a fost implementată și generarea boilerplate-ului asociat cu căutarea simbolurilor acestor anotații în codul de intrare analizat de plugin-uri.
-I s-a dat denumirea \emph{Annotator}, deoarece lucrează cu anotațiile.
-
-\ref{appendix:Kari____Kari_source_Kari_Annotator_Annotator}
+I s-a dat denumirea \emph{Annotator}, deoarece lucrează cu anotațiile.\ref{appendix:Kari____Kari_source_Kari_Annotator_Annotator}
 
 Acest instrument ori se integrează în procesul de build al plugin-urilor, ori fișierele generate sunt incluse în source control.
 Fișierele targets și props din MSBuild distribuite cu Kari realizează integrarea acestui instrument în procesul de build al plugin-ului,
