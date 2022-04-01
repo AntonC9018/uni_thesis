@@ -22,38 +22,20 @@
 \usepackage{url}
 
 % Code blocks
-\usepackage{listings}
-\usepackage{color}
-
-\lstloadlanguages{csh}
-
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
-
-\lstset{ 
-  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-  breaklines=true,                 % sets automatic line breaking
-  captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{mygreen},    % comment style
-  frame=single,	                   % adds a frame around the code
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  language=csh,                    % the language of the code
-  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-  numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  stringstyle=\color{mymauve},     % string literal style
-  tabsize=4	                       % sets default tabsize to 4 spaces
+\usepackage{minted}
+\definecolor{codeBackground}{rgb}{0.95,0.95,0.95}
+\setminted{%
+  autogobble,
+  bgcolor=codeBackground,
+  codetagify,
+  linenos
 }
 
 
 % Start
 \begin{document}
 
-\chapter*{Abstract}
+\begin{abstract}
 
 \textbf{Actualitatea si importanta temei.}
 
@@ -100,11 +82,12 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 
 În această lucrare se argumentează și se elaborează un generator de cod C\# flexibil și extensibil care poate fi utilizat pentru a ușura și a face mai plăcută programarea în C\#, și pentru a spori eficiența programatorului în implementarea unelor soluții.
 
+\end{abstract}
+
+
 \chapter{Sumarul Generării Codului in C\#}
 
 \section{Capacitățile si deficiențele lui C\#}
-
-% https://docs.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/
 
 {C\# este un limbaj de programare modern, posedă caracteristici utile și practice}\cite{tour_of_csharp}, printre care:
 \begin{itemize}
@@ -135,7 +118,7 @@ Generarea codului poate fi folosită și pentru a elimina codul boilerplate, sau
 Urmează o instanță posibilă de apăriția codului boilerplate, unde dorim să implementăm o interfață prin compoziție\cite{composition_interface_boilerplate}.
 Deci fie o astfel de interfață:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public interface IExample
 {
     void A();
@@ -144,7 +127,7 @@ public interface IExample
     void D();
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Acum fie că dorim să creăm o structură, unde să avem o implementare a acestei interfețe.
 Deoarece trebuie să fie o structură, dorim numaidecât să folosim compoziția, și nu putem folosi moștenirea.
@@ -152,17 +135,17 @@ Deoarece trebuie să fie o structură, dorim numaidecât să folosim compoziția
 
 În alte cuvinte:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public struct Composition : IExample
 {
     private IExample _impl;
 }
-\end{lstlisting}
+\end{minted}
 
 Este clar că acum trebuie să implementăm această interfață.
 Deci, unica soluție care C\# ne propune este următoarea:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
   public struct Composition : IExample
 {
     private IExample _impl;
@@ -173,7 +156,7 @@ Deci, unica soluție care C\# ne propune este următoarea:
     void D() { _impl.D(); }
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Este clar, că așa abordare în primul rând este o repetare proastă a codului, aducerea zgomotului fără sens în cod.
 Însă cel mai rău aspect este că, acum, dacă s-ar schimba interfața \texttt{IExample}, s-ar trebui să fie schimbat și acest tip. 
@@ -186,17 +169,17 @@ Da, nu e nimic dacă este doar un singur astfel de tip, dar aceste lucruri se ac
 
 Cu generarea codului, ar putea fi posibilă o astfel de soluție, simplă, clară, ușoară de utilizat, și rezistentă la schimbări ale interfeței:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public partial struct Composition : IExample
 {
     [ForwardMethodCalls]
     private IExample _impl;
 }
-\end{lstlisting}
+\end{minted}
 
 Iar codul generat deja să conțină aceste implementări, într-un fișier aparte:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public partial struct Composition
 {
     void A() { _impl.A(); }
@@ -205,14 +188,14 @@ public partial struct Composition
     void D() { _impl.D(); }
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 
 \section{Exemplu: metodele ajutatoare pentru enumuri flag}
 
 Fie un astfel de enum cu flaguri:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
   public enum Flags
 {
     Shy = 1 << 0,
@@ -220,11 +203,11 @@ Fie un astfel de enum cu flaguri:
     Strong = 1 << 2,
     Beautiful = 1 << 3,
 }
-\end{lstlisting}
+\end{minted}
 
 Și folosirea lui în cod tipică:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 Flags flags = Flags.Shy | Flags.Brave;
 
 // Check if it has the Shy flag
@@ -244,11 +227,11 @@ if (true)
     flags |= Flags.Beautiful;
 else
     flags &= ~Flags.Beautiful;
-\end{lstlisting}
+\end{minted}
 
 Acestea pot fi puse în metode de extensiune și atunci uzul lor devine mai descriptiv:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 Flags flags = Flags.Shy | Flags.Brave;
 
 // Check if it has the Shy flag
@@ -290,7 +273,7 @@ public static class FlagsExtensions
             source &= ~target;
     }
 }
-\end{lstlisting}
+\end{minted}
 
 Problema este că trebuie să se scrie aceste metode pentru toate tipurile flag care sunt în cod.
 Când apare un nou astfel de tip, trebuie să se copieze acest cod, și să se plaseze undeva, cu denimirea tipului de intrare schimbată.
@@ -299,13 +282,13 @@ Aceasta este posibil de realizat cu IL emission, dar nu cred că merită.
 
 Autorul propune următoarea soluție declarativă, explicată mai bine în capitolul 3:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 [NiceFlags]
 public enum Flags
 {
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Aceasta generează toate acele metode automat.
 
@@ -548,7 +531,7 @@ Următorul cod transmite argumentele primite la consolă la parser, care își c
 
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L126-L132
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 ArgumentParser parser = new ArgumentParser();
 var result = parser.ParseArguments(args);
 if (result.IsError)
@@ -556,7 +539,7 @@ if (result.IsError)
     argumentLogger.LogError(result.Error);
     return (int) ExitCode.OptionSyntaxError;
 }
-\end{lstlisting}
+\end{minted}
 
 Aici se arată codul parțial al clasei ce va primi argumentele din consolă, mapate la tipurile câmpurilor.
 Cum se poate observa, este utilizat atributul \texttt{Option} pentru a atinge un API declarativ.
@@ -564,7 +547,7 @@ Acestea sunt scanate în timpul rulării de către parser, utilizând reflexie r
 
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L21-L87
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public class KariOptions
 {
     public string HelpMessage => "Use Kari to generate code for a C\# project.";
@@ -583,14 +566,14 @@ public class KariOptions
     public string generatedNamespaceSuffix = "Generated";
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Urmează un exemplu de utilizare în codul generatorului de cod.
 Metoda \texttt{FillObjectWithOptionValues} umple obiectul dat cu valorile din structura de date internă, și returnează o listă cu toate erorile care s-au îmtâmplat în timpul bindării parametrilor. 
 
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L147-L155
 
-\begin{lstlisting}
+\begin{minted}{csharp}
   var ops = new KariOptions();
 var result1 = parser.FillObjectWithOptionValues(ops);
 
@@ -600,7 +583,7 @@ if (result1.IsError)
         argumentLogger.LogError(e);
     return (int) ExitCode.BadOptionValue;
 }
-\end{lstlisting}
+\end{minted}
 
 Aceeași metodă este utilizată și pentru bindarea valorilor la câmpurile ``administratorilor'' plugin-urilor.
 Administratorii sunt obiecte care dirijează procesul de execuție a plugin-urilor.
@@ -608,7 +591,7 @@ Administratorii sunt obiecte care dirijează procesul de execuție a plugin-uril
 
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L208-L221
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 foreach (var admin in Administrators)
 {
     var result = parser.FillObjectWithOptionValues(admin.GetArgumentObject());
@@ -620,7 +603,7 @@ foreach (var admin in Administrators)
         }
     }
 }
-\end{lstlisting}
+\end{minted}
 
 Interesant este momentul că, când vreo opțiune este menționată în parser, ea este marcată cu un flag.
 După ce toate opțiunile au fost colectate, se poate obține toate opțiunile care nu au fost marcate cu un astfel de flag - argumentele superfluoase.
@@ -629,7 +612,7 @@ Opinia autorului este că prezența argumentelor superfluoase mereu trebuie să 
 
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L446-L460
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 var unrecognizedOptions = parser.GetUnrecognizedOptions();
 var unrecognizedConfigOptions = parser.GetUnrecognizedOptionsFromConfigurations();
 if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
@@ -645,14 +628,14 @@ if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
     }
     return ExitCode.UnknownOptions;
 }
-\end{lstlisting}
+\end{minted}
 
 Un exemplu de output:
 
 \begin{verbatim}
 kari -helloworld -mynameisanton
-[Master]: Unrecognized option: \texttt{helloworld}
-[Master]: Unrecognized option: \texttt{mynameisanton}
+[Master]: Unrecognized option: helloworld
+[Master]: Unrecognized option: mynameisanton
 \end{verbatim}
 
 
@@ -722,7 +705,7 @@ Fiecare mod de intrare are logica sa de căutare a proiectelor acestea, selectat
 Obiectul care permite reprezentarea abstractă a codului sursă în Roslyn se numește o compilație.
 Acest obiect poate fi creat din arbori sintactici care la rândul său sunt creați din codul sursă, citit din fișiere sursă.
 Crearea compilației nu poate fi paralelizată pe mai multe fire, însă generarea arborilor din textul sursă poate fi paralelizată.
-Acestă paralelizare nu aduce un beneficiu mare, însă din testele autorului a accelerat timpul execuției cu aproape 10%.
+Acestă paralelizare nu aduce un beneficiu mare, însă din testele autorului a accelerat timpul execuției cu aproape 10\%.
 
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L604-L664
 
@@ -806,7 +789,7 @@ El are un contor pentru indentarea curentă, și o adaugă de atâtea ori, când
 
 Esența acestei utilități poate fi ilustrată în următorul cod:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 // UTF-8
 public byte[] IndentationBytes { get; }
 
@@ -825,7 +808,7 @@ public void AppendLine()
     Indent();
     NewLine();
 }
-\end{lstlisting}
+\end{minted}
 
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Utils/CodeBuilder.cs#L19-L184
 
@@ -867,7 +850,7 @@ Urmează un exemplu al unui fișier generat.
 Clasa \texttt{DummyDataObjectAnnotations} conține membrul Text cu codul sursă al fișierului, din care acest fișier a fost generat,
 iar clasa \texttt{DataObjectSymbols} reprezintă acel boilerplate ce ține de wrapper-uri pentru atributele.
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 namespace Kari.Plugins.DataObject
 {
     using Kari.GeneratorCore.Workflow;
@@ -898,7 +881,7 @@ namespace Kari.Plugins.DataObject
         }
     }
 }
-\end{lstlisting}
+\end{minted}
 
 \section{Cum lucreaza plugin-urile, mai detaliat}
 
@@ -1073,5 +1056,10 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 \bibliographystyle{plain}
 \bibliography{bibliography}
 
+
+\appendix
+\renewcommand{\thechapter}{\arabic{chapter}} 
+
+% insert appendices here
 
 \end{document}

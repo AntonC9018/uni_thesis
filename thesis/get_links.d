@@ -69,8 +69,7 @@ static struct Link
 
 void main()
 {
-    auto f = std.file.readText("teza.tex");
-    auto lines = f.splitter("\r\n").array;
+    auto lines = File("teza.tex").byLine.map!(a => a.stripRight.idup).array;
 
     // http...AntonC9018/RepoName/blob/hashstring/file/path.ext[#lineFrom-lineTo]
     auto linkRegex = regex(`https://github.com/[^/]+/([^/]+)/blob/[^/]+/([^\#^\}]+)(\#[^\}]+)?`);
@@ -129,7 +128,6 @@ void main()
     {
         const completedFilePath = pathsToStart[link.repo] ~ "/" ~ link.filePath;
         const filename = baseName(link.filePath);
-        string labelString;
         string newLineContent;
         enum maxLineCountInline = 30;
 
@@ -146,13 +144,17 @@ void main()
 
         static string formatInputListing(string filePath, int startLine, int endLine)
         {
-            return format!`\lstinputlisting[firstline=%d, lastline=%d]{%s}`(startLine, endLine, filePath);
+            return format!`\inputminted[firstline=%d, lastline=%d]{%s}{%s}`(startLine, endLine, extension(filePath), filePath);
         }
 
         void doInlineFileRangeCase(int[2] range)
         {
             newLineContent = formatInputListing(completedFilePath, range[0], range[1]);
-            labelString = "";
+        }
+
+        string getRefLabel(string labelString)
+        {
+            return format!`A se vedea Anexa \ref{%s}.`(labelString);
         }
 
         // Entire file
@@ -162,13 +164,12 @@ void main()
             if (lineCountInThatFile <= maxLineCountInline)
             {
                 newLineContent = format!`\lstinputlisting{%s}`(completedFilePath);
-                labelString = "";
             }
             else
             {
                 formattedWrite!`\chapter{%s}`(app, filename);
-                labelString = format!`appendix:%s_%s`(link.repo, friendlyFileName);
-                newLineContent = format!`\ref{%s}`(labelString);
+                const labelString = format!`appendix:%s_%s`(link.repo, friendlyFileName);
+                newLineContent = getRefLabel(labelString);
                 
                 appendLabel(labelString);
 
@@ -196,8 +197,8 @@ void main()
             else
             {
                 formattedWrite!`\chapter{%s, rândurile %d--%d}`(app, filename, range[0], range[1]);
-                labelString = format!`appendix:%s_%s_%d_%d`(link.repo, friendlyFileName, range[0], range[1]);
-                newLineContent = format!`\ref{%s}`(labelString);
+                const labelString = format!`appendix:%s_%s_%d_%d`(link.repo, friendlyFileName, range[0], range[1]);
+                newLineContent = getRefLabel(labelString);
 
                 appendLabel(labelString);
                 app ~= formatInputListing(completedFilePath, range[0], range[1]);
@@ -208,19 +209,8 @@ void main()
         
         lines[link.lineIndex] = newLineContent;
     }
-
-    auto lastLine = lines[$ - 1];
-    const prevLength = lines.length;
-    auto toAdd = [
-        `\appendix`,
-        // `\begin{appendices}`,
-        // `\chapter{Codul sursă menționat}`,
-        app[],
-        // `\end{appendices}`,
-    ];
-    lines.length += toAdd.length;
-    lines[prevLength - 1 .. $ - 1] = toAdd[];
-    lines[$ - 1] = lastLine;
+    
+    lines[lines.countUntil("% insert appendices here")] = app[];
 
     copy(lines.joiner("\n"), File("teza_processed.tex", "w").lockingTextWriter);
 }
