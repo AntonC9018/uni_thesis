@@ -32,8 +32,8 @@
   autogobble,
   codetagify=true,
   linenos,
-  baselinestretch=1.0,
-  fontsize=10pt
+  baselinestretch=1.0
+  % fontsize=10pt
 }
 
 
@@ -89,6 +89,8 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 
 \end{abstract}
 
+% Chapters should count with roman numerals
+\renewcommand{\thechapter}{\Roman{chapter}}
 
 \chapter{Sumarul Generării Codului in C\#}
 
@@ -1040,7 +1042,7 @@ Un astfel de program poate ori să se integreze cu alte scripturi CI/CD, ori să
 În acest capitol s-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
 S-a demonstrat cum generarea codului poate fi incorporată într-un instrument centralizat care poate fi utilizat pentru automatizarea proceselor de dezvoltare a unui sistem informatic.
 
-\chapter{Concluziile finale si Recomandarile}
+\chapter{Concluziile finale si Recomandările}
 
 În lucrarea aceasta, s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
 S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
