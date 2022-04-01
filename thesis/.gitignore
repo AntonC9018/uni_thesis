@@ -6,3 +6,10 @@
 *.blg
 errors.txt
 teza_processed.synctex.gz
+_minted*
+get_links.exe
+get_links.obj
+build.exe
+build.obj
+teza_processed.pyg
+teza_processed.synctex*

@@ -1,1 +1,0 @@
-texify -shell-escape teza_processed.tex

@@ -10,6 +10,9 @@
 % Times New Roman font
 \usepackage{mathptmx}
 
+% For code
+% \usepackage{inconsolata}
+
 % Romanian language support
 \usepackage[T1]{fontenc}
 \usepackage[utf8x]{inputenc}
@@ -22,31 +25,16 @@
 \usepackage{url}
 
 % Code blocks
-\usepackage{listings}
+\usepackage{minted}
 \usepackage{color}
-
-\lstloadlanguages{csh}
-
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
-
-\lstset{
-  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-  breaklines=true,                 % sets automatic line breaking
-  captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{mygreen},    % comment style
-  frame=single,	                   % adds a frame around the code
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  language=csh,                    % the language of the code
-  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-  numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  stringstyle=\color{mymauve},     % string literal style
-  tabsize=4	                       % sets default tabsize to 4 spaces
+\definecolor{codeBackground}{rgb}{0.95,0.95,0.95}
+\setminted{%
+  autogobble,
+  % bgcolor=codeBackground,
+  codetagify=true,
+  linenos,
+  baselinestretch=1.0,
+  fontsize=10pt
 }
 
 
@@ -136,7 +124,7 @@ Generarea codului poate fi folosită și pentru a elimina codul boilerplate, sau
 Urmează o instanță posibilă de apăriția codului boilerplate, unde dorim să implementăm o interfață prin compoziție\cite{composition_interface_boilerplate}.
 Deci fie o astfel de interfață:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public interface IExample
 {
     void A();
@@ -145,7 +133,7 @@ public interface IExample
     void D();
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Acum fie că dorim să creăm o structură, unde să avem o implementare a acestei interfețe.
 Deoarece trebuie să fie o structură, dorim numaidecât să folosim compoziția, și nu putem folosi moștenirea.
@@ -153,18 +141,18 @@ Deoarece trebuie să fie o structură, dorim numaidecât să folosim compoziția
 
 În alte cuvinte:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public struct Composition : IExample
 {
     private IExample _impl;
 }
-\end{lstlisting}
+\end{minted}
 
 Este clar că acum trebuie să implementăm această interfață.
 Deci, unica soluție care C\# ne propune este următoarea:
 
-\begin{lstlisting}
-  public struct Composition : IExample
+\begin{minted}{csharp}
+public struct Composition : IExample
 {
     private IExample _impl;
 
@@ -174,7 +162,7 @@ Deci, unica soluție care C\# ne propune este următoarea:
     void D() { _impl.D(); }
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Este clar, că așa abordare în primul rând este o repetare proastă a codului, aducerea zgomotului fără sens în cod.
 Însă cel mai rău aspect este că, acum, dacă s-ar schimba interfața \texttt{IExample}, s-ar trebui să fie schimbat și acest tip.
@@ -187,17 +175,17 @@ Da, nu e nimic dacă este doar un singur astfel de tip, dar aceste lucruri se ac
 
 Cu generarea codului, ar putea fi posibilă o astfel de soluție, simplă, clară, ușoară de utilizat, și rezistentă la schimbări ale interfeței:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public partial struct Composition : IExample
 {
     [ForwardMethodCalls]
     private IExample _impl;
 }
-\end{lstlisting}
+\end{minted}
 
 Iar codul generat deja să conțină aceste implementări, într-un fișier aparte:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public partial struct Composition
 {
     void A() { _impl.A(); }
@@ -206,26 +194,26 @@ public partial struct Composition
     void D() { _impl.D(); }
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 
 \section{Exemplu: metodele ajutatoare pentru enumuri flag}
 
 Fie un astfel de enum cu flaguri:
 
-\begin{lstlisting}
-  public enum Flags
+\begin{minted}{csharp}
+public enum Flags
 {
     Shy = 1 << 0,
     Brave = 1 << 1,
     Strong = 1 << 2,
     Beautiful = 1 << 3,
 }
-\end{lstlisting}
+\end{minted}
 
 Și folosirea lui în cod tipică:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 Flags flags = Flags.Shy | Flags.Brave;
 
 // Check if it has the Shy flag
@@ -245,11 +233,11 @@ if (true)
     flags |= Flags.Beautiful;
 else
     flags &= ~Flags.Beautiful;
-\end{lstlisting}
+\end{minted}
 
 Acestea pot fi puse în metode de extensiune și atunci uzul lor devine mai descriptiv:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 Flags flags = Flags.Shy | Flags.Brave;
 
 // Check if it has the Shy flag
@@ -291,7 +279,7 @@ public static class FlagsExtensions
             source &= ~target;
     }
 }
-\end{lstlisting}
+\end{minted}
 
 Problema este că trebuie să se scrie aceste metode pentru toate tipurile flag care sunt în cod.
 Când apare un nou astfel de tip, trebuie să se copieze acest cod, și să se plaseze undeva, cu denimirea tipului de intrare schimbată.
@@ -300,13 +288,13 @@ Aceasta este posibil de realizat cu IL emission, dar nu cred că merită.
 
 Autorul propune următoarea soluție declarativă, explicată mai bine în capitolul 3:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 [NiceFlags]
 public enum Flags
 {
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Aceasta generează toate acele metode automat.
 
@@ -503,7 +491,7 @@ Este clar că aceste opțiuni de obicei vor fi ascunse într-un script executabi
 Încă, configurația generală pentru un anumit proiect poate fi pusă într-un fișier json.
 Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc. Exemplu:
 
-\lstinputlisting{../race/game/kari.json}
+\inputminted{json}{../race/game/kari.json}
 
 
 S-a decis ca toate plugin-urile să fie importate ori dintr-o singură directorie, ori individual după cale către DLL-uri.
@@ -547,9 +535,9 @@ A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}.
 Următorul cod transmite argumentele primite la consolă la parser, care își completează structura de date internă cu toate opțiunile prinse, pentru o mapare mai eficientă în continuare:
 
 
-\lstinputlisting[firstline=126, lastline=132]{../Kari/source/Kari.Generator/KariCompiler.cs}
+\inputminted[firstline=126, lastline=132]{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 ArgumentParser parser = new ArgumentParser();
 var result = parser.ParseArguments(args);
 if (result.IsError)
@@ -557,7 +545,7 @@ if (result.IsError)
     argumentLogger.LogError(result.Error);
     return (int) ExitCode.OptionSyntaxError;
 }
-\end{lstlisting}
+\end{minted}
 
 Aici se arată codul parțial al clasei ce va primi argumentele din consolă, mapate la tipurile câmpurilor.
 Cum se poate observa, este utilizat atributul \texttt{Option} pentru a atinge un API declarativ.
@@ -565,7 +553,7 @@ Acestea sunt scanate în timpul rulării de către parser, utilizând reflexie r
 
 A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler_21_87}.
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 public class KariOptions
 {
     public string HelpMessage => "Use Kari to generate code for a C\# project.";
@@ -584,14 +572,14 @@ public class KariOptions
     public string generatedNamespaceSuffix = "Generated";
     // ...
 }
-\end{lstlisting}
+\end{minted}
 
 Urmează un exemplu de utilizare în codul generatorului de cod.
 Metoda \texttt{FillObjectWithOptionValues} umple obiectul dat cu valorile din structura de date internă, și returnează o listă cu toate erorile care s-au îmtâmplat în timpul bindării parametrilor.
 
-\lstinputlisting[firstline=147, lastline=155]{../Kari/source/Kari.Generator/KariCompiler.cs}
+\inputminted[firstline=147, lastline=155]{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
 
-\begin{lstlisting}
+\begin{minted}{csharp}
   var ops = new KariOptions();
 var result1 = parser.FillObjectWithOptionValues(ops);
 
@@ -601,15 +589,15 @@ if (result1.IsError)
         argumentLogger.LogError(e);
     return (int) ExitCode.BadOptionValue;
 }
-\end{lstlisting}
+\end{minted}
 
 Aceeași metodă este utilizată și pentru bindarea valorilor la câmpurile ``administratorilor'' plugin-urilor.
 Administratorii sunt obiecte care dirijează procesul de execuție a plugin-urilor.
 
 
-\lstinputlisting[firstline=208, lastline=221]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=208, lastline=221]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 foreach (var admin in Administrators)
 {
     var result = parser.FillObjectWithOptionValues(admin.GetArgumentObject());
@@ -621,16 +609,16 @@ foreach (var admin in Administrators)
         }
     }
 }
-\end{lstlisting}
+\end{minted}
 
 Interesant este momentul că, când vreo opțiune este menționată în parser, ea este marcată cu un flag.
 După ce toate opțiunile au fost colectate, se poate obține toate opțiunile care nu au fost marcate cu un astfel de flag - argumentele superfluoase.
 Opinia autorului este că prezența argumentelor superfluoase mereu trebuie să fie considerată ca o eroare critică.
 În plus, toate așa erori trebuie să fie explicit afișate.
 
-\lstinputlisting[firstline=446, lastline=460]{../Kari/source/Kari.Generator/KariCompiler.cs}
+\inputminted[firstline=446, lastline=460]{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 var unrecognizedOptions = parser.GetUnrecognizedOptions();
 var unrecognizedConfigOptions = parser.GetUnrecognizedOptionsFromConfigurations();
 if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
@@ -646,7 +634,7 @@ if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
     }
     return ExitCode.UnknownOptions;
 }
-\end{lstlisting}
+\end{minted}
 
 Un exemplu de output:
 
@@ -739,7 +727,7 @@ Cacharea de face în mod paralel.
 Această operație este destul de constisitoare.
 După înțelegerea autorului, cere destul de multe resurse din acea cauză că crearea compilației este leneșă, deci analiza tuturor arborilor sintactice necesită cacharea leneșă a mai multor simboluri.
 
-\lstinputlisting[firstline=699, lastline=727]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=699, lastline=727]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 Fiecare plugin, în rândul său, face filtrarea proprie a tipurilor, colectând datele necesare.
 Aceasta se face în metoda \texttt{IAdministrator.Collect} scopul căreia este să inițializeze toate datele necesare pentru generarea consecutivă a codului.
@@ -761,17 +749,17 @@ Sunt 4 moduri de output:
 
 \begin{itemize}
 \item \texttt{CentralFile}. Output-ul este concatenat între toate proiectele, și scris într-un singur fișier.
-\lstinputlisting[firstline=1114, lastline=1129]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=1114, lastline=1129]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \item \texttt{CentralDirectory}. Output-ul este divizat între proiecte și put într-un folder de ieșire comun.
   Fiecare subfolder al acestui folder are denumirea proiectului pentru care a fost generat fișierul, și conține toate fișierele, ca solicitat de plugin-uri.
-\lstinputlisting[firstline=1064, lastline=1080]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=1064, lastline=1080]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \item \texttt{NestedFile}. Output-ul fiecărui proiect în parte este concatenat și scris în câte un fișier pentru fiecare proiect.
-\lstinputlisting[firstline=1131, lastline=1145]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=1131, lastline=1145]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \item \texttt{NestedDirectory}. Output-ul este divizat între proiecte și generat în căte un subfolder, cu denumirile fișierelor ca solicitat de plugin-uri.
-\lstinputlisting[firstline=1040, lastline=1057]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=1040, lastline=1057]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 \end{itemize}
 
 Înainte de a fi scris în fișier, codul generat este comparat cu conținutul fișierului existent, dacă un fișier cu aceeași denumire deja există.
@@ -781,7 +769,7 @@ Chiar dacă se înlocuiește conținutul unui fișier cu conținutul nou egal, t
 Din această cauză, dacă se admite ca generatorul de cod să nu aibă această verificare, rularea generatorului de cod de a două dată va invoca o recompilare.
 Deoarece recompilarea în Unity este foarte lentă, luând pănă la 10 secunde, se câștigă destul de multe resurse dacă se folosește această verificare.
 
-\lstinputlisting[firstline=950, lastline=972]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=950, lastline=972]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 Se poate observa că se folosește cod asincron de scriere a datelor în fișiere, și codul este la un nivel destul de scăzut.
 Acestea sunt în cea mai mare parte experimentările autorului și de fapt nu accelerează executarea.
@@ -807,7 +795,7 @@ El are un contor pentru indentarea curentă, și o adaugă de atâtea ori, când
 
 Esența acestei utilități poate fi ilustrată în următorul cod:
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 // UTF-8
 public byte[] IndentationBytes { get; }
 
@@ -826,7 +814,7 @@ public void AppendLine()
     Indent();
     NewLine();
 }
-\end{lstlisting}
+\end{minted}
 
 A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Utils_CodeBuilder_19_184}.
 
@@ -868,7 +856,7 @@ Urmează un exemplu al unui fișier generat.
 Clasa \texttt{DummyDataObjectAnnotations} conține membrul Text cu codul sursă al fișierului, din care acest fișier a fost generat,
 iar clasa \texttt{DataObjectSymbols} reprezintă acel boilerplate ce ține de wrapper-uri pentru atributele.
 
-\begin{lstlisting}
+\begin{minted}{csharp}
 namespace Kari.Plugins.DataObject
 {
     using Kari.GeneratorCore.Workflow;
@@ -899,7 +887,7 @@ namespace Kari.Plugins.DataObject
         }
     }
 }
-\end{lstlisting}
+\end{minted}
 
 \section{Cum lucreaza plugin-urile, mai detaliat}
 
@@ -928,7 +916,7 @@ A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAnaly
 În acest caz, sunt colectate unele informații despre toate simbolurile cu atributul \texttt{NiceFlags}.
 
 
-\lstinputlisting[firstline=159, lastline=170]{../Kari/source/Kari.Plugins/Flags/FlagsAnalyzer.cs}
+\inputminted[firstline=159, lastline=170]{cs}{../Kari/source/Kari.Plugins/Flags/FlagsAnalyzer.cs}
 
 Metoda \texttt{GenerateCode\(\)} folosește aceste date pentru a formata un șir cu codul boilerplate și scrie rezultatul într-un \texttt{CodeBuilder}.
 Early exit-ul garantează că dacă nici un tip nu a fost anotat cu atributul \texttt{NiceFlags}, nimic nu va fi generat.
@@ -959,14 +947,14 @@ A se vedea Anexa \ref{appendix:uni_thesis____examples_flags_Program}.
 Pentru aceasta se invocă Kari cu drumul la fișierul de configurare \texttt{kari.json} care conține drumul la DLL-ul plugin-ului Flags.
 Acesta poate fi dat lui Kari și direct, însă utilizarea unui fișier de configurare este mai comod.
 
-\lstinputlisting{../examples/flags/kari.bat}
+\inputminted{bat}{../examples/flags/kari.bat}
 
-\lstinputlisting{../examples/flags/kari.json}
+\inputminted{json}{../examples/flags/kari.json}
 
 
 Și codul generat:
 
-\lstinputlisting{../examples/flags/Generated/FlagsAnnotations.cs}
+\inputminted{cs}{../examples/flags/Generated/FlagsAnnotations.cs}
 
 A se vedea Anexa \ref{appendix:uni_thesis____examples_flags_Generated_Flags}.
 
@@ -983,7 +971,7 @@ A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataO
 
 Informațiile colectate au mai multe chestii, ca simbolul tipului, simbolurile pentru câmpurile instance, etc.
 
-\lstinputlisting[firstline=160, lastline=180]{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
+\inputminted[firstline=160, lastline=180]{cs}{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
 
 Metoda \texttt{CollectSymbols} tot așa colectează simbolurile necesare și le pune în aceste obiecte cu informații suplimentare extrase.
 Se mai fac niște verificări pentru a avertiza utilizatorul despre problemele cu tipul: trebuie să nu fie static, trebuie să fie parțial, trebuie să aibă un modificator de acces.
@@ -1004,7 +992,7 @@ A se vedea Anexa \ref{appendix:uni_thesis____examples_dataobject_Program}.
 
 A se vedea Anexa \ref{appendix:uni_thesis____examples_dataobject_Generated_DataObjects}.
 
-\lstinputlisting{../examples/dataobject/Generated/DataObjectAnnotations.cs}
+\inputminted{cs}{../examples/dataobject/Generated/DataObjectAnnotations.cs}
 
 \section{Operatiile cu Kari ca parte de un instrument centralizat de dezvoltare}
 
@@ -1015,12 +1003,12 @@ A se vedea Anexa \ref{appendix:race____race_dev_cli_source_commands_setup}.
 
 Restul configurației se ia din fișierul de configurație care se conține în mapa cu proiectul Unity al jocului:
 
-\lstinputlisting{../race/game/kari.json}
+\inputminted{json}{../race/game/kari.json}
 
 Instrumentul poate fi invocat din linia de comandă.
 Scriptul \texttt{setup.bat} arată compilarea instrumentului și invocarea comenzii setup.
 
-\lstinputlisting{../race/setup.bat}
+\inputminted{bat}{../race/setup.bat}
 
 Se admite că numele executabilului generat este \texttt{dev}.
 Atunci, comanda de setup poate fi executată în felul următor:
@@ -1076,70 +1064,70 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 
 
 \appendix
-\renewcommand{\thechapter}{Anexa \arabic{chapter}}
+\renewcommand{\thechapter}{\arabic{chapter}}
 
 \chapter{KariCompiler.cs}\label{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}
-\lstinputlisting{../Kari/source/Kari.Generator/KariCompiler.cs}
+\inputminted{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
 
 \chapter{KariCompiler.cs, rândurile 21--87}\label{appendix:Kari____Kari_source_Kari_Generator_KariCompiler_21_87}
-\lstinputlisting[firstline=21, lastline=87]{../Kari/source/Kari.Generator/KariCompiler.cs}
+\inputminted[firstline=21, lastline=87]{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
 
 \chapter{ArgumentParsing.cs}\label{appendix:Kari____Kari_source_Kari_Arguments_ArgumentParsing}
-\lstinputlisting{../Kari/source/Kari.Arguments/ArgumentParsing.cs}
+\inputminted{cs}{../Kari/source/Kari.Arguments/ArgumentParsing.cs}
 
 \chapter{AdministratorFinder.cs}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_AdministratorFinder}
-\lstinputlisting{../Kari/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs}
+\inputminted{cs}{../Kari/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs}
 
 \chapter{MasterEnvironment.cs, rândurile 285--598}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_285_598}
-\lstinputlisting[firstline=285, lastline=598]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=285, lastline=598]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \chapter{MasterEnvironment.cs, rândurile 604--664}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_604_664}
-\lstinputlisting[firstline=604, lastline=664]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=604, lastline=664]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \chapter{MasterEnvironment.cs, rândurile 666--697}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_666_697}
-\lstinputlisting[firstline=666, lastline=697]{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
+\inputminted[firstline=666, lastline=697]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
 \chapter{CodeBuilder.cs, rândurile 19--184}\label{appendix:Kari____Kari_source_Kari_Utils_CodeBuilder_19_184}
-\lstinputlisting[firstline=19, lastline=184]{../Kari/source/Kari.Utils/CodeBuilder.cs}
+\inputminted[firstline=19, lastline=184]{cs}{../Kari/source/Kari.Utils/CodeBuilder.cs}
 
 \chapter{Annotator.cs}\label{appendix:Kari____Kari_source_Kari_Annotator_Annotator}
-\lstinputlisting{../Kari/source/Kari.Annotator/Annotator.cs}
+\inputminted{cs}{../Kari/source/Kari.Annotator/Annotator.cs}
 
 \chapter{InternalPlugin.props}\label{appendix:Kari____Kari_source_Kari_Plugins_InternalPlugin}
-\lstinputlisting{../Kari/source/Kari.Plugins/InternalPlugin.props}
+\inputminted{xml}{../Kari/source/Kari.Plugins/InternalPlugin.props}
 
 \chapter{FlagsAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAdministrator}
-\lstinputlisting{../Kari/source/Kari.Plugins/Flags/FlagsAdministrator.cs}
+\inputminted{cs}{../Kari/source/Kari.Plugins/Flags/FlagsAdministrator.cs}
 
 \chapter{Administrator.cs, rândurile 67--163}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_Administrator_67_163}
-\lstinputlisting[firstline=67, lastline=163]{../Kari/source/Kari.GeneratorCore/Workflow/Administrator.cs}
+\inputminted[firstline=67, lastline=163]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/Administrator.cs}
 
 \chapter{FlagsAnalyzer.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAnalyzer}
-\lstinputlisting{../Kari/source/Kari.Plugins/Flags/FlagsAnalyzer.cs}
+\inputminted{cs}{../Kari/source/Kari.Plugins/Flags/FlagsAnalyzer.cs}
 
 \chapter{Program.cs}\label{appendix:uni_thesis____examples_flags_Program}
-\lstinputlisting{../examples/flags/Program.cs}
+\inputminted{cs}{../examples/flags/Program.cs}
 
 \chapter{Flags.cs}\label{appendix:uni_thesis____examples_flags_Generated_Flags}
-\lstinputlisting{../examples/flags/Generated/Flags.cs}
+\inputminted{cs}{../examples/flags/Generated/Flags.cs}
 
 \chapter{DataObjectAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAdministrator}
-\lstinputlisting{../Kari/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs}
+\inputminted{cs}{../Kari/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs}
 
 \chapter{DataObjectAnalyzer.cs, rândurile 14--46}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_14_46}
-\lstinputlisting[firstline=14, lastline=46]{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
+\inputminted[firstline=14, lastline=46]{cs}{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
 
 \chapter{DataObjectAnalyzer.cs, rândurile 48--157}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_48_157}
-\lstinputlisting[firstline=48, lastline=157]{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
+\inputminted[firstline=48, lastline=157]{cs}{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
 
 \chapter{Program.cs}\label{appendix:uni_thesis____examples_dataobject_Program}
-\lstinputlisting{../examples/dataobject/Program.cs}
+\inputminted{cs}{../examples/dataobject/Program.cs}
 
 \chapter{DataObjects.cs}\label{appendix:uni_thesis____examples_dataobject_Generated_DataObjects}
-\lstinputlisting{../examples/dataobject/Generated/DataObjects.cs}
+\inputminted{cs}{../examples/dataobject/Generated/DataObjects.cs}
 
 \chapter{setup.d}\label{appendix:race____race_dev_cli_source_commands_setup}
-\lstinputlisting{../race/dev_cli/source/commands/setup.d}
+\inputminted{d}{../race/dev_cli/source/commands/setup.d}
 
 
 

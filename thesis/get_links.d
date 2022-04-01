@@ -142,14 +142,34 @@ void main()
             return stripExtension(completedFilePath).replace("\\", "_").replace("/", "_").replace(".", "_");
         }
 
-        static string formatInputListing(string filePath, int startLine, int endLine)
+        static string getLanguageFromFileName(string filename)
         {
-            return format!`\inputminted[firstline=%d, lastline=%d]{%s}{%s}`(startLine, endLine, extension(filePath), filePath);
+            string ext = extension(filename)[1 .. $];
+            switch (ext)
+            {
+                // msbuild files
+                case "props": return "xml";
+                case "csproj": return "xml";
+
+                default: return ext;
+            }
+        }
+
+        static string formatInputListing(string filePath, string fileName, int startLine, int endLine)
+        {
+            return format!`\inputminted[firstline=%d, lastline=%d]{%s}{%s}`(
+                startLine, endLine, getLanguageFromFileName(fileName), filePath);
+        }
+
+        static string formatInputListing2(string filePath, string fileName)
+        {
+            return format!`\inputminted{%s}{%s}`(
+                getLanguageFromFileName(fileName), filePath);
         }
 
         void doInlineFileRangeCase(int[2] range)
         {
-            newLineContent = formatInputListing(completedFilePath, range[0], range[1]);
+            newLineContent = formatInputListing(completedFilePath, filename, range[0], range[1]);
         }
 
         string getRefLabel(string labelString)
@@ -163,7 +183,7 @@ void main()
             const lineCountInThatFile = File(completedFilePath, "r").byLine.count;
             if (lineCountInThatFile <= maxLineCountInline)
             {
-                newLineContent = format!`\lstinputlisting{%s}`(completedFilePath);
+                newLineContent = formatInputListing2(completedFilePath, filename);
             }
             else
             {
@@ -173,7 +193,7 @@ void main()
                 
                 appendLabel(labelString);
 
-                formattedWrite!`\lstinputlisting{%s}`(app, completedFilePath);
+                app ~= formatInputListing2(completedFilePath, filename);
                 app ~= "\n";
                 app ~= "\n";
             }
@@ -201,7 +221,7 @@ void main()
                 newLineContent = getRefLabel(labelString);
 
                 appendLabel(labelString);
-                app ~= formatInputListing(completedFilePath, range[0], range[1]);
+                app ~= formatInputListing(completedFilePath, filename, range[0], range[1]);
                 app ~= "\n";
                 app ~= "\n";
             }

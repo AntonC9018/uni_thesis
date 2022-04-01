@@ -10,6 +10,9 @@
 % Times New Roman font
 \usepackage{mathptmx}
 
+% For code
+% \usepackage{inconsolata}
+
 % Romanian language support
 \usepackage[T1]{fontenc}
 \usepackage[utf8x]{inputenc}
@@ -23,12 +26,14 @@
 
 % Code blocks
 \usepackage{minted}
+\usepackage{color}
 \definecolor{codeBackground}{rgb}{0.95,0.95,0.95}
 \setminted{%
   autogobble,
-  bgcolor=codeBackground,
-  codetagify,
-  linenos
+  codetagify=true,
+  linenos,
+  baselinestretch=1.0,
+  fontsize=10pt
 }
 
 
@@ -146,7 +151,7 @@ Este clar că acum trebuie să implementăm această interfață.
 Deci, unica soluție care C\# ne propune este următoarea:
 
 \begin{minted}{csharp}
-  public struct Composition : IExample
+public struct Composition : IExample
 {
     private IExample _impl;
 
@@ -196,7 +201,7 @@ public partial struct Composition
 Fie un astfel de enum cu flaguri:
 
 \begin{minted}{csharp}
-  public enum Flags
+public enum Flags
 {
     Shy = 1 << 0,
     Brave = 1 << 1,
