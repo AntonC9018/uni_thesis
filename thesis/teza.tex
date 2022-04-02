@@ -1,5 +1,30 @@
 \documentclass[a4paper,12pt]{report}
 
+
+% https://tex.stackexchange.com/a/63393
+\makeatletter
+\def\@makechapterhead#1{%
+  %%%%\vspace*{50\p@}% %%% removed!
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \huge\bfseries \@chapapp\space \thechapter
+        \par\nobreak
+        \vskip 20\p@
+    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+\def\@makeschapterhead#1{%
+  %%%%%\vspace*{50\p@}% %%% removed!
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    \Huge \bfseries  #1\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+
 % spacings
 \usepackage[a4paper,right=15mm,left=25mm,top=20mm,bottom=20mm]{geometry}
 
@@ -37,14 +62,27 @@
   fontsize=\footnotesize
 }
 
-% Chapters left aligned and 14 pt
+% Chapters should count with roman numerals
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+
+% Chapters must left aligned and 14 pt.
+% There's no 14 pt available, though, only 14.4 (\large)
+% https://tex.stackexchange.com/questions/24599/what-point-pt-font-size-are-large-etc/24600#24600
 \usepackage{titlesec}    
-\titleformat{\chapter}[display]
-{\normalfont%
-    \huge% %change this size to your needs for the first line
-    \bfseries}{\chaptertitlename\ \thechapter}{20pt}{%
-    \Huge %change this size to your needs for the second line
-    }
+% \titleformat{〈command 〉}[〈shape〉]{〈format〉}{〈label 〉}{〈sep〉}{〈before-code〉}[〈after-code〉]
+% https://mirror.marwan.ma/ctan/macros/latex/contrib/titlesec/titlesec.pdf#page=4&zoom=200,67,627
+% It gets pretty involved...
+\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter.~}{0pt}{}
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filright}{\thesection.~}{0pt}{}
+% Skips before and after the title
+\titlespacing*{\chapter}{0pt}{12pt}{6pt}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{12pt}{6pt}
+
+% Aliniat de 1 cm.
+\usepackage{indentfirst}
+\setlength{\parindent}{1.0cm}
 
 % https://tex.stackexchange.com/questions/163451/total-number-of-citations
 \usepackage{totcount}
@@ -95,32 +133,31 @@
   \begin{center}
       \vspace*{1cm}
 
-      \Large
+      \large
       \uppercase{\textbf{UNIVERSITATEA DE STAT DIN MOLDOVA\\}}
 
       \normalsize
       \uppercase{\textbf{FACULTATEA DE MATEMATICĂ SI INFORMATICĂ}}
-      \vspace{0.2cm}
+      \vspace{0.1cm}
 
       \normalsize
       \uppercase{\textbf{SPECIALITATEA INFORMATICA APLICATĂ}}
       \vspace{3.0cm}
 
-      \normalsize
-      \uppercase\expandafter{\authorName}
+      \large
+      \textbf{\uppercase\expandafter{\authorName}}
       \vspace{1.5cm}
 
       \Large
-      \uppercase{\textbf\expandafter{\thesisTitle}}
+      \textbf{\uppercase\expandafter{\thesisTitle}}
       \vspace{0.75cm}
 
-      \normalsize
+      \large
       \uppercase{\textbf{CIFRUL ȘI DENUMIREA PROGRAMULUI DE STUDII}}
       \vspace{0.5cm}
 
       \normalsize
-      \Large
-      Teză de \programulDeStudii\
+      \textbf{Teză de \programulDeStudii{}}
   
     \end{center}
   \vfill
@@ -133,7 +170,7 @@
   \end{flushleft}
 
   \begin{center}
-    \textbf{Chișinău --- 2022}
+    \textbf{Chișinău -- 2022}
   \end{center}
 
 \end{titlepage}
@@ -141,9 +178,9 @@
 \tableofcontents
 \newpage
 
-\chapter*{\centering Adnotare}
+\chapter*{Adnotare}
 
-\textbf{la teza de licență/master ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
+\textbf{la teza de licență ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
 
 \textbf{Structura tezei.}
 Teza constă din: Introducere, 4 capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} de titluri.
@@ -178,7 +215,7 @@ Rezultatele obținute au fost raportate la Conferința (-ele) \textbf{\conferenc
 
 \markpage{usefulStuffBegin}
 
-\textbf{Actualitatea si importanta temei.}
+\textbf{Actualitatea si importanța temei.}
 
 Dezvoltarea jocurilor video este un domeniu important în ziua de azi.
 Dezvoltarea lor practică și eficientă necesită mai multe instrumente, ca o modalitate de rendering a mesh-elor sau a imaginilor pe ecran, o modalitate de user input, scripting etc.
@@ -208,7 +245,7 @@ Generatorul de cod este un instrument realizat în limbajul C\#, pe baza platfor
 Generatorul de cod a fost testat și utilizat în practică în Unity.
 Instrumentul a fost elaborat după necesitate în dezvoltare și reiese întreg din experimentare și experiența autorului.
 
-\textbf{Noutatea stiintifica/originalitatea.}
+\textbf{Noutatea stiințifică/originalitatea.}
 
 În general, generatorul de cod a fost proiectat și elaborat după necesitățile autorului.
 Autorul utilizează acest instrument în proiectele proprii și planifică să-l perfecționeze și să-l facă mai modular și mai ușor de utilizat.
@@ -223,10 +260,6 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 
 În această lucrare se argumentează și se elaborează un generator de cod C\# flexibil și extensibil care poate fi utilizat pentru a ușura și a face mai plăcută programarea în C\#, și pentru a spori eficiența programatorului în implementarea unelor soluții.
 
-% \end{abstract}
-
-% Chapters should count with roman numerals
-\renewcommand{\thechapter}{\Roman{chapter}}
 
 \chapter{Sumarul Generării Codului în C\#}
 
@@ -303,9 +336,7 @@ public struct Composition : IExample
 
 Este clar, că așa abordare în primul rând este o repetare proastă a codului, aducerea zgomotului fără sens în cod.
 Însă cel mai rău aspect este că, acum, dacă s-ar schimba interfața \texttt{IExample}, s-ar trebui să fie schimbat și acest tip. 
-Da, nu e nimic dacă este doar un singur astfel de tip, dar aceste lucruri se acumulează și pot face codul mai anevoios de modificat, sporesc fricția între limbajul de programare și programatorul.
-
-\footnote{
+Da, nu e nimic dacă este doar un singur astfel de tip, dar aceste lucruri se acumulează și pot face codul mai anevoios de modificat, sporesc fricția între limbajul de programare și programatorul. \footnote{
   O altă soluție aici ar putea fi supraîncărcarea castului implicit în acest tip integrat,
   însă supraîncarcarea casturilor implicite în interfețe nu este permisă în C\#.
 }
@@ -462,7 +493,7 @@ Roslyn este un ansamblu de librării și instrumente pentru analiza și compilar
 De fapt, însuși compilatorul C\# este implementat pe baza acestor librării Roslyn.
 Roslyn combină întregul pipeline de compilare: tokenizarea, analiza sintactică, analiza semantică, generarea codului executabil, expuzând toate aceste operații.
 
-Cel mai des, Roslyn este utilizat pentru analizori, adică programe care analizează codul sursă și detectează erori logice, posibil propunând o remediere (code fix), sau adaugând operații utile în IDE-urile, de exemplu, ``implement methods'', ``extract into a local function''.
+Cel mai des, Roslyn este utilizat pentru analizori, adică programe care analizează codul sursă și detectează erori logice, posibil propunând o remediere\footnote{``code fix''}, sau adaugând operații utile în IDE-urile, de exemplu, ``implement methods'', ``extract into a local function''.
 De fapt, repertoriul Roslyn conține o mulțime de analizori gata pentru folosire.
 
 Însă Roslyn a fost demult utilizat și pentru generatori de cod ad hoc, adică unele programe care produc codul sursă adaugător, des generat pe baza codului sursă inițial, create pentru un lucru specific.
@@ -521,7 +552,7 @@ Crearea unei soluții personale ar fi mai ușor și mai practic:
   
   \item Soluția ar putea fi utilizată în Unity, precum și în orice alt proiect C\#, indiferent de dacă folosește sau nu MSBuild și indifirent de versiunea compilatorului utilizată în acel proiect.
   
-  \item Reutilizarea configurației tot poate fi asigurată (cel puțin parțial, descris și în continuare). 
+  \item Reutilizarea configurației tot poate fi asigurată\footnote{cel puțin parțial, descris și în continuare.}.
 \end{itemize}
 
 \section{Rezumat}
@@ -531,7 +562,7 @@ A fost introdusă și ideea de fluidizare a procesului utilizând un sistem care
 
 \chapter{Sumarul Arhitecturii}
 
-\section{Concretizarea cerintelor pentru generator de cod}
+\section{Concretizarea cerințelor pentru generator de cod}
 
 Este clar că pentru a putea realiza un produs software trebuie să se știe ce exact se cere de el.
 În cazul unui generator de cod, se poate formaliza cerințele funcționale de bază la nivel înalt în următorul mod:
@@ -626,8 +657,7 @@ De aceea s-a decis că generatorul de cod trebuie să funcționeze ca o aplicaț
 Este clar că aceste opțiuni de obicei vor fi ascunse într-un script executabil, de exemplu, ca un fișier bat pe Windows.
 
 Încă, configurația generală pentru un anumit proiect poate fi pusă într-un fișier json.
-Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc. Exemplu:
-
+Așa fișier poate conține configurația parametrilor concrete pentru plugin-uri, sau configurația de felul care proiect din acestea este principal, cum să fie numită mapă de ieșire, etc.
 https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
 
 
@@ -656,7 +686,7 @@ S-a decis că o arhitectură băzată pe plugin-uri, unde orchestratorul dirijea
 S-a discutat și fluxul de lucru dorit, mai precis, faptul că va fi o aplicație din linia de comandă.
 
 
-\chapter{Implementarea generatorului de cod}
+\chapter{Implementarea Generatorului de Cod}
 
 \section{Configurarea}
 
@@ -664,114 +694,32 @@ După cum s-a menționat, configurarea se va face din linia de comandă și/sau 
 Autorul a decis să creeze codul propriu pentru lucrul acesta, cu toate că deja există mai multe librării care fac același lucru.
 Autorul ori nu a fost satisfăcut cu API-ul lor, ori cu lipsa opțiunilor dorite.
 
-Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua:
-Exemplu\footnote{a se vedea codul sursă pentru un exemplu complet:
+Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua\footnote{a se vedea codul sursă pentru un exemplu complet:
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs
-}
+}.
 
 Următorul cod transmite argumentele primite la consolă la parser, care își completează structura de date internă cu toate opțiunile prinse, pentru o mapare mai eficientă în continuare:
-
-
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L126-L132
-
-\begin{minted}{csharp}
-ArgumentParser parser = new ArgumentParser();
-var result = parser.ParseArguments(args);
-if (result.IsError)
-{
-    argumentLogger.LogError(result.Error);
-    return (int) ExitCode.OptionSyntaxError;
-}
-\end{minted}
 
 Aici se arată codul parțial al clasei ce va primi argumentele din consolă, mapate la tipurile câmpurilor.
 Cum se poate observa, este utilizat atributul \texttt{Option} pentru a atinge un API declarativ.
 Acestea sunt scanate în timpul rulării de către parser, utilizând reflexie runtime, pentru a obține informații despre obiect la care să fie bindate valorile argumentelor. 
-
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L21-L87
-
-\begin{minted}{csharp}
-public class KariOptions
-{
-    public string HelpMessage => "Use Kari to generate code for a C\# project.";
-
-    [Option("Input path to the directory containing source files or projects.", 
-        IsPath = true)] 
-    public string inputFolder = ".";
-
-    [Option("Plugins folder or paths to individual plugin dlls.",
-        // Can be sometimes inferred from input, aka NuGet's packages.config
-        IsRequired = false,
-        IsPath = true)]
-    public string[] pluginPaths = null;
-
-    [Option("The suffix added to the project namespace to generate the output namespace.")]
-    public string generatedNamespaceSuffix = "Generated";
-    // ...
-}
-\end{minted}
 
 Urmează un exemplu de utilizare în codul generatorului de cod.
 Metoda \texttt{FillObjectWithOptionValues} umple obiectul dat cu valorile din structura de date internă, și returnează o listă cu toate erorile care s-au îmtâmplat în timpul bindării parametrilor. 
-
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L147-L155
-
-\begin{minted}{csharp}
-  var ops = new KariOptions();
-var result1 = parser.FillObjectWithOptionValues(ops);
-
-if (result1.IsError)
-{
-    foreach (var e in result1.Errors)
-        argumentLogger.LogError(e);
-    return (int) ExitCode.BadOptionValue;
-}
-\end{minted}
 
 Aceeași metodă este utilizată și pentru bindarea valorilor la câmpurile ``administratorilor'' plugin-urilor.
 Administratorii sunt obiecte care dirijează procesul de execuție a plugin-urilor.
-
-
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L208-L221
 
-\begin{minted}{csharp}
-foreach (var admin in Administrators)
-{
-    var result = parser.FillObjectWithOptionValues(admin.GetArgumentObject());
-    if (result.IsError)
-    {
-        foreach (var err in result.Errors)
-        {
-            Logger.LogError(err);
-        }
-    }
-}
-\end{minted}
 
 Interesant este momentul că, când vreo opțiune este menționată în parser, ea este marcată cu un flag.
 După ce toate opțiunile au fost colectate, se poate obține toate opțiunile care nu au fost marcate cu un astfel de flag - argumentele superfluoase.
 Opinia autorului este că prezența argumentelor superfluoase mereu trebuie să fie considerată ca o eroare critică.
 În plus, toate așa erori trebuie să fie explicit afișate.
-
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L446-L460
-
-\begin{minted}{csharp}
-var unrecognizedOptions = parser.GetUnrecognizedOptions();
-var unrecognizedConfigOptions = parser.GetUnrecognizedOptionsFromConfigurations();
-if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
-{
-    foreach (var arg in unrecognizedOptions)
-    {
-        _logger.LogError($"Unrecognized option: `{arg}`");
-    }
-    foreach (var arg in unrecognizedConfigOptions)
-    {
-        // TODO: This can contain more info, like the line number.
-        _logger.LogError($"Unrecognized option: `{parser.GetPropertyPathOfOption(arg)}`);
-    }
-    return ExitCode.UnknownOptions;
-}
-\end{minted}
 
 Un exemplu de output:
 
@@ -808,7 +756,6 @@ A fost realizat în durata de aproape o zi și în continuare ceva modificat dup
 După cum s-a menționat anterior, codul plugin-urilor este distribuit și încărcat prin DLL-uri.
 Pentru aceasta, se folosesc funcțiile \texttt{Assembly.LoadFile} și \texttt{GetExportedTypes}, după ce se realizează filtrarea tuturor tipurilor, anume căutarea tipurilor care implementează interfața \texttt{IAdministrator}.
 Aceste tipuri deja pot fi instanțiate prin reflexie.
-
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs
 
 După ce s-au încărcat plugin-urile, nu sunt inițializate imediat.
@@ -837,7 +784,6 @@ Kari permite mai multe moduri de intrare (de descoperire a fișierelor sursă):
 Această logică se conține într-o singură funcție, cu mai multe funcții locale imbricate.
 Codul este foarte simplu, operând cu API-urile sistemei de fișiere și în cea mai mare parte conține validări.
 În dependența de cerințele următoare pentru proiect, acest cod poate fi extras în încă o etapă opțională de descoperire.
-
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L285-L598
 
 Acest cod încă gestionează căutarea acelor două proiecte, anume proiectului \texttt{Common} care reprezintă un proiect cu cod agnostic care conceptual nu poate să se refere la nici un alt proiect, și a proiectului \texttt{Root}, adică proiectului care să conține funcții de inițializare și care conceptual poate referi la orice alt proiect.
@@ -849,12 +795,10 @@ Obiectul care permite reprezentarea abstractă a codului sursă în Roslyn se nu
 Acest obiect poate fi creat din arbori sintactici care la rândul său sunt creați din codul sursă, citit din fișiere sursă.
 Crearea compilației nu poate fi paralelizată pe mai multe fire, însă generarea arborilor din textul sursă poate fi paralelizată.
 Acestă paralelizare nu aduce un beneficiu mare, însă din testele autorului a accelerat timpul execuției cu aproape 10\%.
-
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L604-L664
 
 După ce toții arbori s-au încărcat, se creează obiectul de compilație.
 Acest obiect este după înțelegerea autorului în mare parte leneș, adică nu cachează atâtea multe simboluri.
-
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L666-L697
 
 Plugin-urile de obicei lucrează la nivelul tipurilor sau al membrii lor.
@@ -863,7 +807,6 @@ Cel mai importat simbol sunt tipurile definite de utilizator, de aceea ele sunt 
 Cacharea de face în mod paralel.
 Această operație este destul de constisitoare.
 După înțelegerea autorului, cere destul de multe resurse din acea cauză că crearea compilației este leneșă, deci analiza tuturor arborilor sintactice necesită cacharea leneșă a mai multor simboluri.
-
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L699-L727
 
 Fiecare plugin, în rândul său, face filtrarea proprie a tipurilor, colectând datele necesare.
@@ -905,7 +848,6 @@ Aceasta se face, deoarece instrumentele ca MSBuild și Unity, cel puțin în une
 Chiar dacă se înlocuiește conținutul unui fișier cu conținutul nou egal, timestamp-ul se schimbă, ce invocă o recompilare.
 Din această cauză, dacă se admite ca generatorul de cod să nu aibă această verificare, rularea generatorului de cod de a două dată va invoca o recompilare.
 Deoarece recompilarea în Unity este foarte lentă, luând pănă la 10 secunde, se câștigă destul de multe resurse dacă se folosește această verificare.
-
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L950-L972
 
 Se poate observa că se folosește cod asincron de scriere a datelor în fișiere, și codul este la un nivel destul de scăzut.
@@ -955,7 +897,7 @@ public void AppendLine()
 
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Utils/CodeBuilder.cs#L19-L184
 
-Mai jos se vede niște exemple de utilizare.
+Mai jos sunt prezentate și niște exemple de utilizare.
 
 \section{Anotațiile}
 
@@ -974,15 +916,12 @@ Atunci, dacă plugin-ul a fost utilizat cu totul, acest fișier cu anotațiile v
 Problema este că C\# nu poate citi fișiere ca șiruri în timpul compilării, de aceea a trebuit să se realizeze un program aparte care să citească acest fișier cu anotațiile și să genereze un nou fișier cu o singură clasă statică, cu o singură constantă statică cu conținutul acestui fișier.
 Deoarece acum este un program aparte și este posibil de făcut mai multe lucruri decât doar generarea acestei constante, a fost implementată și generarea boilerplate-ului asociat cu căutarea simbolurilor acestor anotații în codul de intrare analizat de plugin-uri.
 I s-a dat denumirea \emph{Annotator}, deoarece lucrează cu anotațiile.
-
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Annotator/Annotator.cs
 
 Acest instrument ori se integrează în procesul de build al plugin-urilor, ori fișierele generate sunt incluse în source control.
 Fișierele targets și props din MSBuild distribuite cu Kari realizează integrarea acestui instrument în procesul de build al plugin-ului,
 însă sistemul de build urmează să fie schimbat la ceva mai ușor de menținut. 
-
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Plugins/InternalPlugin.props
-
 
 
 Referitor la căutarea tuturor simboluri cu un anumit atribut aplicat la ele, a se vedea discuția mai detaliată a soluțiilor.
@@ -1031,13 +970,11 @@ namespace Kari.Plugins.DataObject
 Fiecare plugin, după cum s-a menționat anterior, trebuie să definească cel puțin o clasă publică de \emph{administrator} care să implementeze interfața \texttt{IAdministrator}.
 De obicei, administratorii definesc un tablou de \emph{analizori} care conține câte un analizor pentru fiecare proiect.
 Administratorii deleghează deciziile concrete referitor la analiza tipurilor și generarea codului pentru ele la analizorii aceștia.
-
 https://github.com/AntonC9018/Kari/blob/1e103379417c3a268e1891ab94acb0cc81eb9489/source/Kari.Plugins/Flags/FlagsAdministrator.cs
 
 Aceasta este codul administratorului plugin-ului pentru generarea codului pentru enumuri flag.
 După cum se poate vedea, se utilizează funcțiile statice ale clasei \texttt{AdministratorHelpers}.
 Aceste funcții acomodează exact cazul acesta de utilizare: lucrul printr-un tablou de analizori, câte o instanță pentru fiecare proiect.
-
 https://github.com/AntonC9018/Kari/blob/1e103379417c3a268e1891ab94acb0cc81eb9489/source/Kari.GeneratorCore/Workflow/Administrator.cs#L67-L163 
 
 \begin{itemize}
@@ -1051,8 +988,6 @@ https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f
 
 În acest exemplu, se poate vedea ce de obicei se face în metoda \texttt{CollectSymbols()} al fiecărui analizor.
 În acest caz, sunt colectate unele informații despre toate simbolurile cu atributul \texttt{NiceFlags}.
-
-
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/Flags/FlagsAnalyzer.cs#L159-L170
 
 Metoda \texttt{GenerateCode\(\)} folosește aceste date pentru a formata un șir cu codul boilerplate și scrie rezultatul într-un \texttt{CodeBuilder}.
@@ -1076,23 +1011,18 @@ Acestea includ următoarele:
 Pentru demonstrare, se va crea un proiect nou în care se va folosi generatorul de cod Kari cu acest plugin.
 Acest proiect este un proiect console fără dependențe pe .NET 6.
 Fișierul principal conține următorul cod sursă, foarte asemănător cu exemplul din capitolul 1:
-
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Program.cs
 
 
 Înainte de compilare trebuie să se ruleze generatorul de cod.
 Pentru aceasta se invocă Kari cu drumul la fișierul de configurare \texttt{kari.json} care conține drumul la DLL-ul plugin-ului Flags.
 Acesta poate fi dat lui Kari și direct, însă utilizarea unui fișier de configurare este mai comod.
-
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.bat
-
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.json
 
 
 Și codul generat:
-
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/FlagsAnnotations.cs
-
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/Flags.cs
 
 \section{Plugin-ul DataObject}
@@ -1103,48 +1033,38 @@ Codului generat va conține supraîncărcări triviale pentru operatorii de egal
 De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C\# 10 din {{.}NET} 5 și {{.}NET} 6 respectiv, în forma de \emph{records} și \emph{record structs}, însă acestea nu sunt accesibile în Unity.\cite{records_in_csharp}
 
 Administratorul acestui plugin are aceeași structură ca și administratorul plugin-ului Flags:
-
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs
 
 Informațiile colectate au mai multe chestii, ca simbolul tipului, simbolurile pentru câmpurile instance, etc.
-
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L160-L180
 
 Metoda \texttt{CollectSymbols} tot așa colectează simbolurile necesare și le pune în aceste obiecte cu informații suplimentare extrase.
 Se mai fac niște verificări pentru a avertiza utilizatorul despre problemele cu tipul: trebuie să nu fie static, trebuie să fie parțial, trebuie să aibă un modificator de acces.
-
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L14-L46
 
 Metoda pentru generarea codului este puțin mai complicată decât cea a plugin-ului Flags, deoarece codul generat depinde de detaliile tipului mai mult.
 De exemplu, dacă tipul este o clasă, atunci operatorul \texttt{==} trebuie să verifice cazul când unul sau ambele argumente sunt nule. 
-
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L48-L157
 
 Proiectul cu exemplul de utilizare are aceeași structură ca și proiectul pentru flaguri, doar că menționează plugin-ul \texttt{DataObject} în loc de \texttt{Flags}.
 Codul programului:
-
 https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Program.cs
 
 Și codul generat:
-
 https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjects.cs
-
 https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjectAnnotations.cs
 
-\section{Operatiile cu Kari ca parte de un instrument centralizat de dezvoltare}
+\section{Operațiile cu Kari ca parte de un instrument centralizat de dezvoltare}
 
 În cadrul unui proiect al său, autorul a realizat un instrument în limbajul D care permite integrarea mai ușoară a lui Kari, fără a folosi fișiere de proiecte MSBuild.
 Codul definește două comenzi — una compilează Kari în configurația dată, iar a doua îl execută pe Kari, construind drumurile la DLL-urile plugin-urilor din denumirile lor.
-
 https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/dev_cli/source/commands/setup.d
 
 Restul configurației se ia din fișierul de configurație care se conține în mapa cu proiectul Unity al jocului:
-
 https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
 
 Instrumentul poate fi invocat din linia de comandă.
 Scriptul \texttt{setup.bat} arată compilarea instrumentului și invocarea comenzii setup.
-
 https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/setup.bat
 
 Se admite că numele executabilului generat este \texttt{dev}.
@@ -1178,7 +1098,7 @@ Un astfel de program poate ori să se integreze cu alte scripturi CI/CD, ori să
 În acest capitol s-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
 S-a demonstrat cum generarea codului poate fi incorporată într-un instrument centralizat care poate fi utilizat pentru automatizarea proceselor de dezvoltare a unui sistem informatic.
 
-\chapter{Concluziile finale si Recomandările}
+\chapter{Concluziile Finale si Recomandările}
 
 În lucrarea aceasta, s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
 S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
@@ -1199,11 +1119,20 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 \newpage
 \markpage{usefulStuffEnd}
 
+% Bibliography
 \bibliographystyle{plain}
 \bibliography{bibliography}
 
+% Appendices
 \appendix
-\renewcommand{\thechapter}{\arabic{chapter}} 
+
+% Number with arabic numbers instead of Roman
+\renewcommand{\thechapter}{\arabic{chapter}}
+% Prepend Anexa to section names, center them
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filcenter}{Anexa \thesection.~}{0pt}{}
+% Every section on new page
+\newcommand{\sectionbreak}{\clearpage}
+
 \chapter{Codurile sursă}
 % insert appendices here
 
