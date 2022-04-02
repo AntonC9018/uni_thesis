@@ -150,6 +150,7 @@ void main()
                 // msbuild files
                 case "props": return "xml";
                 case "csproj": return "xml";
+                case "json": return "js";
 
                 default: return ext;
             }
@@ -187,7 +188,7 @@ void main()
             }
             else
             {
-                formattedWrite!`\chapter{%s}`(app, filename);
+                formattedWrite!`\section{%s}`(app, filename);
                 const labelString = format!`appendix:%s_%s`(link.repo, friendlyFileName);
                 newLineContent = getRefLabel(labelString);
                 
@@ -216,7 +217,7 @@ void main()
             }
             else
             {
-                formattedWrite!`\chapter{%s, rândurile %d--%d}`(app, filename, range[0], range[1]);
+                formattedWrite!`\section{%s, rândurile %d--%d}`(app, filename, range[0], range[1]);
                 const labelString = format!`appendix:%s_%s_%d_%d`(link.repo, friendlyFileName, range[0], range[1]);
                 newLineContent = getRefLabel(labelString);
 

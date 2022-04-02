@@ -13,3 +13,8 @@ build.exe
 build.obj
 teza_processed.pyg
 teza_processed.synctex*
+*.fdb_latexmk
+*.fls
+output
+*.pagecount
+*.toc

@@ -19,7 +19,7 @@
 \usepackage[romanian]{babel}
 
 % Appendices
-% \usepackage[toc,page]{appendix}
+\usepackage[toc,page]{appendix}
 
 % Format urls in the bibliography
 \usepackage{url}
@@ -27,20 +27,156 @@
 % Code blocks
 \usepackage{minted}
 \usepackage{color}
-\definecolor{codeBackground}{rgb}{0.95,0.95,0.95}
 \setminted{%
-  autogobble,
+  autogobble=true,
   codetagify=true,
-  linenos,
-  baselinestretch=1.0
-  % fontsize=10pt
+  linenos=true,
+  breaklines=true,
+  baselinestretch=0.72,
+  % https://www.giss.nasa.gov/tools/latex/ltx-178.html
+  fontsize=\footnotesize
 }
 
+% Chapters left aligned and 14 pt
+\usepackage{titlesec}    
+\titleformat{\chapter}[display]
+{\normalfont%
+    \huge% %change this size to your needs for the first line
+    \bfseries}{\chaptertitlename\ \thechapter}{20pt}{%
+    \Huge %change this size to your needs for the second line
+    }
+
+% https://tex.stackexchange.com/questions/163451/total-number-of-citations
+\usepackage{totcount}
+\newtotcounter{citnum} %From the package documentation
+\def\oldbibitem{} \let\oldbibitem=\bibitem{}
+\def\bibitem{\stepcounter{citnum}\oldbibitem}
+
+% Thank you to @paante on LaTeX Discord.
+% Makes it possible to mark pages and then do math on them.
+% usage: \markpage{key}
+%        \getpagemark{key}
+\newwrite\pagecountf
+\AtBeginDocument{%
+    \InputIfFileExists{\jobname.pagecount}{}{}%
+    \immediate\openout\pagecountf={\jobname.pagecount}%
+}
+\AtEndDocument{\closeout\pagecountf}
+\protected\def\markpage#1{%
+    \write\pagecountf{%
+        \noexpand\expandafter\gdef
+            \noexpand\csname pagecount/#1\endcsname
+            {\the\value{page}}%
+    }%
+}
+\def\getpagemark#1{\ifcsname pagecount/#1\endcsname \csname pagecount/#1\endcsname \else 0\fi}
+
+
+% Description
+\newcommand{\authorName}{Curmanschii Anton}
+\newcommand{\thesisTitle}{Tehnicile avansate în programarea jocurilor video: generarea codului}
+\newcommand{\uniGroupName}{IA1901}
+\newcommand{\programulDeStudii}{licență}
+
+% does math on counters
+\newcommand{\usefulPageCount}{%
+  % this evaluates a math expression, which is `end - begin`
+  \the\numexpr\getpagemark{usefulStuffEnd}-\getpagemark{usefulStuffBegin}\relax}
+
+\newcommand{\anexeCount}{24} % for now, hardcode this
+\newcommand{\conferencesList}{I don't know what to write here}
+\newcommand{\bibliographyEntryCount}{\total{citnum}}
 
 % Start
 \begin{document}
 
-\begin{abstract}
+\begin{titlepage}
+  \vspace*{\fill}
+  \begin{center}
+      \vspace*{1cm}
+
+      \Large
+      \uppercase{\textbf{UNIVERSITATEA DE STAT DIN MOLDOVA\\}}
+
+      \normalsize
+      \uppercase{\textbf{FACULTATEA DE MATEMATICĂ SI INFORMATICĂ}}
+      \vspace{0.2cm}
+
+      \normalsize
+      \uppercase{\textbf{SPECIALITATEA INFORMATICA APLICATĂ}}
+      \vspace{3.0cm}
+
+      \normalsize
+      \uppercase\expandafter{\authorName}
+      \vspace{1.5cm}
+
+      \Large
+      \uppercase{\textbf\expandafter{\thesisTitle}}
+      \vspace{0.75cm}
+
+      \normalsize
+      \uppercase{\textbf{CIFRUL ȘI DENUMIREA PROGRAMULUI DE STUDII}}
+      \vspace{0.5cm}
+
+      \normalsize
+      \Large
+      Teză de \programulDeStudii\
+  
+    \end{center}
+  \vfill
+
+  \normalsize
+  \begin{flushleft}
+    Șef de departament: \\
+    Conducătorul științific: Marin Maria \\
+    Autor:
+  \end{flushleft}
+
+  \begin{center}
+    \textbf{Chișinău --- 2022}
+  \end{center}
+
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\chapter*{\centering Adnotare}
+
+\textbf{la teza de licență/master ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
+
+\textbf{Structura tezei.}
+Teza constă din: Introducere, 4 capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} de titluri.
+Textul de bază cuprinde \usefulPageCount{} de pagini și \anexeCount{} anexe.
+
+\textbf{Cuvinte-cheie:}
+Generarea codului, eliminarea codului boilerplate, programarea declarativă,
+jocuri video, eficiență și plăcere a programatorului, Unity, C\#.
+
+\textbf{Actualitatea.}
+Generarea codului poate face lucrul programatorilor mai plăcut și mai eficient,
+eliminând codul repetativ, complex, sau presupus la erori, poate spori eficiența sau 
+necesitățile de memorie a programei, în special importante în dezvoltarea jocurilor video.
+
+\textbf{Scopul și obiectivele cercetării}.
+Scopul tezei constă în elaborarea și argumentarea unui generator de cod, folosirea lui pentru programarea jocurilor.
+Obiectivele tezei constau în studiul soluțiilor existente pentru generarea codului,
+identificarea faptului că ele nu corespund cerințelor sau nu sunt practice,
+dezvoltarea unui sistem de generare a codului extensibil prin plugin-uri și ușor de utilizat.
+ 
+\textbf{Rezultatele preconizate și obținute} rezumă în (1) analiza soluțiilor existente pentru generarea codului (2) implementarea nucleului generatorului de cod, (3) suportului pentru plugin-uri, (4) demonstrarea unor plugin-uri utile, (5) folosirea generatorului de cod într-un un proiect real. 
+
+\textbf{Problemele importante rezolvate} sunt generarea codului repetetiv, complicat sau presupus la erori, dacă scris manual, pe baza codului sursă; lipsa de capacități de metaprogramare în C\#.
+
+\textbf{Valoarea aplicativă.} Generarea codului înlocuiește codul asemănător scris manual, predispus la erori, dificil și anevoios de menținut, deci sporește eficiența și plăcerea programatorului. 
+
+
+Rezultatele obținute au fost raportate la Conferința (-ele) \textbf{\conferencesList}.
+
+
+\chapter*{Introducere}
+
+\markpage{usefulStuffBegin}
 
 \textbf{Actualitatea si importanta temei.}
 
@@ -68,7 +204,7 @@ Se arată încă cum generatorul de cod poate fi integrat într-o aplicație de 
 
 \textbf{Suportul metodologic.}
 
-Generatorul de cod este un instrument realizat în limbajul C\#, pe baza platformei \. NET 6 și a lui Roslyn care este un set de librării și instrumente pentru analiza codului sursă C\#.
+Generatorul de cod este un instrument realizat în limbajul C\#, pe baza platformei {{.}NET} 6 și a lui Roslyn care este un set de librării și instrumente pentru analiza codului sursă C\#.
 Generatorul de cod a fost testat și utilizat în practică în Unity.
 Instrumentul a fost elaborat după necesitate în dezvoltare și reiese întreg din experimentare și experiența autorului.
 
@@ -87,12 +223,12 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 
 În această lucrare se argumentează și se elaborează un generator de cod C\# flexibil și extensibil care poate fi utilizat pentru a ușura și a face mai plăcută programarea în C\#, și pentru a spori eficiența programatorului în implementarea unelor soluții.
 
-\end{abstract}
+% \end{abstract}
 
 % Chapters should count with roman numerals
 \renewcommand{\thechapter}{\Roman{chapter}}
 
-\chapter{Sumarul Generării Codului in C\#}
+\chapter{Sumarul Generării Codului în C\#}
 
 \section{Capacitățile si deficiențele lui C\#}
 
@@ -198,7 +334,7 @@ public partial struct Composition
 \end{minted}
 
 
-\section{Exemplu: metodele ajutatoare pentru enumuri flag}
+\section{Exemplu: metodele ajutătoare pentru enumuri flag}
 
 Fie un astfel de enum cu flaguri:
 
@@ -326,8 +462,8 @@ Roslyn este un ansamblu de librării și instrumente pentru analiza și compilar
 De fapt, însuși compilatorul C\# este implementat pe baza acestor librării Roslyn.
 Roslyn combină întregul pipeline de compilare: tokenizarea, analiza sintactică, analiza semantică, generarea codului executabil, expuzând toate aceste operații.
 
-Cel mai des, Roslyn este utilizat pentru analizatori, adică programe care analizează codul sursă și detectează erori logice, posibil propunând o remediere (code fix), sau adaugând operații utile în IDE-urile (de exemplu, ``implement methods'', ``extract into a local function'').
-De fapt, repertoriul Roslyn conține o mulțime de analizatori gata pentru folosire.
+Cel mai des, Roslyn este utilizat pentru analizori, adică programe care analizează codul sursă și detectează erori logice, posibil propunând o remediere (code fix), sau adaugând operații utile în IDE-urile, de exemplu, ``implement methods'', ``extract into a local function''.
+De fapt, repertoriul Roslyn conține o mulțime de analizori gata pentru folosire.
 
 Însă Roslyn a fost demult utilizat și pentru generatori de cod ad hoc, adică unele programe care produc codul sursă adaugător, des generat pe baza codului sursă inițial, create pentru un lucru specific.
 Așa programe manual citesc fișierele sursă, manual le parsează conținuturile, manual le analizează și le produc output-ul.
@@ -341,14 +477,14 @@ Deci așa programe de fapt fac următoarele lucruri:
 \end{itemize}
 
 Un exemplu este generatorul de cod Message-Pack\cite{message_pack_github}.
-Kari, generatorul de cod descris în această lucrare, a fost scris inițial după aceeași arhitectură ca și codul acestui proiect, însă autorul a prins oportunitatea să-l generalizeze.
+Kari, generatorul de cod descris în această lucrare, a fost dezvoltat inițial după aceeași arhitectură ca și codul acestui proiect, însă autorul a prins oportunitatea să-l generalizeze.
 
 Decizia să facă generatorul de cod în C\# a fost o decizie evidentă, deoarece nu există nici o altă librărie care este asemănător de capabilă.
 
-\section{Source Generators in \. NET}
+\section{Source Generators în {{.}NET}}
 
-\. NET 5 a introdus un concept nou --- Source Generators (generatori de sursă)\cite{source_generators}.
-Acestea sunt de fapt analizatorii care primesc la intrare arborele sintactic, și returnează codul sursă generat.
+{{.}NET} 5 a introdus un concept nou --- Source Generators (generatori de sursă)\cite{source_generators}.
+Acestea sunt de fapt analizorii care primesc la intrare arborele sintactic, și returnează codul sursă generat.
 Acestea integrează cu compilatorul, deci funcționează pe baza arborelui sintactic al compilatorului.
 
 Generatorii de sursă permit accelerarea generatorilor de cod personalizate, prin reutilizarea configurației și a datelor despre cod deja existente în timpul compilării în memoria compilatorului.
@@ -361,10 +497,10 @@ Aceasta permite generatorilor de cod personalizate să facă mai puțin lucru ir
   \item După experiența autorului, ele pot fi folosite doar cu MSBuild, sistemul de build al lui Microsoft.
   MSBuild este renumit pentru scalabilitatea proastă --- un proces de build chiar puțin netrivial devine aproape imposibil de suportat.
 
-  \item Generatorii de sursă trebuie să folosească și ele fișiere MSBuild pentru a-și specifica configurația (n-am sursă) și pentru a fi distribuite ca pachete NuGet, 
+  \item Generatorii de sursă trebuie să folosească și ele fișiere MSBuild pentru a-și specifica configurația\cite{source_generators_msbuild_configuration} și pentru a fi distribuite ca pachete NuGet, 
     însă în experiența autorului crearea de așa fișiere MSBuild pentru integrarea ușoară în alte proiecte devine foarte complicată și este predispusă la erori.
 
-  \item Nu se poate folosi toate capacitățile framework-ului --- sunt dintr-o cauză limitate la \. NET Standard 2.0.
+  \item Nu se poate folosi toate capacitățile framework-ului --- sunt dintr-o cauză limitate la {{.}NET} Standard 2.0.
 
   \item Sunt considerate o capacitate avansată și experimentală, și nu sunt documentate bine.
 
@@ -421,14 +557,14 @@ Prima cerință poate fi concretizată mai tare:
 Se concretizează a doua cerință în modul următor:
 
 \begin{itemize}
-  \item Codul de analiză și de generare a codului să fie scris în limbajul C\# pe baza platformei \. NET 6, să poată accesa toate API-urile specifice acestuia.
+  \item Codul de analiză și de generare a codului să fie scris în limbajul C\# pe baza platformei {{.}NET} 6, să poată accesa toate API-urile specifice acestuia.
   \item Această logică trebuie să poată analiza o reprezentare abstractă a codului sursă de intrare și să poată genera output-ul, ca text.
   \item Se cere ca să fie ușor de creat fișiere cu codul care să conforme formatării corecte și care să nu lupte cu simboluri din codul inițial.
   În alte cuvinte, se cere ca librăria generatorului de cod să ofere API-uri utile pentru generarea codului și lucrul cu simboluri din cod.
   \item Deoarece se dorește ca codul de intrare să fie declarativ, să folosească extensiv atribute aplicate la tipuri și la membrii lor, ar fi foarte
   comod dacă codul generat să poată automat conțină definiții pentru aceste atribute, partajate între codul de intrare care să le folosească drept atribute,
   și logica de analiză și generare care să le caute în reprezentarea abstractă a codului sursă și să le inspecteze.
-  \item Logica acestui analizator se va schimba des, și analizatorii noi vor fi adăugați, de aceea se cere ca acest nivel să fie cât mai flexibil, să fie posibil să se modifice și să se augmenteze ușor.
+  \item Logica acestui analizor se va schimba des, și analizorii noi vor fi adăugați, de aceea se cere ca acest nivel să fie cât mai flexibil, să fie posibil să se modifice și să se augmenteze ușor.
 \end{itemize}
 
 
@@ -505,9 +641,9 @@ Din punct de vedere a integrării cu instrumente, invocarea directă ar fi mai b
 
 Deci, comanda exemplu de invocare ar putea fi următoarea:
 
-\begin{verbatim}
+\begin{minted}{text}
 kari -configurationFile kari.json -pluginPaths plugin1.dll,plugin2.dll,plugin3.dll
-\end{verbatim}
+\end{minted}
 
 Aceasta ar invoca generatorul de cod cu plugin-uri plugin1, plugin2 și plugin3, unde restul configurației se ia din fișierul kari.json.
 După aceasta, programul generează codul, ori arată erori, posibil cu mesajul de ajutor care arată toate opțiunile.
@@ -529,7 +665,7 @@ Autorul a decis să creeze codul propriu pentru lucrul acesta, cu toate că deja
 Autorul ori nu a fost satisfăcut cu API-ul lor, ori cu lipsa opțiunilor dorite.
 
 Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua:
-Exemplu\footnote{a se vede codul sursă pentru un exemplu complet:
+Exemplu\footnote{a se vedea codul sursă pentru un exemplu complet:
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs
 }
 
@@ -639,11 +775,11 @@ if (unrecognizedOptions.Any() || unrecognizedConfigOptions.Any())
 
 Un exemplu de output:
 
-\begin{verbatim}
+\begin{minted}{text}
 kari -helloworld -mynameisanton
 [Master]: Unrecognized option: helloworld
 [Master]: Unrecognized option: mynameisanton
-\end{verbatim}
+\end{minted}
 
 
 Mesajele de ajutor au fost implementate utilizând librăria Spectre Console\cite{spectre_console_github}, în particular, funcționalitatea de creare a tabelelor.
@@ -667,7 +803,7 @@ Să se noteze că API-ul nu este final.
 A fost realizat în durata de aproape o zi și în continuare ceva modificat după necesitățile aplicației.
 
 
-\section{Incarcarea plugin-urilor}
+\section{Incărcarea plugin-urilor}
 
 După cum s-a menționat anterior, codul plugin-urilor este distribuit și încărcat prin DLL-uri.
 Pentru aceasta, se folosesc funcțiile \texttt{Assembly.LoadFile} și \texttt{GetExportedTypes}, după ce se realizează filtrarea tuturor tipurilor, anume căutarea tipurilor care implementează interfața \texttt{IAdministrator}.
@@ -680,7 +816,7 @@ La început, ele iau argumentele de linie de comanda, iar după aceasta sunt în
 Plugin-urile realizează inițializarea suplimentară după ce devin accesibile toate proiectele cu codul sursă și după ce au primit toate argumentele, deoarece validarea argumentelor deseori se face pe baza proiectelor sau tipurilor existente în compilație.
 De exemplu, unele plguin-uri generează un fel de output agnostic, de aceea doresc să știu care este proiectul comun, pentru a scrie fișierele acolo, însă denumirea proiectului comun nu se cunoaște înainte ca proiectele utilizatorului au fost descoperite.
 
-\section{Descoperirea fisierelor sursa}
+\section{Descoperirea fișierelor sursă}
 
 Kari permite mai multe moduri de intrare (de descoperire a fișierelor sursă):
 
@@ -707,7 +843,7 @@ https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd
 Acest cod încă gestionează căutarea acelor două proiecte, anume proiectului \texttt{Common} care reprezintă un proiect cu cod agnostic care conceptual nu poate să se refere la nici un alt proiect, și a proiectului \texttt{Root}, adică proiectului care să conține funcții de inițializare și care conceptual poate referi la orice alt proiect.
 Fiecare mod de intrare are logica sa de căutare a proiectelor acestea, selectată în așa fel ca să aibă cât mai mult sens în scopul modului de intrare selectat.
 
-\section{Pornirea plugin-urilor cu codul sursa ca parametri de intrare}
+\section{Pornirea plugin-urilor cu codul sursă ca parametri de intrare}
 
 Obiectul care permite reprezentarea abstractă a codului sursă în Roslyn se numește o compilație.
 Acest obiect poate fi creat din arbori sintactici care la rândul său sunt creați din codul sursă, citit din fișiere sursă.
@@ -738,7 +874,7 @@ După ce toate plugin-urile au terminat cacharea simbolurilor, are loc generarea
 Șirurile cu codul sursă de ieșire la început sunt generate aparte în memorie, adică nu sunt scrise imediat în fișiere.
 Paralelizarea se face în același mod ca și la colectarea simbolurilor.
 
-\section{Salvarea output-ului}
+\section{Sălvarea output-ului}
 
 Plugin-urile scriu codul de output al lor direct într-un UTF-8 bufer ca să fie posibil să scrie textul de ieșire direct în fișiere.
 Se utilizează librăria ZString\cite{zstring_github}, cu toate că se planifică să se folosească capacitățile noi de interpolare a șirurilor fără alocările memoriei adăugate în .NET 6.\cite{string_interpolation_csharp_10}
@@ -821,7 +957,7 @@ https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587
 
 Mai jos se vede niște exemple de utilizare.
 
-\section{Anotatiile}
+\section{Anotațiile}
 
 Următorul caz de utilizare comun pentru majoritatea plugin-urilor sunt anotațiile (sau atributele).
 Atributele sunt acel lucru care permite design-ul unor API-uri declarative.
@@ -849,12 +985,12 @@ https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587
 
 
 
-Referitor la căutarea tuturor simboluri cu un anumit atribut aplicat la ele, a se vede discuția mai detaliată a soluțiilor.
+Referitor la căutarea tuturor simboluri cu un anumit atribut aplicat la ele, a se vedea discuția mai detaliată a soluțiilor.
 Codul generat de către anotator creează instanțe de wrapper-uri asupra atributelor interesante și le păstrează în câmpuri.\cite{converting_attributes_roslyn}
 
 
 Urmează un exemplu al unui fișier generat.
-Clasa \texttt{DummyDataObjectAnnotations} conține membrul Text cu codul sursă al fișierului, din care acest fișier a fost generat,
+Clasa \texttt{DummyDataObjectAnnotations} conține membrul \texttt{Text} cu codul sursă al fișierului, din care acest fișier a fost generat,
 iar clasa \texttt{DataObjectSymbols} reprezintă acel boilerplate ce ține de wrapper-uri pentru atributele.
 
 \begin{minted}{csharp}
@@ -890,7 +1026,7 @@ namespace Kari.Plugins.DataObject
 }
 \end{minted}
 
-\section{Cum lucreaza plugin-urile, mai detaliat}
+\section{Cum lucrează plugin-urile, mai detaliat}
 
 Fiecare plugin, după cum s-a menționat anterior, trebuie să definească cel puțin o clasă publică de \emph{administrator} care să implementeze interfața \texttt{IAdministrator}.
 De obicei, administratorii definesc un tablou de \emph{analizori} care conține câte un analizor pentru fiecare proiect.
@@ -964,7 +1100,7 @@ https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18
 DataObject este un plugin pentru Kari care permite generarea codului pentru tipuri care conceptual doar conțin datele.
 Codului generat va conține supraîncărcări triviale pentru operatorii de egalitate, supraîncărcarea metodei \texttt{Equals}, \texttt{GetHashCode}.
 
-De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C\# 10 din \. NET 5 și \. NET 6 respectiv, în forma de \emph{records} și \emph{record structs}, însă acestea nu sunt accesibile în Unity.\cite{records_in_csharp}
+De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C\# 10 din {{.}NET} 5 și {{.}NET} 6 respectiv, în forma de \emph{records} și \emph{record structs}, însă acestea nu sunt accesibile în Unity.\cite{records_in_csharp}
 
 Administratorul acestui plugin are aceeași structură ca și administratorul plugin-ului Flags:
 
@@ -1014,23 +1150,23 @@ https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267
 Se admite că numele executabilului generat este \texttt{dev}.
 Atunci, comanda de setup poate fi executată în felul următor:
 
-\begin{verbatim}
+\begin{minted}{text}
 dev setup
-\end{verbatim}
+\end{minted}
 
 Aceasta ia ca argumentele și toate acele argumente definite în cod, deci este foarte ușor de configurat.
 De exemplu, se poate face:
 
-\begin{verbatim}
+\begin{minted}{text}
 dev setup -kariConfiguration Release
-\end{verbatim}
+\end{minted}
 
 Pașii de compilare și de executare a generatorului de cod pot fi realizați aparte.
 
-\begin{verbatim}
+\begin{minted}{text}
 dev kari build -- arguments_to_dotnet_build
 dev kari run -- arguments_to_kari
-\end{verbatim}
+\end{minted}
 
 Aceste comenzi definite într-un sistem centralizat sunt foarte utile în timpul dezvoltării, și pentru pipeline-uri CI/CD.
 Logica concretă a procesului de build poate fi delegată la acest program \texttt{dev} în loc de a defini toata complexitate de build asociată cu jocurile în scripturi shell.
@@ -1060,13 +1196,15 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 
 Însă, Kari deja a fost folosit cu succes în dezvoltarea jocurilor, și instrumentul a ieșit foarte ușor de utilizat, deschizând posibilități mari din punct de vedere a complexității analizei codului și a codului generat.
 
+\newpage
+\markpage{usefulStuffEnd}
+
 \bibliographystyle{plain}
 \bibliography{bibliography}
 
-
 \appendix
 \renewcommand{\thechapter}{\arabic{chapter}} 
-
+\chapter{Codurile sursă}
 % insert appendices here
 
 \end{document}
