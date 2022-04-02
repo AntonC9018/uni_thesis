@@ -150,6 +150,8 @@ void main()
                 // msbuild files
                 case "props": return "xml";
                 case "csproj": return "xml";
+
+                // So that comments are allowed (jsonc is not supported)
                 case "json": return "js";
 
                 default: return ext;
