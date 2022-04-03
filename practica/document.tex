@@ -1,0 +1,212 @@
+\documentclass[a4paper,12pt]{report}
+
+% https://tex.stackexchange.com/a/63393
+\makeatletter
+\def\@makechapterhead#1{%
+  %%%%\vspace*{50\p@}% %%% removed!
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \huge\bfseries \@chapapp\space \thechapter
+        \par\nobreak
+        \vskip 20\p@
+    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+\def\@makeschapterhead#1{%
+  %%%%%\vspace*{50\p@}% %%% removed!
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    \Huge \bfseries  #1\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+
+% spacings
+\usepackage[a4paper,right=15mm,left=25mm,top=20mm,bottom=20mm]{geometry}
+
+% 1.5 line spacing
+\usepackage{setspace}
+\setstretch{1.5}
+
+% Being able to copy-paste from the document
+% Display the diacritics correctly
+\usepackage{fontspec}
+% Times New Roman font
+\setmainfont{Times New Roman}
+
+% Romanian language support
+\usepackage[romanian]{babel}
+
+% Appendices
+\usepackage[toc,page]{appendix}
+
+% Lista abrevierelor
+\usepackage[printonlyused]{acronym}
+
+% Format urls in the bibliography
+\usepackage{hyperref}
+% Clickable table of contents
+\hypersetup{linktoc=all}
+
+% Code blocks
+\usepackage{minted}
+\usepackage{color}
+\setminted{%
+  autogobble=true,
+  codetagify=true,
+  linenos=true,
+  breaklines=true,
+  baselinestretch=0.8,
+  % https://www.giss.nasa.gov/tools/latex/ltx-178.html
+  fontsize=\footnotesize
+  % Prevent it from spilling over margins for especially long lines
+  ,breakanywhere=true
+}
+
+% Chapters should count with roman numerals
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+
+% Chapters must left aligned and 14 pt.
+% There's no 14 pt available, though, only 14.4 (\large)
+% https://tex.stackexchange.com/questions/24599/what-point-pt-font-size-are-large-etc/24600#24600
+\usepackage{titlesec}
+% \titleformat{〈command 〉}[〈shape〉]{〈format〉}{〈label 〉}{〈sep〉}{〈before-code〉}[〈after-code〉]
+% https://mirror.marwan.ma/ctan/macros/latex/contrib/titlesec/titlesec.pdf#page=4&zoom=200,67,627
+% It gets pretty involved...
+\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter.~}{0pt}{}
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filright}{\thesection.~}{0pt}{}
+% Skips before and after the title
+\titlespacing*{\chapter}{0pt}{12pt}{6pt}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{12pt}{6pt}
+
+% Aliniat de 1 cm.
+\usepackage{indentfirst}
+\setlength{\parindent}{1.0cm}
+
+% Description
+\newcommand{\authorName}{Curmanschii Anton}
+\newcommand{\documentTitle}{Raport la practică de producție}
+\newcommand{\uniGroupName}{IA1901}
+\newcommand{\programulDeStudii}{licență}
+
+% Start
+\begin{document}
+
+% Prevent spills over margin
+\sloppy
+
+\begin{titlepage}
+  \vspace*{\fill}
+  \begin{center}
+      \vspace*{1cm}
+
+      \large
+      \uppercase{\textbf{UNIVERSITATEA DE STAT DIN MOLDOVA\\}}
+
+      \normalsize
+      \uppercase{\textbf{FACULTATEA DE MATEMATICĂ SI INFORMATICĂ}}
+      \vspace{0.1cm}
+
+      \normalsize
+      \uppercase{\textbf{SPECIALITATEA INFORMATICA APLICATĂ}}
+      \vspace{3.0cm}
+
+      \large
+      \textbf{\uppercase\expandafter{\authorName}}
+      \vspace{1.5cm}
+
+      \Large
+      \textbf{\uppercase\expandafter{\thesisTitle}}
+      \vspace{0.75cm}
+
+    \end{center}
+  \vfill
+
+  \normalsize
+  \begin{flushleft}
+    Șef de departament: \\
+    Conducătorul științific: Marin Maria \\
+    Autor:
+  \end{flushleft}
+
+  \begin{center}
+    \textbf{Chișinău -- 2022}
+  \end{center}
+
+\end{titlepage}
+
+\clearpage
+\tableofcontents
+
+\clearpage
+\chapter*{Lista abrevierelor}
+\begin{acronym}
+  \begin{center}
+    \acro{XR}{Extended reality}
+    \acro{VR}{Virtual reality}
+  \end{center}
+\end{acronym}
+
+
+\chapter{Detaliile privind locul de practică}
+
+
+\section{Laboratorul AVR}
+
+Practica s-a petrecut la universitate, la laboratorul AVR.
+Laboratorul acesta este o sală de calculatori, destul de largă, conținând mai mult ca 15 de calculatori moderne și puternice, un printer 3D, echipamentul \ac{XR} divers, adică căștile și controller-uri \ac{VR}.
+Această sală este perfectă pentru elaborarea eficientă și avansată a jocurilor video.
+
+Sala de calculători era deschisă în aproape orice zi de lucru, de la 11:00 dimineața până 20:00 seara, și am avut posibilitate s-o folosesc spre folosul meu.
+
+
+\section{Procesul de lucru la laborator}
+
+Am primit o sarcină concretă --- să se elaboreze un joc cu un set de cerințe fixat, reușind să realizez proiectul în timpul prestabilit.
+La dispoziție am avut orice echipament necesar din laborator, și am putut să pun întrebări la conducător de practică.
+
+Deoarece jocul s-a planificat să fie un joc simplu pentru calculator, nu am folosit alt echipament decât propriu zis calculător.
+Datorită faptului că calculatorii sunt atât de bune, am putut să lucrez foarte eficient asupra sarcinii.
+
+Orarul a fost liber --- am putut să vin sau să nu vin în orice zi, principalul a fost să reușesc să prezint proiectul în termen limită.
+Când puteam, veneam la universitate la ora 11:00 și lucram până la 19:00-20:00 seara.
+În zilele de odihnă și în acele zile când nu am fost la Chișinău, lucram din casă, de pe laptopul propriu.
+
+Planificarea mai detaliată a realizării sarcinii am administrat în cea mai mare parte eu singur.
+Eu mă descurcam cu implementarea sarcinii singur, de aceea aici nu a fost necesar ajutorul din partea conducătorului.
+
+
+\chapter{Sarcina de practică}
+
+După cum s-a menționat anterior, s-a cerut să se elaboreze un joc cu un set de cerințe fixat.
+Jocul concret care urmat să fie implementat a fost un joc de curse cu mașini, cu o vedere la persoana a treia.
+Jocul trebuia să aibă 2 scene, cu cerințe specifice la fiecare scenă:
+
+\textbf{Garaj:}
+\begin{itemize}
+  \item Posibilitatea de a schimba culoarea mașinii;
+  \item Un sistem de caracteristici (stat-uri) cu sănătatea și viteza;
+
+\end{itemize}
+
+
+% Bibliography
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+% Appendices
+\appendix
+
+% Number with arabic numbers instead of Roman
+\renewcommand{\thechapter}{\arabic{chapter}}
+% Prepend Anexa to section names, center them
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filcenter}{Anexa \thesection.~}{0pt}{}
+% Every section on new page
+% \newcommand{\sectionbreak}{\clearpage}
+
+\end{document}
