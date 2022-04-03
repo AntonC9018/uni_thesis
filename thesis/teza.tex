@@ -49,6 +49,9 @@
 % Appendices
 \usepackage[toc,page]{appendix}
 
+% Lista abrevierelor
+\usepackage[printonlyused]{acronym}
+
 % Format urls in the bibliography
 % \usepackage{url}
 \usepackage{hyperref}
@@ -186,9 +189,20 @@
 
 \end{titlepage}
 
+\clearpage
 \tableofcontents
-\newpage
 
+\clearpage
+\chapter*{Lista abrevierelor}
+\begin{acronym}
+  \acro{CI/CD}{Continuous Integration / Continuous Delivery}
+  \acro{DSL}{Domain-Specific Language}
+  \acro{AOT}{Ahead of Time}
+  \acro{DLL}{Dynamically-Linked Library}
+  \acro{API}{Application Programming Interface}
+\end{acronym}
+
+\clearpage
 \chapter*{Adnotare}
 
 \textbf{la teza de licență ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
@@ -248,7 +262,7 @@ Codul generat va fi echivalent cu acel cod boilerplate, însă nu trebuie fi scr
 În această lucrare autorul proiectează, explică și elaborează un astfel generator de cod.
 Generatorul final poate fi utilizat ușor în mai multe proiecte, poate fi extins dinamic utilizând plugin-uri care să conțină logica specifică de analiză a codului sursă și de generare a codului nou.
 Se demonstrează niște exemple de utilizare a generatorului de cod.
-Se arată încă cum generatorul de cod poate fi integrat într-o aplicație de linie de comandă centralizată care să se utilizeze într-un pipeline CI/CD.
+Se arată încă cum generatorul de cod poate fi integrat într-o aplicație de linie de comandă centralizată care să se utilizeze într-un pipeline \ac{CI/CD}.
 
 \textbf{Suportul metodologic.}
 
@@ -481,9 +495,9 @@ Aceasta generează toate acele metode automat.
 
 Cele două exemple clar arată capacitățile generării codului în eliminarea boilerplate-ului.
 Însă acesta nu este singurul lor caz de utilizare.
-Să se menționeze această prezentare\cite{microservices_code_generation} unde autorul demonstrează cum compania lui generează codul pentru endpoint-uri API din fișiere agnostice de configurare.
-Protobuf\cite{protobuf} care generează codul pentru mai multe limbaje, realizând protocolul personalizat dintr-o descriere într-un DSL.
-Message Pack\cite{message_pack_github} care permite emiterea codului IL pentru serializarea eficientă a datelor, dar permite și generarea codului AOT.
+Să se menționeze această prezentare\cite{microservices_code_generation} unde autorul demonstrează cum compania lui generează codul pentru endpoint-uri \ac{API} din fișiere agnostice de configurare.
+Protobuf\cite{protobuf} care generează codul pentru mai multe limbaje, realizând protocolul personalizat dintr-o descriere într-un \ac{DSL}.
+Message Pack\cite{message_pack_github} care permite emiterea codului IL pentru serializarea eficientă a datelor, dar permite și generarea codului \ac{AOT}.
 Încă un exemplu: consola și comenzile integrate în joc\cite{command_terminal}.
 
 
@@ -599,10 +613,10 @@ Prima cerință poate fi concretizată mai tare:
 Se concretizează a doua cerință în modul următor:
 
 \begin{itemize}
-  \item Codul de analiză și de generare a codului să fie scris în limbajul C\# pe baza platformei {{.}NET} 6, să poată accesa toate API-urile specifice acestuia.
+  \item Codul de analiză și de generare a codului să fie scris în limbajul C\# pe baza platformei {{.}NET} 6, să poată accesa toate \ac{API}-urile specifice acestuia.
   \item Această logică trebuie să poată analiza o reprezentare abstractă a codului sursă de intrare și să poată genera output-ul, ca text.
   \item Se cere ca să fie ușor de creat fișiere cu codul care să conforme formatării corecte și care să nu lupte cu simboluri din codul inițial.
-  În alte cuvinte, se cere ca librăria generatorului de cod să ofere API-uri utile pentru generarea codului și lucrul cu simboluri din cod.
+  În alte cuvinte, se cere ca librăria generatorului de cod să ofere \ac{API}-uri utile pentru generarea codului și lucrul cu simboluri din cod.
   \item Deoarece se dorește ca codul de intrare să fie declarativ, să folosească extensiv atribute aplicate la tipuri și la membrii lor, ar fi foarte
   comod dacă codul generat să poată automat conține definițiile pentru aceste atribute, partajate între codul de intrare care să le folosească drept atribute,
   și logica de analiză și generare care să le caute în reprezentarea abstractă a codului sursă și să le inspecteze.
@@ -653,7 +667,7 @@ Acest cod atunci ar putea să se schimbe fără a afecta logica sistemului origi
 
 Utilizarea plugin-urilor reprezintă o soluție care foarte bine corespunde cerințelor: în primul rând, restul sistemului este decuplat de nivelul plugin-urilor, iar acesta este foarte flexibil, adică ușor de modificat și de augmentat.
 
-În C\#, există DLL-uri --- librării care permit să încarce codul în timpul rulării, să linkeze toate funcțiile necesare, să descopere tipurile prezente în această librărie și să facă ceva cu ele.
+În C\#, există \ac{DLL}-uri --- librării care permit să încarce codul în timpul rulării, să linkeze toate funcțiile necesare, să descopere tipurile prezente în această librărie și să facă ceva cu ele.
 În cazul generatorului de cod dat, dorim ca aceste plugin-uri să poată fi inițializate, să analizeze codul sursă și să genereze codul nou.
 Cea mai ușoară modalitate de a asigura acest lucru este de a defini o interfață cu toate aceste acțiuni ca metode, iar în timpul rulării de a căuta toate tipurile care implementează această interfață, după ce pot fi instanțiate și utilizate, executând metodele acestei interfețe. 
 
@@ -671,8 +685,8 @@ Așa fișier poate conține configurația parametrilor concrete pentru plugin-ur
 https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/game/kari.json
 
 
-S-a decis ca toate plugin-urile să fie importate ori dintr-o singură directorie, ori individual după cale către DLL-uri.
-Încă se admite instalarea prin NuGet, pentru a putea să le împărtășească ușor cu lumea, însă procesul de lucru cu NuGet gol este mult mai complicat decât folosirea submodulelor git și setarea individuală a calelor la DLL-uri într-un script, de aceea această funcționalitate nu se folosește la moment.
+S-a decis ca toate plugin-urile să fie importate ori dintr-o singură directorie, ori individual după cale către \ac{DLL}-uri.
+Încă se admite instalarea prin NuGet, pentru a putea să le împărtășească ușor cu lumea, însă procesul de lucru cu NuGet gol este mult mai complicat decât folosirea submodulelor git și setarea individuală a calelor la \ac{DLL}-uri într-un script, de aceea această funcționalitate nu se folosește la moment.
 
 Configurarea plugin-urilor tot se face prin consola.
 Ele primesc argumente în același fel ca și orchestratorul.
@@ -702,9 +716,9 @@ S-a discutat și fluxul de lucru dorit, mai precis, faptul că va fi o aplicați
 
 După cum s-a menționat, configurarea se va face din linia de comandă și/sau prin fișiere json de configurare.
 Autorul a decis să creeze codul propriu pentru lucrul acesta, cu toate că deja există mai multe librării care fac același lucru.
-Autorul ori nu a fost satisfăcut cu API-ul lor, ori cu lipsa opțiunilor dorite.
+Autorul ori nu a fost satisfăcut cu \ac{API}-ul lor, ori cu lipsa opțiunilor dorite.
 
-Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua.
+Deci a fost realizat un \ac{API} declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua.
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs
 pentru un exemplu complet.
 
@@ -712,7 +726,7 @@ Următorul cod transmite argumentele primite la consolă la parser, care își c
 https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587/source/Kari.Generator/KariCompiler.cs#L126-L132
 
 Aici se arată codul parțial al clasei ce va primi argumentele din consolă, mapate la tipurile câmpurilor.
-Cum se poate observa, este utilizat atributul \texttt{Option} pentru a atinge un API declarativ.
+Cum se poate observa, este utilizat atributul \texttt{Option} pentru a atinge un \ac{API} declarativ.
 Acestea sunt scanate în timpul rulării de către parser, utilizând reflexie runtime, pentru a obține informații despre obiect la care să fie bindate valorile argumentelor. 
 A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}, rândurile 21-87.
 
@@ -756,17 +770,17 @@ Pe scurt:
   \item Metoda \texttt{FillObjectWithOptionValues} primește la intrare un obiect de orice tip, îi inspectează câmpurile, utilizând reflexia runtime, și performă conversiunile din tip șir în tipul câmpului corespunzător.
   \item Metoda \texttt{GetHelpFor} construiește un tabel, utilizând aceeași reflexie runtime.
   \item Metodele \texttt{GetUnrecognizedOptions} și \texttt{GetUnrecognizedOptionsFromConfigurations} se iterează prin toate opțiunele nemarcate și le returnează numele.
-  Să se noteze că API-ul nu este final.
+  Să se noteze că \ac{API}-ul nu este final.
   A fost realizat în durata de aproape o zi și în continuare ceva modificat după necesitățile aplicației.
 \end{itemize}
 
-Să se noteze că API-ul nu este final.
+Să se noteze că \ac{API}-ul nu este final.
 A fost realizat în durata de aproape o zi și în continuare ceva modificat după necesitățile aplicației.
 
 
 \section{Incărcarea plugin-urilor}
 
-După cum s-a menționat anterior, codul plugin-urilor este distribuit și încărcat prin DLL-uri.
+După cum s-a menționat anterior, codul plugin-urilor este distribuit și încărcat prin \ac{DLL}-uri.
 Pentru aceasta, se folosesc funcțiile \texttt{Assembly.LoadFile} și \texttt{GetExportedTypes}, după ce se realizează filtrarea tuturor tipurilor, anume căutarea tipurilor care implementează interfața \texttt{IAdministrator}.
 Aceste tipuri deja pot fi instanțiate prin reflexie.
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs
@@ -795,7 +809,7 @@ Kari permite mai multe moduri de intrare (de descoperire a fișierelor sursă):
 \end{itemize}
 
 Această logică se conține într-o singură funcție, cu mai multe funcții locale imbricate.
-Codul este foarte simplu, operând cu API-urile sistemului de fișiere și în cea mai mare parte conține validări.
+Codul este foarte simplu, operând cu \ac{API}-urile sistemului de fișiere și în cea mai mare parte conține validări.
 În dependența de cerințele următoare pentru proiect, acest cod poate fi extras în încă o etapă opțională de descoperire.
 https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs#L285-L598
 
@@ -876,7 +890,7 @@ Este clar că nu sunt considerate dependențele între proiecte și orice schimb
 Încă, dependențele de fiecare plugin din punct de vedere a tipurilor cu atribute specifice, sau a tipului de output (dependent de totul input, sau pentru un proiect aparte) nu au fost explorate.
 Acestea pot fi folosite pentru a accelera generatorul de cod și mai departe, dar necesită și mai mult cod și timp pentru a le implementa.
 
-\chapter{Programarea Plugin-urilor si Exemple de Utilizare}
+\chapter{Programarea Plugin-urilor și Exemple de Utilizare}
 
 \section{CodeBuilder}
 
@@ -915,7 +929,7 @@ Mai jos sunt prezentate și niște exemple de utilizare.
 \section{Anotațiile}
 
 Următorul caz de utilizare comun pentru majoritatea plugin-urilor sunt anotațiile (sau atributele).
-Atributele sunt acel lucru care permite design-ul unor API-uri declarative.
+Atributele sunt acel lucru care permite design-ul unor \ac{API}-uri declarative.
 Este comod pentru ele să fie partajate între codul sursă al plugin-ului și cel al consumatorului.
 Plugin-ul le-ar utiliza ca containeri pentru datele extrase din codul consumatorului, iar acela le-ar folosi pentru a stabili aceste date.
 Astfel, același container este utilizat și pentru definirea datelor, și pentru manipularea lor.
@@ -1028,7 +1042,7 @@ https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18
 
 
 Înainte de compilare trebuie să se ruleze generatorul de cod.
-Pentru aceasta se invocă Kari cu drumul la fișierul de configurare \texttt{kari.json} care conține drumul la DLL-ul plugin-ului Flags.
+Pentru aceasta se invocă Kari cu drumul la fișierul de configurare \texttt{kari.json} care conține drumul la \ac{DLL}-ul plugin-ului Flags.
 Acesta poate fi dat lui Kari și direct, însă utilizarea unui fișier de configurare este mai comod.
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.bat
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/kari.json
@@ -1070,7 +1084,7 @@ https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178
 \section{Operațiile cu Kari ca parte de un instrument centralizat de dezvoltare}
 
 În cadrul unui proiect al său, autorul a realizat un instrument în limbajul D care permite integrarea mai ușoară a lui Kari, fără a folosi fișiere de proiecte MSBuild.
-Codul definește două comenzi — una compilează Kari în configurația dată, iar a doua îl execută pe Kari, construind drumurile la DLL-urile plugin-urilor din denumirile lor.
+Codul definește două comenzi — una compilează Kari în configurația dată, iar a doua îl execută pe Kari, construind drumurile la \ac{DLL}-urile plugin-urilor din denumirile lor.
 https://github.com/AntonC9018/race/blob/c5b282236ce3381a983bad4e48f213472dff7267/dev_cli/source/commands/setup.d
 
 Restul configurației se ia din fișierul de configurație care se conține în mapa cu proiectul Unity al jocului:
@@ -1101,10 +1115,10 @@ dev kari build -- arguments_to_dotnet_build
 dev kari run -- arguments_to_kari
 \end{minted}
 
-Aceste comenzi definite într-un sistem centralizat sunt foarte utile în timpul dezvoltării, și pentru pipeline-uri CI/CD.
+Aceste comenzi definite într-un sistem centralizat sunt foarte utile în timpul dezvoltării, și pentru pipeline-uri \ac{CI/CD}.
 Logica concretă a procesului de build poate fi delegată la acest program \texttt{dev} în loc de a defini toata complexitate de build asociată cu jocurile în scripturi shell.
 Programul \texttt{dev} este scris în limbajul de programare D, deci este foarte ușor de programat și de configurat, permite modalitățile avansate de programare, poate accesa librăria standartă excelentă Phobos, și este mult mai comod, ușor de menținut și portabil, decât scripturi shell.
-Un astfel de program poate ori să se integreze cu alte scripturi CI/CD, ori să le înlocuiască complet.
+Un astfel de program poate ori să se integreze cu alte scripturi \ac{CI/CD}, ori să le înlocuiască complet.
 
 \section{Rezumat}
 
