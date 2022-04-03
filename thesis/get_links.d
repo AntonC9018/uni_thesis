@@ -123,9 +123,14 @@ void main()
         "race": "../race",
         "uni_thesis": ".."   
     ];
+    
+    bool hasAppendedSpacing = false;
 
-    foreach (link; links)
+    while (!links.empty)
     {
+        auto link = links.front;
+        links.popFront();
+
         const completedFilePath = pathsToStart[link.repo] ~ "/" ~ link.filePath;
         const filename = baseName(link.filePath);
         string newLineContent;
@@ -134,7 +139,6 @@ void main()
         void appendLabel(string label)
         {
             app.formattedWrite!`\label{%s}`(label);
-            app ~= "\n";
         }
 
         string friendlyFileName()
@@ -180,6 +184,18 @@ void main()
             return format!`A se vedea Anexa \ref{%s}.`(labelString);
         }
 
+        void maybeAppendSpacing()
+        {
+            if (!hasAppendedSpacing)
+            {
+                hasAppendedSpacing = true;
+                return;
+            }
+            app ~= "\n\n";
+            app ~= `\clearpage`;
+            // app ~= "\n\n";
+        }
+
         // Entire file
         if (link.range[0] == -1)
         {
@@ -190,15 +206,15 @@ void main()
             }
             else
             {
+                maybeAppendSpacing();
+
                 formattedWrite!`\section{%s}`(app, filename);
                 const labelString = format!`appendix:%s_%s`(link.repo, friendlyFileName);
                 newLineContent = getRefLabel(labelString);
                 
                 appendLabel(labelString);
-
+                app ~= "\n";
                 app ~= formatInputListing2(completedFilePath, filename);
-                app ~= "\n";
-                app ~= "\n";
             }
         }
 
@@ -219,14 +235,15 @@ void main()
             }
             else
             {
+                maybeAppendSpacing();
+
                 formattedWrite!`\section{%s, rândurile %d--%d}`(app, filename, range[0], range[1]);
                 const labelString = format!`appendix:%s_%s_%d_%d`(link.repo, friendlyFileName, range[0], range[1]);
                 newLineContent = getRefLabel(labelString);
-
+                
                 appendLabel(labelString);
+                app ~= "\n";
                 app ~= formatInputListing(completedFilePath, filename, range[0], range[1]);
-                app ~= "\n";
-                app ~= "\n";
             }
         }
         

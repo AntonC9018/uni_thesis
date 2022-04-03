@@ -1,6 +1,5 @@
 \documentclass[a4paper,12pt]{report}
 
-
 % https://tex.stackexchange.com/a/63393
 \makeatletter
 \def\@makechapterhead#1{%
@@ -32,22 +31,29 @@
 \usepackage{setspace}
 \setstretch{1.5}
 
+% Being able to copy-paste from the document
+% Display the diacritics correctly
+\usepackage{fontspec}
 % Times New Roman font
-\usepackage{mathptmx}
-
-% For code
-% \usepackage{inconsolata}
+\setmainfont{Times New Roman}
 
 % Romanian language support
-\usepackage[T1]{fontenc}
-\usepackage[utf8x]{inputenc}
 \usepackage[romanian]{babel}
+
+% https://tex.stackexchange.com/a/57967
+% \input{glyphtounicode}
+% \pdfgentounicode=1
+
+% \usepackage{mathptmx}
 
 % Appendices
 \usepackage[toc,page]{appendix}
 
 % Format urls in the bibliography
-\usepackage{url}
+% \usepackage{url}
+\usepackage{hyperref}
+% Clickable table of contents
+\hypersetup{linktoc=all}
 
 % Code blocks
 \usepackage{minted}
@@ -57,9 +63,11 @@
   codetagify=true,
   linenos=true,
   breaklines=true,
-  baselinestretch=0.72,
+  baselinestretch=0.8,
   % https://www.giss.nasa.gov/tools/latex/ltx-178.html
   fontsize=\footnotesize
+  % Prevent it from spilling over margins for especially long lines
+  ,breakanywhere=true
 }
 
 % Chapters should count with roman numerals
@@ -121,12 +129,15 @@
   % this evaluates a math expression, which is `end - begin`
   \the\numexpr\getpagemark{usefulStuffEnd}-\getpagemark{usefulStuffBegin}\relax}
 
-\newcommand{\anexeCount}{24} % for now, hardcode this
+\newcommand{\anexeCount}{20} % for now, hardcode this
 \newcommand{\conferencesList}{I don't know what to write here}
 \newcommand{\bibliographyEntryCount}{\total{citnum}}
 
 % Start
 \begin{document}
+
+% Prevent spills over margin
+\sloppy
 
 \begin{titlepage}
   \vspace*{\fill}
@@ -183,12 +194,12 @@
 \textbf{la teza de licență ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
 
 \textbf{Structura tezei.}
-Teza constă din: Introducere, 4 capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} de titluri.
-Textul de bază cuprinde \usefulPageCount{} de pagini și \anexeCount{} anexe.
+Teza constă din: Introducere, 4 capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} titluri.
+Textul de bază cuprinde \usefulPageCount{} de pagini și \anexeCount{} de anexe.
 
 \textbf{Cuvinte-cheie:}
-Generarea codului, eliminarea codului boilerplate, programarea declarativă,
-jocuri video, eficiență și plăcere a programatorului, Unity, C\#.
+\textit{Generarea codului, eliminarea codului boilerplate, programarea declarativă,
+jocuri video, eficiență și plăcere a programatorului, Unity, C\#.}
 
 \textbf{Actualitatea.}
 Generarea codului poate face lucrul programatorilor mai plăcut și mai eficient,
@@ -201,7 +212,7 @@ Obiectivele tezei constau în studiul soluțiilor existente pentru generarea cod
 identificarea faptului că ele nu corespund cerințelor sau nu sunt practice,
 dezvoltarea unui sistem de generare a codului extensibil prin plugin-uri și ușor de utilizat.
 
-\textbf{Rezultatele preconizate și obținute} rezumă în (1) analiza soluțiilor existente pentru generarea codului (2) implementarea nucleului generatorului de cod, (3) suportului pentru plugin-uri, (4) demonstrarea unor plugin-uri utile, (5) folosirea generatorului de cod într-un un proiect real.
+\textbf{Rezultatele preconizate și obținute} rezumă în (1) analiza soluțiilor existente pentru generarea codului (2) implementarea nucleului generatorului de cod, (3) suportului pentru plugin-uri, (4) demonstrarea unor plugin-uri utile, (5) folosirea generatorului de cod într-un proiect real.
 
 \textbf{Problemele importante rezolvate} sunt generarea codului repetetiv, complicat sau presupus la erori, dacă scris manual, pe baza codului sursă; lipsa de capacități de metaprogramare în C\#.
 
@@ -227,7 +238,7 @@ C\# nu este un limbaj perfect.
 Este dificil să se scrie codul declarativ fără să se utilizeze reflexie runtime care este lentă și alocă multă memorie excesivă.
 Uneori necesită mai mult cod boilerplate sau cod mai puțin eficient sau care să consume mai multă memorie chiar pentru a atinge lucruri simple.
 
-În mai multe cazuri, însă, acest cod poate fi generat pe baza fișierelor de sursă inițiale.
+În mai multe cazuri, însă, acest cod poate fi generat pe baza fișierelor sursă inițiale.
 Codul care să genereze acest boilerplate dorit poate fi mai ușor de înțeles decât codul băzat pe reflexie runtime, și trebuie să fie scris doar o singură dată, eliminând codul boilerplate dat pentru întotdeauna.
 Codul generat va fi echivalent cu acel cod boilerplate, însă nu trebuie fi scris de mână de fiecare dată, și nu trebuie să fie sincronizat cu codul inițial — acestea se vor face automat de către generatorul de cod.
 
@@ -451,7 +462,7 @@ public static class FlagsExtensions
 
 Problema este că trebuie să se scrie aceste metode pentru toate tipurile flag care sunt în cod.
 Când apare un nou astfel de tip, trebuie să se copieze acest cod, și să se plaseze undeva, cu denimirea tipului de intrare schimbată.
-C\# nu propune o soluție pentru această problemă: este pur și simplu imposibil să scrieți astfel de metode care să lucreze cu orice tip enum flag.
+C\# nu propune o soluție comodă pentru această problemă: este pur și simplu imposibil să scrieți astfel de metode care să lucreze cu orice tip enum flag.
 Aceasta este posibil de realizat cu IL emission, dar nu cred că merită.
 
 Autorul propune următoarea soluție declarativă, explicată mai bine în capitolul 3:
@@ -478,11 +489,11 @@ Message Pack\cite{message_pack_github} care permite emiterea codului IL pentru s
 
 \section{Istoriografia problemei}
 
-După ce autorul a început să studieze și să practice programarea independentă în C\#, și anume în proiectul Hopper descris în teza de an, au devenit evidente deficiențele acestui limbaj.
+După ce autorul a început să studieze și să practice programarea independentă în C\#, și anume în proiectul Hopper descris în teză de an, au devenit evidente deficiențele acestui limbaj.
 Folosind o abordare directă, a fost conceput și creat un prototip al generatorului de cod, cuplat cu proiectul în care a fost utilizat.
-Acest generator de cod s-a descris pe scurt în teza de an al autorului.
+Acest generator de cod s-a descris pe scurt în teză de an al autorului.
 
-După teza de an, autorul a continuat să experiementeze cu aceste concepte, implementând baza unui alt joc, conceput cu două ani înainte de perfectarea tezei de an.
+După teză de an, autorul a continuat să experiementeze cu aceste concepte, implementând baza unui alt joc, conceput cu două ani înainte de perfectarea tezei de an.
 În timp de aproape o lună și jumătate, a fost creat un proiect-șablon în Unity cu toate instrumentele necesare: generatorul de cod, divizarea modulară a asamblelor C\# în Unity, integrarea unui terminal virtual în joc, o interfață de consolă centrală\cite{particular_project}.
 Deci, generatorul de cod a fost inițial adaptat la nevoile acestui proiect, însă autorul a văzut oportunitatea să-l modularizeze printr-o arhitectură pe baza plugin-urilor, ceea ce și se explică în această lucrare.
 
@@ -562,7 +573,7 @@ A fost introdusă și ideea de fluidizare a procesului utilizând un sistem care
 
 \chapter{Sumarul Arhitecturii}
 
-\section{Concretizarea cerintelor pentru generator de cod}
+\section{Concretizarea cerințelor pentru generator de cod}
 
 Este clar că pentru a putea realiza un produs software trebuie să se știe ce exact se cere de el.
 În cazul unui generator de cod, se poate formaliza cerințele funcționale de bază la nivel înalt în următorul mod:
@@ -593,7 +604,7 @@ Se concretizează a doua cerință în modul următor:
   \item Se cere ca să fie ușor de creat fișiere cu codul care să conforme formatării corecte și care să nu lupte cu simboluri din codul inițial.
   În alte cuvinte, se cere ca librăria generatorului de cod să ofere API-uri utile pentru generarea codului și lucrul cu simboluri din cod.
   \item Deoarece se dorește ca codul de intrare să fie declarativ, să folosească extensiv atribute aplicate la tipuri și la membrii lor, ar fi foarte
-  comod dacă codul generat să poată automat conțină definiții pentru aceste atribute, partajate între codul de intrare care să le folosească drept atribute,
+  comod dacă codul generat să poată automat conține definițiile pentru aceste atribute, partajate între codul de intrare care să le folosească drept atribute,
   și logica de analiză și generare care să le caute în reprezentarea abstractă a codului sursă și să le inspecteze.
   \item Logica acestui analizor se va schimba des, și analizorii noi vor fi adăugați, de aceea se cere ca acest nivel să fie cât mai flexibil, să fie posibil să se modifice și să se augmenteze ușor.
 \end{itemize}
@@ -603,7 +614,7 @@ Ultima cerință se obține prin paralelizare.
 
 \section{Schița arhitecturii}
 
-În primul rând se dorește să se precizeze încă o dată etapele concrete de funcționare a sistemei propuse care reies în mod natural din analiza superficială a cerințelor:
+În primul rând se dorește să se precizeze încă o dată etapele concrete de funcționare a sistemului propuse care reies în mod natural din analiza superficială a cerințelor:
 
 \begin{itemize}
 \item Configurarea --- parsarea argumentelor liniei de comandă, sau a fișierelor de configurare; validarea lor.
@@ -622,7 +633,7 @@ Aceasta natural aduce la următoarea arhitectură:
 \begin{itemize}
   \item Să existe un orchestrator, care să accepte configurația din linia de comandă, să citească fișierele sursă și să le converteze în reprezentarea codului abstractă.
   \item Să existe mai multe plugin-uri, care să analizeze și să genereze output-ul pentru această reprezentare abstractă.
-  \item Orchestratorul va încărca plugin-urile în timpul rulării, conform configurației, le va inițializa, iarăși, conform configurației, și le va da codul ca datele de intrare. El va primi output-ul generat de către ele și îl va scrie în fișiere corespunzătoare.
+  \item Orchestratorul va încărca plugin-urile în timpul rulării, conform configurației, le va inițializa, iarăși, conform configurației, și le va da codul ca datele de intrare. El va primi output-ul generat de către ele și îl va scrie în fișierele corespunzătoare.
 \end{itemize}
 
 Arhitectura propusă poate fi eventual subdivizată și la mai multe etape, prin divizarea orchestratorului la mai multe părți.
@@ -633,21 +644,20 @@ Acest modul ar putea fi reutilizat în alte locuri în cod, sau poate fi substit
 
 \section{Plugin-uri}
 
-Ideea principală a sistemelor băzate pe plugin-uri este ca să fie posibil să se augmenteze logica sistemului în timpul rulării, adică fără să se schimbe codul acestei sisteme.
+Ideea principală a sistemelor băzate pe plugin-uri este ca să fie posibil să se augmenteze logica sistemului în timpul rulării, adică fără să se schimbe codul acestui sistem.
 Acesta presupune că trebuie să existe o modalitate de a descoperi în timpul rulării codul logicii care trebuie să fie executat.
-Acest cod atunci ar putea să se schimbe fără a afecta logica sistemei originale.
+Acest cod atunci ar putea să se schimbe fără a afecta logica sistemului original.
 
 În alte cuvinte, totul ce sistemul va trebui să facă va fi administrarea și integrarea acestor plugin-uri.
-Însăși logică va fi conținută în aceste plugin-uri și nu va fi partea integrală a sistemei.
+Însăși logică va fi conținută în aceste plugin-uri și nu va fi o parte integrală a sistemului.
 
-Utilizarea plugin-urilor reprezintă o soluție care foarte bine corespunde cerințelor: în primul rând, restul sistemului este decuplat din nivelul plugin-urilor, iar acesta este foarte flexibil, adică ușor de modificat și de augmentat.
+Utilizarea plugin-urilor reprezintă o soluție care foarte bine corespunde cerințelor: în primul rând, restul sistemului este decuplat de nivelul plugin-urilor, iar acesta este foarte flexibil, adică ușor de modificat și de augmentat.
 
 În C\#, există DLL-uri --- librării care permit să încarce codul în timpul rulării, să linkeze toate funcțiile necesare, să descopere tipurile prezente în această librărie și să facă ceva cu ele.
 În cazul generatorului de cod dat, dorim ca aceste plugin-uri să poată fi inițializate, să analizeze codul sursă și să genereze codul nou.
-Cea mai ușoară modalitate de a asigura acest lucru este de a defini o interfață cu toate aceste acțiuni ca metode, iar în timpul rulării de a căuta toate tipurile care implementează această interfață, după ce poate fi instanțiate și utilizate, executând metodele acestei interfețe.
+Cea mai ușoară modalitate de a asigura acest lucru este de a defini o interfață cu toate aceste acțiuni ca metode, iar în timpul rulării de a căuta toate tipurile care implementează această interfață, după ce pot fi instanțiate și utilizate, executând metodele acestei interfețe.
 
-În plus, deoarece se presupune că plugin-urile sunt independente, putem paraleliza în mod trivial executarea lor.
-(Pot fi și dependente, însă această problemă tot poate fi soluționată fără a anula utilizarea plugin-urilor și argumentul dat.)
+În plus, deoarece se presupune că plugin-urile sunt independente, putem paraleliza în mod trivial executarea lor\footnote{Pot fi și dependente, însă această problemă tot poate fi soluționată fără a anula utilizarea plugin-urilor și argumentul dat.}.
 
 \section{Fluxul de lucru cu generatorul de cod}
 
@@ -665,17 +675,17 @@ S-a decis ca toate plugin-urile să fie importate ori dintr-o singură directori
 Încă se admite instalarea prin NuGet, pentru a putea să le împărtășească ușor cu lumea, însă procesul de lucru cu NuGet gol este mult mai complicat decât folosirea submodulelor git și setarea individuală a calelor la DLL-uri într-un script, de aceea această funcționalitate nu se folosește la moment.
 
 Configurarea plugin-urilor tot se face prin consola.
-Ei primesc argumente în același fel ca și orchestratorul.
+Ele primesc argumente în același fel ca și orchestratorul.
 
 Din punct de vedere a integrării cu instrumente, invocarea directă ar fi mai bună, ca de exemplu linkarea la librării C, însă invocarea unui proces la consolă tot este destul de ușor.
 
-Deci, comanda exemplu de invocare ar putea fi următoarea:
+Deci, comanda-exemplu de invocare ar putea fi următoarea:
 
 \begin{minted}{text}
 kari -configurationFile kari.json -pluginPaths plugin1.dll,plugin2.dll,plugin3.dll
 \end{minted}
 
-Aceasta ar invoca generatorul de cod cu plugin-uri plugin1, plugin2 și plugin3, unde restul configurației se ia din fișierul kari.json.
+Aceasta ar invoca generatorul de cod cu plugin-urile \textit{plugin1}, \textit{plugin2} și \textit{plugin3}, unde restul configurației se ia din fișierul \textit{kari{.}json}.
 După aceasta, programul generează codul, ori arată erori, posibil cu mesajul de ajutor care arată toate opțiunile.
 
 
@@ -694,9 +704,9 @@ După cum s-a menționat, configurarea se va face din linia de comandă și/sau 
 Autorul a decis să creeze codul propriu pentru lucrul acesta, cu toate că deja există mai multe librării care fac același lucru.
 Autorul ori nu a fost satisfăcut cu API-ul lor, ori cu lipsa opțiunilor dorite.
 
-Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua\footnote{a se vedea codul sursă pentru un exemplu complet:
+Deci a fost realizat un API declarativ pentru specificarea opțiunilor particulare care o clasă specifică va lua.
 A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}.
-}.
+pentru un exemplu complet.
 
 Următorul cod transmite argumentele primite la consolă la parser, care își completează structura de date internă cu toate opțiunile prinse, pentru o mapare mai eficientă în continuare:
 \inputminted[firstline=126, lastline=132]{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
@@ -704,7 +714,7 @@ Următorul cod transmite argumentele primite la consolă la parser, care își c
 Aici se arată codul parțial al clasei ce va primi argumentele din consolă, mapate la tipurile câmpurilor.
 Cum se poate observa, este utilizat atributul \texttt{Option} pentru a atinge un API declarativ.
 Acestea sunt scanate în timpul rulării de către parser, utilizând reflexie runtime, pentru a obține informații despre obiect la care să fie bindate valorile argumentelor.
-A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler_21_87}.
+A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}, rândurile 21-87.
 
 Urmează un exemplu de utilizare în codul generatorului de cod.
 Metoda \texttt{FillObjectWithOptionValues} umple obiectul dat cu valorile din structura de date internă, și returnează o listă cu toate erorile care s-au îmtâmplat în timpul bindării parametrilor.
@@ -716,7 +726,7 @@ Administratorii sunt obiecte care dirijează procesul de execuție a plugin-uril
 
 
 Interesant este momentul că, când vreo opțiune este menționată în parser, ea este marcată cu un flag.
-După ce toate opțiunile au fost colectate, se poate obține toate opțiunile care nu au fost marcate cu un astfel de flag - argumentele superfluoase.
+După ce toate opțiunile au fost colectate, se poate obține toate opțiunile care nu au fost marcate cu un astfel de flag --- argumentele superfluoase.
 Opinia autorului este că prezența argumentelor superfluoase mereu trebuie să fie considerată ca o eroare critică.
 În plus, toate așa erori trebuie să fie explicit afișate.
 \inputminted[firstline=446, lastline=460]{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
@@ -731,7 +741,10 @@ kari -helloworld -mynameisanton
 
 
 Mesajele de ajutor au fost implementate utilizând librăria Spectre Console\cite{spectre_console_github}, în particular, funcționalitatea de creare a tabelelor.
-Deci, o parte a mesajul de ajutor arată cam în modul următor:
+
+% An example not included, because latex cannot display it
+% Could do a figure, but meh
+% Deci, o parte a mesajul de ajutor arată cam în modul următor:
 
 Codul parser-ului este foarte simplu.
 A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_Arguments_ArgumentParsing}.
@@ -741,8 +754,8 @@ Pe scurt:
   \item Toate opțiunile sunt colectate și păstrate într-un tablou asociativ, numele $\rightarrow$ valoarea.
   \item Toate fișierele menționate prin opțiunea \texttt{configurationFile} sunt încărcate și sălvate într-o listă.
   \item Metoda \texttt{FillObjectWithOptionValues} primește la intrare un obiect de orice tip, îi inspectează câmpurile, utilizând reflexia runtime, și performă conversiunile din tip șir în tipul câmpului corespunzător.
-  \item Metoda \texttt{GetHelpFor} consruiește un tabel, utilizând aceeași reflexie runtime.
-  \item Metodele \texttt{GetUnrecognizedOptions} și \texttt{GetUnrecognizedOptionsFromConfigurations} iterează prin toate opțiunele nemarcate și le returnează numele.
+  \item Metoda \texttt{GetHelpFor} construiește un tabel, utilizând aceeași reflexie runtime.
+  \item Metodele \texttt{GetUnrecognizedOptions} și \texttt{GetUnrecognizedOptionsFromConfigurations} se iterează prin toate opțiunele nemarcate și le returnează numele.
   Să se noteze că API-ul nu este final.
   A fost realizat în durata de aproape o zi și în continuare ceva modificat după necesitățile aplicației.
 \end{itemize}
@@ -782,7 +795,7 @@ Kari permite mai multe moduri de intrare (de descoperire a fișierelor sursă):
 \end{itemize}
 
 Această logică se conține într-o singură funcție, cu mai multe funcții locale imbricate.
-Codul este foarte simplu, operând cu API-urile sistemei de fișiere și în cea mai mare parte conține validări.
+Codul este foarte simplu, operând cu API-urile sistemului de fișiere și în cea mai mare parte conține validări.
 În dependența de cerințele următoare pentru proiect, acest cod poate fi extras în încă o etapă opțională de descoperire.
 A se vedea Anexa \ref{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_285_598}.
 
@@ -856,7 +869,7 @@ Deci acest cod probabil va fi schimbat când autorul va găsi timpul pentru refa
 
 \section{Rezumat}
 
-În acest capitol s-au discutat detaliile referitor la implementarea sistemei: cum se configurează sistemul, cum el interacționează cu plugin-urile, cum codul sursă este citit și cum sunt scrise fișierele de ieșire.
+În acest capitol s-au discutat detaliile referitor la implementarea sistemului: cum se configurează sistemul, cum el interacționează cu plugin-urile, cum codul sursă este citit și cum sunt scrise fișierele de ieșire.
 În acest capitol nu s-a discutat logica generării codului, deoarece aceasta deja vine din plugin-uri concrete.
 
 Este clar că nu sunt considerate dependențele între proiecte și orice schimbare forțează codul pentru fiecare proiect să fie regenerat.
@@ -1054,7 +1067,7 @@ A se vedea Anexa \ref{appendix:uni_thesis____examples_dataobject_Program}.
 A se vedea Anexa \ref{appendix:uni_thesis____examples_dataobject_Generated_DataObjects}.
 \inputminted{cs}{../examples/dataobject/Generated/DataObjectAnnotations.cs}
 
-\section{Operatiile cu Kari ca parte de un instrument centralizat de dezvoltare}
+\section{Operațiile cu Kari ca parte de un instrument centralizat de dezvoltare}
 
 În cadrul unui proiect al său, autorul a realizat un instrument în limbajul D care permite integrarea mai ușoară a lui Kari, fără a folosi fișiere de proiecte MSBuild.
 Codul definește două comenzi — una compilează Kari în configurația dată, iar a doua îl execută pe Kari, construind drumurile la DLL-urile plugin-urilor din denumirile lor.
@@ -1098,9 +1111,9 @@ Un astfel de program poate ori să se integreze cu alte scripturi CI/CD, ori să
 În acest capitol s-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
 S-a demonstrat cum generarea codului poate fi incorporată într-un instrument centralizat care poate fi utilizat pentru automatizarea proceselor de dezvoltare a unui sistem informatic.
 
-\chapter{Concluziile Finale si Recomandările}
+\chapter*{Concluziile Finale si Recomandările}
 
-În lucrarea aceasta, s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
+În lucrarea aceasta s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
 S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
 A fost demonstrată utilizarea generatorului de cod în două proiecte demonstrative, precum și în cadrul unui instrument centralizat în limbajul D, pe care autorul l-a utilizat în cadrul dezvoltării unui joc în Unity.
 
@@ -1109,7 +1122,7 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 
 \begin{itemize}
   \item Divizarea lui Kari la mai multe etape, pentru a acomoda utilizarea generatorului de cod ca librărie, și pentru a putea testa fiecare etapă aparte;
-  \item Profilarea mai sigură a codului legat cu sălvarea conținutului a fișierelor generate, și simplificarea lui dacă codul curent nu aduce beneficii din punct de vedere a vitezei de execuție;
+  \item Profilarea mai sigură a codului legat cu sălvarea conținutului fișierelor generate, și simplificarea lui dacă codul curent nu aduce beneficii din punct de vedere a vitezei de execuție;
   \item Explorarea posibilității de a stabili și de a optimiza timpul de execuție pe baza dependențelor fiecărui plugin, adică ce tipuri sau ce fișiere contribuie la codul generat;
   \item Mai multe idei care nu au fost discutate în această lucrare.
 \end{itemize}
@@ -1131,72 +1144,67 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 % Prepend Anexa to section names, center them
 \titleformat{\section}[block]{\normalfont\normalsize\bfseries\filcenter}{Anexa \thesection.~}{0pt}{}
 % Every section on new page
-\newcommand{\sectionbreak}{\clearpage}
+% \newcommand{\sectionbreak}{\clearpage}
 
 \chapter{Codurile sursă}
 \section{KariCompiler.cs}\label{appendix:Kari____Kari_source_Kari_Generator_KariCompiler}
 \inputminted{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
 
-\section{KariCompiler.cs, rândurile 21--87}\label{appendix:Kari____Kari_source_Kari_Generator_KariCompiler_21_87}
-\inputminted[firstline=21, lastline=87]{cs}{../Kari/source/Kari.Generator/KariCompiler.cs}
-
-\section{ArgumentParsing.cs}\label{appendix:Kari____Kari_source_Kari_Arguments_ArgumentParsing}
+\clearpage\section{ArgumentParsing.cs}\label{appendix:Kari____Kari_source_Kari_Arguments_ArgumentParsing}
 \inputminted{cs}{../Kari/source/Kari.Arguments/ArgumentParsing.cs}
 
-\section{AdministratorFinder.cs}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_AdministratorFinder}
+\clearpage\section{AdministratorFinder.cs}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_AdministratorFinder}
 \inputminted{cs}{../Kari/source/Kari.GeneratorCore/Workflow/AdministratorFinder.cs}
 
-\section{MasterEnvironment.cs, rândurile 285--598}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_285_598}
+\clearpage\section{MasterEnvironment.cs, rândurile 285--598}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_285_598}
 \inputminted[firstline=285, lastline=598]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
-\section{MasterEnvironment.cs, rândurile 604--664}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_604_664}
+\clearpage\section{MasterEnvironment.cs, rândurile 604--664}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_604_664}
 \inputminted[firstline=604, lastline=664]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
-\section{MasterEnvironment.cs, rândurile 666--697}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_666_697}
+\clearpage\section{MasterEnvironment.cs, rândurile 666--697}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_MasterEnvironment_666_697}
 \inputminted[firstline=666, lastline=697]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/MasterEnvironment.cs}
 
-\section{CodeBuilder.cs, rândurile 19--184}\label{appendix:Kari____Kari_source_Kari_Utils_CodeBuilder_19_184}
+\clearpage\section{CodeBuilder.cs, rândurile 19--184}\label{appendix:Kari____Kari_source_Kari_Utils_CodeBuilder_19_184}
 \inputminted[firstline=19, lastline=184]{cs}{../Kari/source/Kari.Utils/CodeBuilder.cs}
 
-\section{Annotator.cs}\label{appendix:Kari____Kari_source_Kari_Annotator_Annotator}
+\clearpage\section{Annotator.cs}\label{appendix:Kari____Kari_source_Kari_Annotator_Annotator}
 \inputminted{cs}{../Kari/source/Kari.Annotator/Annotator.cs}
 
-\section{InternalPlugin.props}\label{appendix:Kari____Kari_source_Kari_Plugins_InternalPlugin}
+\clearpage\section{InternalPlugin.props}\label{appendix:Kari____Kari_source_Kari_Plugins_InternalPlugin}
 \inputminted{xml}{../Kari/source/Kari.Plugins/InternalPlugin.props}
 
-\section{FlagsAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAdministrator}
+\clearpage\section{FlagsAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAdministrator}
 \inputminted{cs}{../Kari/source/Kari.Plugins/Flags/FlagsAdministrator.cs}
 
-\section{Administrator.cs, rândurile 67--163}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_Administrator_67_163}
+\clearpage\section{Administrator.cs, rândurile 67--163}\label{appendix:Kari____Kari_source_Kari_GeneratorCore_Workflow_Administrator_67_163}
 \inputminted[firstline=67, lastline=163]{cs}{../Kari/source/Kari.GeneratorCore/Workflow/Administrator.cs}
 
-\section{FlagsAnalyzer.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAnalyzer}
+\clearpage\section{FlagsAnalyzer.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_Flags_FlagsAnalyzer}
 \inputminted{cs}{../Kari/source/Kari.Plugins/Flags/FlagsAnalyzer.cs}
 
-\section{Program.cs}\label{appendix:uni_thesis____examples_flags_Program}
+\clearpage\section{Program.cs}\label{appendix:uni_thesis____examples_flags_Program}
 \inputminted{cs}{../examples/flags/Program.cs}
 
-\section{Flags.cs}\label{appendix:uni_thesis____examples_flags_Generated_Flags}
+\clearpage\section{Flags.cs}\label{appendix:uni_thesis____examples_flags_Generated_Flags}
 \inputminted{cs}{../examples/flags/Generated/Flags.cs}
 
-\section{DataObjectAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAdministrator}
+\clearpage\section{DataObjectAdministrator.cs}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAdministrator}
 \inputminted{cs}{../Kari/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs}
 
-\section{DataObjectAnalyzer.cs, rândurile 14--46}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_14_46}
+\clearpage\section{DataObjectAnalyzer.cs, rândurile 14--46}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_14_46}
 \inputminted[firstline=14, lastline=46]{cs}{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
 
-\section{DataObjectAnalyzer.cs, rândurile 48--157}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_48_157}
+\clearpage\section{DataObjectAnalyzer.cs, rândurile 48--157}\label{appendix:Kari____Kari_source_Kari_Plugins_DataObject_DataObjectAnalyzer_48_157}
 \inputminted[firstline=48, lastline=157]{cs}{../Kari/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs}
 
-\section{Program.cs}\label{appendix:uni_thesis____examples_dataobject_Program}
+\clearpage\section{Program.cs}\label{appendix:uni_thesis____examples_dataobject_Program}
 \inputminted{cs}{../examples/dataobject/Program.cs}
 
-\section{DataObjects.cs}\label{appendix:uni_thesis____examples_dataobject_Generated_DataObjects}
+\clearpage\section{DataObjects.cs}\label{appendix:uni_thesis____examples_dataobject_Generated_DataObjects}
 \inputminted{cs}{../examples/dataobject/Generated/DataObjects.cs}
 
-\section{setup.d}\label{appendix:race____race_dev_cli_source_commands_setup}
+\clearpage\section{setup.d}\label{appendix:race____race_dev_cli_source_commands_setup}
 \inputminted{d}{../race/dev_cli/source/commands/setup.d}
-
-
 
 \end{document}

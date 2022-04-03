@@ -18,3 +18,5 @@ teza_processed.synctex*
 output
 *.pagecount
 *.toc
+*.out
+*.xdv

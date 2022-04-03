@@ -17,5 +17,5 @@ int main()
     if (spawnProcess2(["dmd", "-run", "get_links.d"]).wait != 0)
         return 1;
     
-    return spawnProcess2(["latexmk", "--shell-escape", "-pdf", "teza_processed.tex"]).wait;
+    return spawnProcess2(["latexmk", "--shell-escape", "-xelatex", "teza_processed.tex"]).wait;
 }
