@@ -147,8 +147,11 @@
 \chapter*{Lista abrevierelor}
 \begin{acronym}
   \begin{center}
-    \acro{XR}{Extended reality}
-    \acro{VR}{Virtual reality}
+    \acro{XR}{Extended Reality}
+    \acro{VR}{Virtual Reality}
+    \acro{3D}{3-Dimensional}
+    \acro{XML}{Extended Markup Language}
+    \acro{UI}{User Interface}
   \end{center}
 \end{acronym}
 
@@ -159,7 +162,7 @@
 \section{Laboratorul AVR}
 
 Practica s-a petrecut la universitate, la laboratorul AVR.
-Laboratorul acesta este o sală de calculatori, destul de largă, conținând mai mult ca 15 de calculatori moderne și puternice, un printer 3D, echipamentul \ac{XR} divers, adică căștile și controller-uri \ac{VR}.
+Laboratorul acesta este o sală de calculatori, destul de largă, conținând mai mult ca 15 de calculatori moderne și puternice, un printer \ac{3D}, echipamentul \ac{XR} divers, adică căștile și controller-uri \ac{VR}.
 Această sală este perfectă pentru elaborarea eficientă și avansată a jocurilor video.
 
 Sala de calculători era deschisă în aproape orice zi de lucru, de la 11:00 dimineața până 20:00 seara, și am avut posibilitate s-o folosesc spre folosul meu.
@@ -191,8 +194,63 @@ Jocul trebuia să aibă 2 scene, cu cerințe specifice la fiecare scenă:
 \begin{itemize}
   \item Posibilitatea de a schimba culoarea mașinii;
   \item Un sistem de caracteristici (stat-uri) cu sănătatea și viteza;
-
+  \item Posibilitatea de a selecta o mașină dintr-o listă prestabilită;
+  \item Posibilitatea de a-și selecta numele de utilizator;
+  \item Serializarea selectării culorii, mașinii, numii și a stat-urilor, folosind \ac{XML} și \texttt{PlayerPrefs} în Unity;
+  \item Posibilitatea de a adjusta stat-urile utilizând valuta;
+  \item Posibilitatea de a adăuga valuta prin tranzacții cu bani reali (simulat, fără tranzacții reale);
+  \item Posibilitatea de a selecta una din două mape și a începe al doilea stagiu al jocului.
 \end{itemize}
+
+\textbf{Tranziția între scene:}
+\begin{itemize}
+  \item Să fie arătată un avertisment în timpul tranziției.
+\end{itemize}
+
+\textbf{Gameplay:}
+\begin{itemize}
+  \item Să fie realizat un joc de curse cu două mașini, una controlată de jucător, alta de computer;
+  \item Să se utilizeze \texttt{Addressables} pentru a spawna mașinile.
+  \item Mașina poate să se accelereze, să se frâneze, să se vireze la dreapta și la stânga;
+  \item Să se realizeze un controller pe baza vitezelor, ca în mașini reale. Să se permită a schimba viteze între 1 și 5, și să fie și o viteză inversă;
+  \item Caracteristicile specifice a motorului să se depindă de stat-uri selectate în garaj;
+  \item Prima mașină care ajunge la sfârșitul traseului câștigă și cursul se termină, după ce să se întoarcă la garaj.
+\end{itemize}
+
+
+\chapter{Realizarea proiectului de practică}
+
+
+\section{Analiza mai profundă a cerințelor}
+
+Chiar la începutul lucrului, mi-a fost clar că proiectul este destul de voluminos, dar în același timp ușor de abordat, neavând ceva extraordinar complicat de realizat.
+După ce am studiat și am reflectat despre cerințele proiectului, am ajuns la următoarele concluzii care într-un fel au marcat și planul lucrării ce să se urmeze.
+
+Garaj trebuia să fie simplu de implementat: trebuia să creez sau să găsesc unele modele de mașini, să le includ în joc, să creez elementele \ac{UI}-ului, să le conectez la modelul cu date prin event-uri.
+Aici nu-i nimic extraordinar, doar trebuie să se implementeze logica și să se conecteze \ac{UI}-ul la event-uri.
+
+Cu scena principală cu gameplay eu nu am fost sigur cum s-o realizez, deoarece nu am știut cum anume lucrează sistemul de viteze în mașini, nu am cunoscut sistemul Addressables și nu am știut cum să realizez mecanicile mașinilor în Unity.
+Am avut noroc cu ultimul punct, deoarece Unity are collider-uri incluse pentru roți care realizează majoritatea calculărilor fizice complicate necesare.
+
+Ca să fiu mai productiv, am decis să conectez generatorul meu de cod la proiect, să integrez aproape imediat consola integrată care am programat-o anterior, și să-mi setez un mediu pentru crearea posibilă a instrumentelor, aparte de proiect în Unity.
+Anterior deja am programat un astfel de mediu, sau un astfel de instrument de productivitate.
+A fost programat în Python, și, cu toate că lucra destul de bine, a fost destul de dificil de menținut.
+De aceea, am hotărât să dedic vreo săptămână la programarea acestui mediu și setarea infrastructurii generale a proiectului.
+
+
+\section{Proiectarea infrastructurii proiectului}
+
+În primul rând, am hotărât să încep cu instrumentul \texttt{dev} de productivitate, în care să integrez totul legat de adminisitrarea proiectului: compilarea generatorului de cod, rularea generatorului de cod, setarea inițială a proiectului, și posibil mai multe lucruri ca build sau testarea automatizate, publicarea pachetelor automatizate, script-uri de automatizare pentru convertarea între formate, script-uri de verificare a validității stării proiectului, etc.
+
+Am hotărât să realizez instrumentul dat în limbajul D, deoarece consider că este o alegere bună pentru crearea script-urilor: poate fi de nivel foarte înalt, este foarte expresiv și are un \ac{GC} util pentru script-uri, dar în același timp are un sistem static de tipuri și este compilat.
+Pentru a realiza un astfel de instrument, însă, mi-a trebuit și o librărie capabilă pentru instrumente pentru linie de comandă (CLI Framework).
+Am găsit framework-ul lui Bradley Chatha, JCLI, însă am hotărât să lucrez asupra ei, deoarece a lipsit suportul pentru comenzi imbricate, deciziile în cod nu a fost documentate destul de bine, și sintaxa de utilizare a fost incomodă.
+Aceasta a terminat cu petrecerea a aproximativ 5 zile rescriind modulele de bază, simplificându-le și făcând părțile aceasta mai reutilizabile în general, și adăugând pe urma capacitățile necesare mie.
+
+După aceasta, am creat instrumentul \texttt{dev} într-un timp scurt, integrând și generatorul de cod cu consola.
+
+Astfel, etapa inițială de creare a mediului de dezvoltare s-a terminat.
+
 
 
 % Bibliography
