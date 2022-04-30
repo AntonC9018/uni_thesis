@@ -252,6 +252,63 @@ După aceasta, am creat instrumentul \texttt{dev} într-un timp scurt, integrân
 Astfel, etapa inițială de creare a mediului de dezvoltare s-a terminat.
 
 
+\section{Garaj}
+
+Am început lucrul asupra scenei cu realizarea că voi avea nevoie de câteva modele de mașini.
+Am încărcat niște modele, dar am realizat că ele au și configurații foarte diferite.
+Că să fie mai ușor de lucrat cu ele din cod, a fost necesar să le preprocesez manual:
+
+\begin{itemize}
+  \item Să renumesc roțile conform poziției lor (front-right, front-left, back-right, back-left);
+  \item Să pun toate roțile sub un singur părinte comun;
+  \item Să renumesc obiectul cu corpul mașinii în \texttt{body}
+  \item Dacă modelul este prea detaliat, să-l simplific;
+  \item Să le rotesc, punandu-le într-o orientație comună.
+\end{itemize}
+
+Am decis dar să studiez baza aplicației de modelare Blender pentru a putea face aceste modificări, creând un model de mașină al meu propriu.
+Nu a fost dificil pentru mine, deoarece deja cunosc baza lui \ac{3D} rendering, cum se reprezintă și se rasterează obiectele în \ac{GPU}, mi-a rămas deci doar să învăț cum să folosesc instrumente pentru modelare.
+Cu încărcarea modelelor am avut puține probleme.
+
+După aceasta, am creat modelul de date a mașinii și a utilizatorului, am implementat serializarea în \ac{XML} și în PlayerPrefs respectiv, după ce am implementat celelalte sisteme și le-am conectat la modelul de date prin event-uri.
+
+Una din cerințe funcționale a fost de a putea reseta culoarea mașinii.
+Pentru aceasta am avut nevoie de un color picker --- elementul \ac{UI} pentru selectarea culorii.
+Am găsit codul care să implementeze acesta, însă, realizând cât de prost, complicat și neeficient este codul dat, l-am rescris din nou, simplificându-l, dar păstrând toate funcționalități le.
+
+
+
+\section{Gameplay}
+
+În acel moment, proiectul a ajuns la o etapă unde a trebuit deja să încep a căuta informații despre modul în care pot implementa fizica mașinilor în Unity.
+După cum s-a menționat, am avut noroc cu \texttt{WheelCollider} care există în Unity implicit.
+Am realizat doar un script care să le seteze corect pe baza modelelor mașinilor, descoperind roții, mărimea lor, și setând collider-uri corect.
+
+Cu mecanicile motorului și ale vitezelor am avut mai puțin noroc.
+Aici, trebuiam să fac research singur, de la zero.
+După studierea informațiilor de pe internet am înțeles cum lucrează vitezele și eficiența motorului și le-am putut implementa în cod.
+Cu aceste lucruri, și mai ceva setup, mi-am putut testa codul în editor.
+
+Am decis să realizez un fel de speedometer și tachometer și încă un fel de display pentru viteză curentă.
+Am creat o componentă grafică care desenează un cerc cu diviziuni, generată dinamic pe baza configurației care include lățimea și lungimea lor, precum și cât de dese sunt.
+Creez câte un astfel de element pentru viteza și pentru revoluțiile motorului per minut care sunt controlate de scripturi respective, care le leagă de datele curente despre mașină.
+
+Următorul pas a fost crearea logicii cursului și a mapelor.
+După jucarea cu sistemul terrain-ului în Unity, și cu pachetele pentru drumuri, am înțeles că îmi trebuie mai mult timp să relizez niște mape interesante și să creez interfețe pentru logica pachetelor la codul meu, de aceea am hotărât să fac două mape unde drumul se duce doar înainte, și nu avem decorații.
+Doar schimb culoarea background-ului între mape.
+
+Am programat după aceasta sistemul cursului, unde dacă jucătorul trece de pe drum, el este respawnat cu viteza zero, și câștigă când sfârșește cursul.
+Depind de o interfață abstractă care dă informații pentru drumul pe baza segmentelor.
+Fiecare segment ar avea un ID și o progresie în el.
+Track-ul expune o interfață care permite conversiunea între sistemul de coordonate Unity și sistemul intern de segmente de drumuri, și pemite accesarea informațiilor despre segmente specifice a drumului, ca direcția normală, direcția drept, și accesarea despre întregul track, de exemplu, progresul total pe baza segmentului curent, oare mașina a trecut de pe drup.
+Pentru mapa mea dreaptă, implementarea interfeței este foarte simplă, deoarece am un singur segment drept de drum, dar se poate imagina un sistem de drumuri băzate pe curbe Bezier care ar integra tot bine cu sistemul acesta. 
+
+
+\section{Inițializarea și Tranzițiile}
+
+
+
+
 
 % Bibliography
 \bibliographystyle{plain}
