@@ -40,6 +40,12 @@
 % Romanian language support
 \usepackage[romanian]{babel}
 
+% https://tex.stackexchange.com/a/57967 
+% \input{glyphtounicode}
+% \pdfgentounicode=1
+
+% \usepackage{mathptmx}
+
 % Appendices
 \usepackage[toc,page]{appendix}
 
@@ -47,6 +53,7 @@
 \usepackage[printonlyused]{acronym}
 
 % Format urls in the bibliography
+% \usepackage{url}
 \usepackage{hyperref}
 % Clickable table of contents
 \hypersetup{linktoc=all}
@@ -69,16 +76,24 @@
 % Chapters should count with roman numerals
 \renewcommand{\thechapter}{\Roman{chapter}}
 \renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}}
+
+% Add dots to numbers, only applies to TOC
+\let\savenumberline=\numberline
+\def\numberline#1{\savenumberline{#1.}}
 
 % Chapters must left aligned and 14 pt.
 % There's no 14 pt available, though, only 14.4 (\large)
 % https://tex.stackexchange.com/questions/24599/what-point-pt-font-size-are-large-etc/24600#24600
-\usepackage{titlesec}
+\usepackage{titlesec}    
 % \titleformat{〈command 〉}[〈shape〉]{〈format〉}{〈label 〉}{〈sep〉}{〈before-code〉}[〈after-code〉]
 % https://mirror.marwan.ma/ctan/macros/latex/contrib/titlesec/titlesec.pdf#page=4&zoom=200,67,627
 % It gets pretty involved...
-\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter.~}{0pt}{}
-\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filright}{\thesection.~}{0pt}{}
+\def\tabSize{1cm}
+\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter~}{\tabSize}{}
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filright}{\thesection~}{\tabSize}{}
+\titleformat{\subsection}[block]{\normalfont\normalsize\bfseries\filright}{\thesubsection~}{\tabSize}{}
+
 % Skips before and after the title
 \titlespacing*{\chapter}{0pt}{12pt}{6pt}
 \titlespacing*{\section}{0pt}{12pt}{6pt}
@@ -87,6 +102,45 @@
 % Aliniat de 1 cm.
 \usepackage{indentfirst}
 \setlength{\parindent}{1.0cm}
+
+% https://tex.stackexchange.com/questions/163451/total-number-of-citations
+\usepackage{totcount}
+\newtotcounter{citnum} %From the package documentation
+\def\oldbibitem{} \let\oldbibitem=\bibitem{}
+\def\bibitem{\stepcounter{citnum}\oldbibitem}
+
+% Thank you to @paante on LaTeX Discord.
+% Makes it possible to mark pages and then do math on them.
+% usage: \markpage{key}
+%        \getpagemark{key}
+\newwrite\pagecountf
+\AtBeginDocument{%
+    \InputIfFileExists{\jobname.pagecount}{}{}%
+    \immediate\openout\pagecountf={\jobname.pagecount}%
+}
+\AtEndDocument{\closeout\pagecountf}
+\protected\def\markpage#1{%
+    \write\pagecountf{%
+        \noexpand\expandafter\gdef
+            \noexpand\csname pagecount/#1\endcsname
+            {\the\value{page}}%
+    }%
+}
+\def\getpagemark#1{\ifcsname pagecount/#1\endcsname \csname pagecount/#1\endcsname \else 0\fi}
+
+
+% Extracting the name of chapters.
+% https://tex.stackexchange.com/questions/62241/how-to-get-the-current-chapter-name-section-name-subsection-name-etc
+\usepackage{nameref}
+
+% No spacing for lists.
+% https://tex.stackexchange.com/questions/10684/vertical-space-in-lists
+\usepackage{enumitem}
+\setlist{nosep}
+
+\newcommand{\unnumberedChapter}[1]{%
+  \chapter*{#1}
+  \addcontentsline{toc}{chapter}{#1}}
 
 % Description
 \newcommand{\authorName}{Curmanschii Anton}
@@ -128,10 +182,13 @@
   \vfill
 
   \normalsize
+
   \begin{flushleft}
-    Șef de departament: \\
-    Conducătorul științific: Marin Maria \\
-    Autor:
+    \begin{tabular}{ p{4cm} p{4cm} p{8cm} }
+      Șef de departament:      & \underscores{4cm} & IDK Who \\
+      Conducătorul științific: & \underscores{4cm} & MARIN Maria \\
+      Autor:                   & \underscores{4cm} & \authorName
+    \end{tabular}
   \end{flushleft}
 
   \begin{center}
@@ -144,7 +201,7 @@
 \tableofcontents
 
 \clearpage
-\chapter*{Lista abrevierelor}
+\unnumberedChapter{Lista abrevierelor}
 \begin{acronym}
   \begin{center}
     \acro{XR}{Extended Reality}
@@ -204,7 +261,7 @@ Jocul trebuia să aibă 2 scene, cu cerințe specifice la fiecare scenă:
 
 \textbf{Tranziția între scene:}
 \begin{itemize}
-  \item Să fie arătată un avertisment în timpul tranziției.
+  \item Să fie arătat un avertisment în timpul tranziției.
 \end{itemize}
 
 \textbf{Gameplay:}
@@ -277,36 +334,65 @@ Pentru aceasta am avut nevoie de un color picker --- elementul \ac{UI} pentru se
 Am găsit codul care să implementeze acesta, însă, realizând cât de prost, complicat și neeficient este codul dat, l-am rescris din nou, simplificându-l, dar păstrând toate funcționalități le.
 
 
-
 \section{Gameplay}
 
 În acel moment, proiectul a ajuns la o etapă unde a trebuit deja să încep a căuta informații despre modul în care pot implementa fizica mașinilor în Unity.
 După cum s-a menționat, am avut noroc cu \texttt{WheelCollider} care există în Unity implicit.
-Am realizat doar un script care să le seteze corect pe baza modelelor mașinilor, descoperind roții, mărimea lor, și setând collider-uri corect.
+Am realizat doar un script care să le seteze corect pe baza modelelor mașinilor, descoperind roții, mărimea lor, și setând collider-uri conform acestor date.
 
 Cu mecanicile motorului și ale vitezelor am avut mai puțin noroc.
 Aici, trebuiam să fac research singur, de la zero.
 După studierea informațiilor de pe internet am înțeles cum lucrează vitezele și eficiența motorului și le-am putut implementa în cod.
-Cu aceste lucruri, și mai ceva setup, mi-am putut testa codul în editor.
+Cu aceste lucruri, și mai ceva setup, mi-am putut testa codul în Unity.
 
 Am decis să realizez un fel de speedometer și tachometer și încă un fel de display pentru viteză curentă.
 Am creat o componentă grafică care desenează un cerc cu diviziuni, generată dinamic pe baza configurației care include lățimea și lungimea lor, precum și cât de dese sunt.
-Creez câte un astfel de element pentru viteza și pentru revoluțiile motorului per minut care sunt controlate de scripturi respective, care le leagă de datele curente despre mașină.
+Creez câte o astfel de componentă pentru viteza și pentru revoluțiile motorului per minut care sunt controlate de scripturi respective, care le leagă de datele curente despre mașină.
 
-Următorul pas a fost crearea logicii cursului și a mapelor.
-După jucarea cu sistemul terrain-ului în Unity, și cu pachetele pentru drumuri, am înțeles că îmi trebuie mai mult timp să relizez niște mape interesante și să creez interfețe pentru logica pachetelor la codul meu, de aceea am hotărât să fac două mape unde drumul se duce doar înainte, și nu avem decorații.
+Următorul pas a fost implementarea logicii cursului și a mapelor.
+După jucarea cu sistemul terrain-ului în Unity, și cu pachetele pentru drumuri, am înțeles că aș avea nevoie de mai mult timp ca să realizez niște mape interesante și să creez interfețe pentru logica pachetelor la codul meu, de aceea am hotărât să fac două mape unde drumul se duce doar înainte, și nu avem decorații.
 Doar schimb culoarea background-ului între mape.
 
 Am programat după aceasta sistemul cursului, unde dacă jucătorul trece de pe drum, el este respawnat cu viteza zero, și câștigă când sfârșește cursul.
 Depind de o interfață abstractă care dă informații pentru drumul pe baza segmentelor.
-Fiecare segment ar avea un ID și o progresie în el.
+Fiecare segment trebuie să fie asociat un ID, iar poziția jucătorului în segment poate fi expresată prin progresia în scopul acestuia.
 Track-ul expune o interfață care permite conversiunea între sistemul de coordonate Unity și sistemul intern de segmente de drumuri, și pemite accesarea informațiilor despre segmente specifice a drumului, ca direcția normală, direcția drept, și accesarea despre întregul track, de exemplu, progresul total pe baza segmentului curent, oare mașina a trecut de pe drup.
-Pentru mapa mea dreaptă, implementarea interfeței este foarte simplă, deoarece am un singur segment drept de drum, dar se poate imagina un sistem de drumuri băzate pe curbe Bezier care ar integra tot bine cu sistemul acesta. 
+Pentru mapa mea dreaptă, implementarea interfeței a fost foarte simplă --- am un singur segment drept de drum, dar se poate imagina un sistem de drumuri băzate pe curbe Bézier care tot ar integra bine cu sistemul acesta.
 
 
 \section{Inițializarea și Tranzițiile}
 
+Deoarece ambele scene deja au fost în mare parte realizate, am putut să încep a lurca asupra sistemului de tranziții între scene și asupra sistemului de inițializare.
+Am decis să fac câte un script pentru inițializarea locală a scenei, adică acela care este folosit în varianta scenei unde ea ar exista în izolație,
+și câte un script de inițializare normală, adică cea folosită în propriu zis joc.
+Acest script va fi folosit de către scriptul central de inițializare a întregului joc.
 
+Sună destul de simplu, însă inițializarea este un lucru care este destul de greu de implementat,
+în special astfel încât să fie posibil să refolosească părți individuale ale inițializării,
+și să se poată testa lucruri individuale într-un context izolat de întregul sistem.
+Eu am decis să nu folosesc framework-uri care să simplifice și automatizeze acest proces de inițializare (dependency injection framework),
+dar să fac eu singur un astfel de framework într-un scop limitat.
+Cazurile care nu se acoperă de acest mini-framework sunt procesate manual, într-un script aparte.
+
+Scripturile de inițializare sunt după design izolate pentru fiecare scenă, și nu se cunosc unul pe altul.
+Așadar, a fost necesar încă cel puțin un script care să transmită datele necesare pentru inițializare dintr-o scenă în altă.
+De exemplu, în cazul în care se inițializează scena Gameplay din scena Garaj, datele care trebuie să fie transmise sunt datele despre mașina selectată, caracteristicile mașinii, ca puterea motorului, numărul de boți, dificultatea boților, mapa selectată, etc.
+Acest script de tranziție deja va lua aceste date cum ele au fost sugerate de Garaj, le va transforma într-un format care Gameplay poate folosi pentru inițializare, și va inițializa scena Gameplay, transmitându-i aceste date.
+
+Mi-a luat destul de mult timp să înțeleg cum trebuie să lucreze sistemul acesta, și implementarea lui a ieșit destul de intricată, și am lăsat-o într-o stare imperfectă, însă funcțională.
+
+
+\unnumberedChapter{Concluzii și Recomandări}
+
+În timpul implementării sarcinii practice am realizat că sunt capabil la dezvoltarea jocurilor,
+având toate cunoștințele necesare pentru dezvoltarea eficientă în Unity, putând produce un sistem ușor de menținut și modificat.
+Am mai realizat că Unity lipsește mai multe instrumente de confort pentru dezvoltator care trebuie să fie programate manual.
+Deci, pentru un workflow de dezvoltare maxim eficient, ar trebui să dezvolt niște librării și extensiuni pentru editor, inclusiv și mai multe plugin-uri utile pentru generatorul meu de cod.
+
+Atmosfera în laborator a fost foarte prietenoasă, iar calculatorii au fost o adiție minunată pentru productivitate.
+Fără un calculator puternic aș pierde foarte mult timp simplu așteptând ca Unity să-mi recompileze script-urile. 
+
+Nu am învățat atât de multe lucruri noi referitor la programare, în mare parte pur și simplu mi-am solidificat cunoștințele.
 
 
 
