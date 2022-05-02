@@ -40,12 +40,6 @@
 % Romanian language support
 \usepackage[romanian]{babel}
 
-% https://tex.stackexchange.com/a/57967 
-% \input{glyphtounicode}
-% \pdfgentounicode=1
-
-% \usepackage{mathptmx}
-
 % Appendices
 \usepackage[toc,page]{appendix}
 
@@ -60,7 +54,6 @@
 
 % Code blocks
 \usepackage{minted}
-\usepackage{color}
 \setminted{%
   autogobble=true,
   codetagify=true,
@@ -143,6 +136,9 @@
   \chapter*{#1}
   \addcontentsline{toc}{chapter}{#1}}
 
+% SIGN HERE: _______ sort of field
+\def\underscores#1{\leavevmode \leaders\hrule\hskip#1\relax}
+
 % Description
 \newcommand{\authorName}{CURMANSCHII Anton}
 \newcommand{\thesisTitle}{Tehnologii avansate la elaborarea jocurilor pe calculator}
@@ -201,8 +197,6 @@
   \vfill
 
   \normalsize
-
-  \def\underscores#1{\leavevmode \leaders\hrule\hskip#1\relax}
   
   \begin{flushleft}
     \begin{tabular}{ p{4cm} p{4cm} p{8cm}}

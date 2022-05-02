@@ -40,12 +40,6 @@
 % Romanian language support
 \usepackage[romanian]{babel}
 
-% https://tex.stackexchange.com/a/57967 
-% \input{glyphtounicode}
-% \pdfgentounicode=1
-
-% \usepackage{mathptmx}
-
 % Appendices
 \usepackage[toc,page]{appendix}
 
@@ -53,14 +47,27 @@
 \usepackage[printonlyused]{acronym}
 
 % Format urls in the bibliography
-% \usepackage{url}
 \usepackage{hyperref}
 % Clickable table of contents
 \hypersetup{linktoc=all}
 
+% Inserting pictures
+\usepackage{graphicx}
+% All paths will be relative to this folder.
+\graphicspath{{../race/screenshots/} {./images/}}
+
+% https://tex.stackexchange.com/a/32903
+\usepackage[export]{adjustbox}
+\newcommand{\centeredImageWithCaption}[2]{%
+  \begin{figure}[H]
+    \caption{#1}
+    \includegraphics[max size={\textwidth}{\textheight}]{#2}
+    \centering
+  \end{figure}}
+
+
 % Code blocks
 \usepackage{minted}
-\usepackage{color}
 \setminted{%
   autogobble=true,
   codetagify=true,
@@ -138,6 +145,9 @@
 \usepackage{enumitem}
 \setlist{nosep}
 
+% SIGN HERE: _______ sort of field
+\def\underscores#1{\leavevmode \leaders\hrule\hskip#1\relax}
+
 \newcommand{\unnumberedChapter}[1]{%
   \chapter*{#1}
   \addcontentsline{toc}{chapter}{#1}}
@@ -147,6 +157,7 @@
 \newcommand{\documentTitle}{Raport la practică de producție}
 \newcommand{\uniGroupName}{IA1901}
 \newcommand{\programulDeStudii}{licență}
+\newcommand{\identificatorulCursului}{0613.5 Informatică aplicată}
 
 % Start
 \begin{document}
@@ -175,7 +186,7 @@
       \vspace{1.5cm}
 
       \Large
-      \textbf{\uppercase\expandafter{\thesisTitle}}
+      \textbf{\uppercase\expandafter{\documentTitle}}
       \vspace{0.75cm}
 
     \end{center}
@@ -191,6 +202,8 @@
     \end{tabular}
   \end{flushleft}
 
+  \vspace{1cm}
+
   \begin{center}
     \textbf{Chișinău -- 2022}
   \end{center}
@@ -199,17 +212,18 @@
 
 \clearpage
 \tableofcontents
+\addcontentsline{toc}{chapter}{\contentsname}
 
 \clearpage
 \unnumberedChapter{Lista abrevierelor}
 \begin{acronym}
-  \begin{center}
-    \acro{XR}{Extended Reality}
-    \acro{VR}{Virtual Reality}
-    \acro{3D}{3-Dimensional}
-    \acro{XML}{Extended Markup Language}
-    \acro{UI}{User Interface}
-  \end{center}
+  \acro{XR}{Extended Reality}
+  \acro{VR}{Virtual Reality}
+  \acro{3D}{3-Dimensional}
+  \acro{XML}{Extended Markup Language}
+  \acro{UI}{User Interface}
+  \acro{GC}{Garbage Collector}
+  \acro{GPU}{Graphics Processing Unit}
 \end{acronym}
 
 
@@ -267,7 +281,7 @@ Jocul trebuia să aibă 2 scene, cu cerințe specifice la fiecare scenă:
 \textbf{Gameplay:}
 \begin{itemize}
   \item Să fie realizat un joc de curse cu două mașini, una controlată de jucător, alta de computer;
-  \item Să se utilizeze \texttt{Addressables} pentru a spawna mașinile.
+  \item Să se utilizeze \texttt{Addressables} pentru a spawn-a mașinile.
   \item Mașina poate să se accelereze, să se frâneze, să se vireze la dreapta și la stânga;
   \item Să se realizeze un controller pe baza vitezelor, ca în mașini reale. Să se permită a schimba viteze între 1 și 5, și să fie și o viteză inversă;
   \item Caracteristicile specifice a motorului să se depindă de stat-uri selectate în garaj;
@@ -327,11 +341,32 @@ Am decis dar să studiez baza aplicației de modelare Blender pentru a putea fac
 Nu a fost dificil pentru mine, deoarece deja cunosc baza lui \ac{3D} rendering, cum se reprezintă și se rasterează obiectele în \ac{GPU}, mi-a rămas deci doar să învăț cum să folosesc instrumente pentru modelare.
 Cu încărcarea modelelor am avut puține probleme.
 
+\centeredImageWithCaption{Lucrul la modelul mașinii în Blender}{blender_car_model.png}
+
 După aceasta, am creat modelul de date a mașinii și a utilizatorului, am implementat serializarea în \ac{XML} și în PlayerPrefs respectiv, după ce am implementat celelalte sisteme și le-am conectat la modelul de date prin event-uri.
 
 Una din cerințe funcționale a fost de a putea reseta culoarea mașinii.
 Pentru aceasta am avut nevoie de un color picker --- elementul \ac{UI} pentru selectarea culorii.
-Am găsit codul care să implementeze acesta, însă, realizând cât de prost, complicat și neeficient este codul dat, l-am rescris din nou, simplificându-l, dar păstrând toate funcționalități le.
+Am găsit codul care să implementeze acesta, însă, realizând cât de prost, complicat și neeficient este codul dat, l-am rescris din nou, simplificându-l, dar păstrând toate funcționalitățile.
+
+\centeredImageWithCaption{Mașina recolorată}{car_different_color.png}
+
+
+Interfața s-a implementat în sistemul Unity UI, adică acel sistem veche de UI în Unity.
+
+Interfața este constituită din obiecte cu componente individuale de butoane, câmpuri text pentru input, elemente text simplu, etc., totul conectat între sine prin event-uri în cod.
+De fapt, fiecare display, de exemplu acel pentru numele utilizatorului, are câte un script asociat lui.
+Acest script poate monitoriza starea curentă a variabilei relevante (în acest caz, a numelui de jucător), utilizând event-uri.
+Deci, când se schimbă valoarea variabilei, acest script este notificat, și actualizează interfața, setând textul nou.
+
+\centeredImageWithCaption{Cum arată interfața în garaj}{garage.png}
+
+
+Pentru butoane de cumpărare a stat-urilor, de exemplu, folosesc un script ceva diferit.
+El are două sarcini: să se facă butonul inactiv dacă jucătorul nu are de ajuns bani, sau dacă stat-urile sunt deja la maximum, și să se scoată banii, în același timp adaugând stat-uri, după click pe buton.
+Astfel de script dă conexiunea bidirecțională între modelul de date și interfața --- starea butonului depinde de starea internă a sistemei, și, în același timp, interacțiunea cu butonul poate aduce la actualizări în sistem.
+
+\centeredImageWithCaption{Opținuea virtuală de a cumpăra valută în joc}{buy_coins.png}
 
 
 \section{Gameplay}
@@ -353,11 +388,15 @@ Următorul pas a fost implementarea logicii cursului și a mapelor.
 După jucarea cu sistemul terrain-ului în Unity, și cu pachetele pentru drumuri, am înțeles că aș avea nevoie de mai mult timp ca să realizez niște mape interesante și să creez interfețe pentru logica pachetelor la codul meu, de aceea am hotărât să fac două mape unde drumul se duce doar înainte, și nu avem decorații.
 Doar schimb culoarea background-ului între mape.
 
-Am programat după aceasta sistemul cursului, unde dacă jucătorul trece de pe drum, el este respawnat cu viteza zero, și câștigă când sfârșește cursul.
+Am programat după aceasta sistemul cursului, unde dacă jucătorul trece de pe drum, el este respawn-at cu viteza zero, și câștigă când sfârșește cursul.
 Depind de o interfață abstractă care dă informații pentru drumul pe baza segmentelor.
 Fiecare segment trebuie să fie asociat un ID, iar poziția jucătorului în segment poate fi expresată prin progresia în scopul acestuia.
 Track-ul expune o interfață care permite conversiunea între sistemul de coordonate Unity și sistemul intern de segmente de drumuri, și pemite accesarea informațiilor despre segmente specifice a drumului, ca direcția normală, direcția drept, și accesarea despre întregul track, de exemplu, progresul total pe baza segmentului curent, oare mașina a trecut de pe drup.
 Pentru mapa mea dreaptă, implementarea interfeței a fost foarte simplă --- am un singur segment drept de drum, dar se poate imagina un sistem de drumuri băzate pe curbe Bézier care tot ar integra bine cu sistemul acesta.
+
+\centeredImageWithCaption{Cursul în proces în scena Gameplay}{back_view.png}
+
+\centeredImageWithCaption{Vedere din față a mașinii}{front_view.png}
 
 
 \section{Inițializarea și Tranzițiile}
@@ -381,6 +420,8 @@ Acest script de tranziție deja va lua aceste date cum ele au fost sugerate de G
 
 Mi-a luat destul de mult timp să înțeleg cum trebuie să lucreze sistemul acesta, și implementarea lui a ieșit destul de intricată, și am lăsat-o într-o stare imperfectă, însă funcțională.
 
+\centeredImageWithCaption{Placeholder-ul advertismentului în timpul tranziției între scene}{ad.png}
+
 
 \unnumberedChapter{Concluzii și Recomandări}
 
@@ -392,7 +433,7 @@ Deci, pentru un workflow de dezvoltare maxim eficient, ar trebui să dezvolt ni�
 Atmosfera în laborator a fost foarte prietenoasă, iar calculatorii au fost o adiție minunată pentru productivitate.
 Fără un calculator puternic aș pierde foarte mult timp simplu așteptând ca Unity să-mi recompileze script-urile. 
 
-Nu am învățat atât de multe lucruri noi referitor la programare, în mare parte pur și simplu mi-am solidificat cunoștințele.
+Nu am învățat atât de multe lucruri noi referitor la programare, în mare parte pur și simplu mi-am solidificat cunoștințele și am primit mai multă experiența practică cu lucrul în Unity.
 
 
 
