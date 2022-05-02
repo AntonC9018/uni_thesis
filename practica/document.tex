@@ -85,6 +85,9 @@
 \renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
 \renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}}
 
+% Figure counters 3.2.1
+\renewcommand\thefigure{\thesection.\arabic{figure}}
+
 % Add dots to numbers, only applies to TOC
 \let\savenumberline=\numberline
 \def\numberline#1{\savenumberline{#1.}}
