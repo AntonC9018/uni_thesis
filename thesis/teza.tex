@@ -40,12 +40,6 @@
 % Romanian language support
 \usepackage[romanian]{babel}
 
-% https://tex.stackexchange.com/a/57967 
-% \input{glyphtounicode}
-% \pdfgentounicode=1
-
-% \usepackage{mathptmx}
-
 % Appendices
 \usepackage[toc,page]{appendix}
 
@@ -60,7 +54,6 @@
 
 % Code blocks
 \usepackage{minted}
-\usepackage{color}
 \setminted{%
   autogobble=true,
   codetagify=true,
@@ -76,6 +69,11 @@
 % Chapters should count with roman numerals
 \renewcommand{\thechapter}{\Roman{chapter}}
 \renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}}
+
+% Add dots to numbers, only applies to TOC
+\let\savenumberline=\numberline
+\def\numberline#1{\savenumberline{#1.}}
 
 % Chapters must left aligned and 14 pt.
 % There's no 14 pt available, though, only 14.4 (\large)
@@ -84,8 +82,11 @@
 % \titleformat{〈command 〉}[〈shape〉]{〈format〉}{〈label 〉}{〈sep〉}{〈before-code〉}[〈after-code〉]
 % https://mirror.marwan.ma/ctan/macros/latex/contrib/titlesec/titlesec.pdf#page=4&zoom=200,67,627
 % It gets pretty involved...
-\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter.~}{0pt}{}
-\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filright}{\thesection.~}{0pt}{}
+\def\tabSize{1cm}
+\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter~}{\tabSize}{}
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filright}{\thesection~}{\tabSize}{}
+\titleformat{\subsection}[block]{\normalfont\normalsize\bfseries\filright}{\thesubsection~}{\tabSize}{}
+
 % Skips before and after the title
 \titlespacing*{\chapter}{0pt}{12pt}{6pt}
 \titlespacing*{\section}{0pt}{12pt}{6pt}
@@ -121,11 +122,29 @@
 \def\getpagemark#1{\ifcsname pagecount/#1\endcsname \csname pagecount/#1\endcsname \else 0\fi}
 
 
+% Extracting the name of chapters.
+% https://tex.stackexchange.com/questions/62241/how-to-get-the-current-chapter-name-section-name-subsection-name-etc
+\usepackage{nameref}
+
+% No spacing for lists.
+% https://tex.stackexchange.com/questions/10684/vertical-space-in-lists
+\usepackage{enumitem}
+\setlist{nosep}
+
+
+\newcommand{\unnumberedChapter}[1]{%
+  \chapter*{#1}
+  \addcontentsline{toc}{chapter}{#1}}
+
+% SIGN HERE: _______ sort of field
+\def\underscores#1{\leavevmode \leaders\hrule\hskip#1\relax}
+
 % Description
-\newcommand{\authorName}{Curmanschii Anton}
-\newcommand{\thesisTitle}{Tehnicile avansate în programarea jocurilor video}
+\newcommand{\authorName}{CURMANSCHII Anton}
+\newcommand{\thesisTitle}{Tehnologii avansate la elaborarea jocurilor pe calculator}
 \newcommand{\uniGroupName}{IA1901}
 \newcommand{\programulDeStudii}{licență}
+\newcommand{\identificatorulCursului}{0613.5 Informatică aplicată}
 
 % does math on counters
 \newcommand{\usefulPageCount}{%
@@ -135,6 +154,7 @@
 \newcommand{\anexeCount}{20} % for now, hardcode this
 \newcommand{\conferencesList}{I don't know what to write here}
 \newcommand{\bibliographyEntryCount}{\total{citnum}}
+\newcommand\chapterConclusionSection[1]{\section{Concluziile la capitol \nameref{#1}}}
 
 % Start
 \begin{document}
@@ -159,7 +179,7 @@
       \vspace{3.0cm}
 
       \large
-      \textbf{\uppercase\expandafter{\authorName}}
+      \textbf{\expandafter{\authorName}}
       \vspace{1.5cm}
 
       \Large
@@ -167,7 +187,7 @@
       \vspace{0.75cm}
 
       \large
-      \uppercase{\textbf{0613.5 Informatică aplicată}}
+      \textbf{\uppercase\expandafter{\identificatorulCursului}}
       \vspace{0.5cm}
 
       \normalsize
@@ -177,11 +197,16 @@
   \vfill
 
   \normalsize
+  
   \begin{flushleft}
-    Șef de departament: \\
-    Conducătorul științific: Marin Maria \\
-    Autor:
+    \begin{tabular}{ p{4cm} p{4cm} p{8cm}}
+      Șef de departament:      & \underscores{4cm} & IDK Who \\
+      Conducătorul științific: & \underscores{4cm} & MARIN Maria \\
+      Autor:                   & \underscores{4cm} & \authorName
+    \end{tabular}
   \end{flushleft}
+
+  \vspace{1cm}
 
   \begin{center}
     \textbf{Chișinău -- 2022}
@@ -191,9 +216,10 @@
 
 \clearpage
 \tableofcontents
+\addcontentsline{toc}{chapter}{\contentsname}
 
 \clearpage
-\chapter*{Lista abrevierelor}
+\unnumberedChapter{Lista Abrevierelor}
 \begin{acronym}
   \acro{CI/CD}{Continuous Integration / Continuous Delivery}
   \acro{DSL}{Domain-Specific Language}
@@ -203,7 +229,7 @@
 \end{acronym}
 
 \clearpage
-\chapter*{Adnotare}
+\unnumberedChapter{Adnotare}
 
 \textbf{la teza de licență ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
 
@@ -236,7 +262,7 @@ dezvoltarea unui sistem de generare a codului extensibil prin plugin-uri și uș
 Rezultatele obținute au fost raportate la Conferința (-ele) \textbf{\conferencesList}.
 
 
-\chapter*{Introducere}
+\unnumberedChapter{Introducere}
 
 \markpage{usefulStuffBegin}
 
@@ -286,9 +312,11 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 În această lucrare se argumentează și se elaborează un generator de cod C\# flexibil și extensibil care poate fi utilizat pentru a ușura și a face mai plăcută programarea în C\#, și pentru a spori eficiența programatorului în implementarea unelor soluții.
 
 
-\chapter{Sumarul Generării Codului în C\#}
+\chapter{Generarea Codului în Limbajul de Programare C\#}\label{intro_chapter_title}
 
-\section{Capacitățile și deficiențele lui C\#}
+\section{Argumentarea necesității generării codului în C\#}
+
+\subsection{Capacitățile și deficiențele limbajului de programare C\#}
 
 {C\# este un limbaj de programare modern, posedă caracteristici utile și practice}\cite{tour_of_csharp}, printre care:
 \begin{itemize}
@@ -314,7 +342,7 @@ Dacă această analiză nu este delegată la timpul rulării ci este executată 
 
 Generarea codului poate fi folosită și pentru a elimina codul boilerplate, sau pentru a genera wrapper-uri sau funcții ajutătoare.
 
-\section{Exemplu: implementarea interfețelor prin compoziție}
+\subsection{Exemplu: implementarea interfețelor prin compoziție}
 
 Urmează o instanță posibilă de apăriția codului boilerplate, unde dorim să implementăm o interfață prin compoziție\cite{composition_interface_boilerplate}.
 Deci fie o astfel de interfață:
@@ -390,7 +418,7 @@ public partial struct Composition
 \end{minted}
 
 
-\section{Exemplu: metodele ajutătoare pentru enumuri flag}
+\subsection{Exemplu: metodele ajutătoare pentru enumuri flag}
 
 Fie un astfel de enum cu flaguri:
 
@@ -491,7 +519,7 @@ public enum Flags
 
 Aceasta generează toate acele metode automat.
 
-\section{Mai multe exemple}
+\subsection{Mai multe exemple}
 
 Cele două exemple clar arată capacitățile generării codului în eliminarea boilerplate-ului.
 Însă acesta nu este singurul lor caz de utilizare.
@@ -580,12 +608,12 @@ Crearea unei soluții personale ar fi mai ușor și mai practic:
   \item Reutilizarea configurației tot poate fi asigurată\footnote{cel puțin parțial, descris și în continuare.}.
 \end{itemize}
 
-\section{Rezumat}
+\chapterConclusionSection{intro_chapter_title}
 
 În acest capitol s-a discutat și s-a exemplificat valoarea practică a generatorilor de cod, și s-a argumentat de ce soluțiile existente nu sunt practice.
 A fost introdusă și ideea de fluidizare a procesului utilizând un sistem care să reutilizeze o singură sursă de informație despre structura codului, făcând mai puțin lucru în total, așadar întregul proces să devină mai rapid în general.
 
-\chapter{Sumarul Arhitecturii}
+\chapter{Arhitectura Aplicației}\label{architecture_chapter_title}
 
 \section{Concretizarea cerințelor pentru generator de cod}
 
@@ -703,16 +731,17 @@ Aceasta ar invoca generatorul de cod cu plugin-urile \textit{plugin1}, \textit{p
 După aceasta, programul generează codul, ori arată erori, posibil cu mesajul de ajutor care arată toate opțiunile.
 
 
-\section{Rezumat}
+\chapterConclusionSection{architecture_chapter_title}
 
 În acest capitol s-au stabilit cerințele principale pentru generatorul de cod și s-a discutat arhitectura generală a sistemului.
 S-a decis că o arhitectură băzată pe plugin-uri, unde orchestratorul dirijează o mulțime de plugin-uri soluționează problema conform cerințelor.
 S-a discutat și fluxul de lucru dorit, mai precis, faptul că va fi o aplicație din linia de comandă.
 
+\chapter{Implementarea Sistemului}\label{implementation_chapter_title}
 
-\chapter{Implementarea Generatorului de Cod}
+\section{Implementarea Generatorului de Cod}
 
-\section{Configurarea}
+\subsection{Configurarea}
 
 După cum s-a menționat, configurarea se va face din linia de comandă și/sau prin fișiere json de configurare.
 Autorul a decis să creeze codul propriu pentru lucrul acesta, cu toate că deja există mai multe librării care fac același lucru.
@@ -778,7 +807,7 @@ Să se noteze că \ac{API}-ul nu este final.
 A fost realizat în durata de aproape o zi și în continuare ceva modificat după necesitățile aplicației.
 
 
-\section{Incărcarea plugin-urilor}
+\subsection{Incărcarea plugin-urilor}
 
 După cum s-a menționat anterior, codul plugin-urilor este distribuit și încărcat prin \ac{DLL}-uri.
 Pentru aceasta, se folosesc funcțiile \texttt{Assembly.LoadFile} și \texttt{GetExportedTypes}, după ce se realizează filtrarea tuturor tipurilor, anume căutarea tipurilor care implementează interfața \texttt{IAdministrator}.
@@ -790,7 +819,7 @@ La început, ele iau argumentele de linie de comanda, iar după aceasta sunt în
 Plugin-urile realizează inițializarea suplimentară după ce devin accesibile toate proiectele cu codul sursă și după ce au primit toate argumentele, deoarece validarea argumentelor deseori se face pe baza proiectelor sau tipurilor existente în compilație.
 De exemplu, unele plguin-uri generează un fel de output agnostic, de aceea doresc să știu care este proiectul comun, pentru a scrie fișierele acolo, însă denumirea proiectului comun nu se cunoaște înainte ca proiectele utilizatorului au fost descoperite.
 
-\section{Descoperirea fișierelor sursă}
+\subsection{Descoperirea fișierelor sursă}
 
 Kari permite mai multe moduri de intrare (de descoperire a fișierelor sursă):
 
@@ -816,7 +845,7 @@ https://github.com/AntonC9018/Kari/blob/9d12bfd2ec2520e6192fe3ffa3f119421d6016cd
 Acest cod încă gestionează căutarea acelor două proiecte, anume proiectului \texttt{Common} care reprezintă un proiect cu cod agnostic care conceptual nu poate să se refere la nici un alt proiect, și a proiectului \texttt{Root}, adică proiectului care să conține funcții de inițializare și care conceptual poate referi la orice alt proiect.
 Fiecare mod de intrare are logica sa de căutare a proiectelor acestea, selectată în așa fel ca să aibă cât mai mult sens în scopul modului de intrare selectat.
 
-\section{Pornirea plugin-urilor cu codul sursă ca parametri de intrare}
+\subsection{Pornirea plugin-urilor cu codul sursă ca parametri de intrare}
 
 Obiectul care permite reprezentarea abstractă a codului sursă în Roslyn se numește o compilație.
 Acest obiect poate fi creat din arbori sintactici care la rândul său sunt creați din codul sursă, citit din fișiere sursă.
@@ -844,7 +873,7 @@ După ce toate plugin-urile au terminat cacharea simbolurilor, are loc generarea
 Șirurile cu codul sursă de ieșire la început sunt generate aparte în memorie, adică nu sunt scrise imediat în fișiere.
 Paralelizarea se face în același mod ca și la colectarea simbolurilor.
 
-\section{Sălvarea output-ului}
+\subsection{Sălvarea output-ului}
 
 Plugin-urile scriu codul de output al lor direct într-un UTF-8 bufer ca să fie posibil să scrie textul de ieșire direct în fișiere.
 Se utilizează librăria ZString\cite{zstring_github}, cu toate că se planifică să se folosească capacitățile noi de interpolare a șirurilor fără alocările memoriei adăugate în .NET 6.\cite{string_interpolation_csharp_10}
@@ -881,18 +910,9 @@ Se poate observa că se folosește cod asincron de scriere a datelor în fișier
 Acestea sunt în cea mai mare parte experimentările autorului și de fapt nu accelerează executarea.
 Deci acest cod probabil va fi schimbat când autorul va găsi timpul pentru refactoring.
 
-\section{Rezumat}
+\section{Programarea Plugin-urilor}
 
-În acest capitol s-au discutat detaliile referitor la implementarea sistemului: cum se configurează sistemul, cum el interacționează cu plugin-urile, cum codul sursă este citit și cum sunt scrise fișierele de ieșire.
-În acest capitol nu s-a discutat logica generării codului, deoarece aceasta deja vine din plugin-uri concrete.
-
-Este clar că nu sunt considerate dependențele între proiecte și orice schimbare forțează codul pentru fiecare proiect să fie regenerat.
-Încă, dependențele de fiecare plugin din punct de vedere a tipurilor cu atribute specifice, sau a tipului de output (dependent de totul input, sau pentru un proiect aparte) nu au fost explorate.
-Acestea pot fi folosite pentru a accelera generatorul de cod și mai departe, dar necesită și mai mult cod și timp pentru a le implementa.
-
-\chapter{Programarea Plugin-urilor și Exemple de Utilizare}
-
-\section{CodeBuilder}
+\subsection{CodeBuilder}
 
 Când se realizează generarea codului, se dorește ca codul generat să fie formatat conform standardelor.
 Formatarea corectă face codul mai ușor de citit și de înțeles pentru persoana care îl citește.
@@ -926,7 +946,7 @@ https://github.com/AntonC9018/Kari/blob/fd60ad86f353444ae51f53f72393850dad7bf587
 
 Mai jos sunt prezentate și niște exemple de utilizare.
 
-\section{Anotațiile}
+\subsection{Anotațiile}
 
 Următorul caz de utilizare comun pentru majoritatea plugin-urilor sunt anotațiile (sau atributele).
 Atributele sunt acel lucru care permite design-ul unor \ac{API}-uri declarative.
@@ -992,7 +1012,7 @@ namespace Kari.Plugins.DataObject
 }
 \end{minted}
 
-\section{Cum lucrează plugin-urile, mai detaliat}
+\subsection{Modul de funcționare a plugin-urilor}
 
 Fiecare plugin, după cum s-a menționat anterior, trebuie să definească cel puțin o clasă publică de \emph{administrator} care să implementeze interfața \texttt{IAdministrator}.
 De obicei, administratorii definesc un tablou de \emph{analizori} care conține câte un analizor pentru fiecare proiect.
@@ -1021,7 +1041,7 @@ Metoda \texttt{GenerateCode\(\)} folosește aceste date pentru a formata un șir
 Early exit-ul garantează că dacă nici un tip nu a fost anotat cu atributul \texttt{NiceFlags}, nimic nu va fi generat.
 
 
-\section{Plugin-ul Flags}
+\subsection{Plugin-ul Flags}
 
 Cu toate că plugin-ul pentru generarea codului pentru enumuri flag deja a fost menționat în lucrare de mai multe ori, merită a vedea întreaga imagine.
 Deci, plugin-ul Flags este un plugin pentru generatorul de cod Kari care permite generarea metodelor utile pentru lucrul cu enumuri flag.
@@ -1052,7 +1072,7 @@ https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/FlagsAnnotations.cs
 https://github.com/AntonC9018/uni_thesis/blob/ee1ae3f38d2d4ce81a8ada5956ede10b18deb6f7/examples/flags/Generated/Flags.cs
 
-\section{Plugin-ul DataObject}
+\subsection{Plugin-ul DataObject}
 
 DataObject este un plugin pentru Kari care permite generarea codului pentru tipuri care conceptual doar conțin datele.
 Codului generat va conține supraîncărcări triviale pentru operatorii de egalitate, supraîncărcarea metodei \texttt{Equals}, \texttt{GetHashCode}.
@@ -1081,7 +1101,7 @@ https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178
 https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjects.cs
 https://github.com/AntonC9018/uni_thesis/blob/3b9ae9b4f06acfda5debe2b50043f7a178212c97/examples/dataobject/Generated/DataObjectAnnotations.cs
 
-\section{Operațiile cu Kari ca parte de un instrument centralizat de dezvoltare}
+\subsection{Operațiile cu Kari ca parte de un instrument centralizat de dezvoltare}
 
 În cadrul unui proiect al său, autorul a realizat un instrument în limbajul D care permite integrarea mai ușoară a lui Kari, fără a folosi fișiere de proiecte MSBuild.
 Codul definește două comenzi — una compilează Kari în configurația dată, iar a doua îl execută pe Kari, construind drumurile la \ac{DLL}-urile plugin-urilor din denumirile lor.
@@ -1120,12 +1140,20 @@ Logica concretă a procesului de build poate fi delegată la acest program \text
 Programul \texttt{dev} este scris în limbajul de programare D, deci este foarte ușor de programat și de configurat, permite modalitățile avansate de programare, poate accesa librăria standartă excelentă Phobos, și este mult mai comod, ușor de menținut și portabil, decât scripturi shell.
 Un astfel de program poate ori să se integreze cu alte scripturi \ac{CI/CD}, ori să le înlocuiască complet.
 
-\section{Rezumat}
 
-În acest capitol s-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
+\chapterConclusionSection{implementation_chapter_title}
+
+În acest capitol s-au discutat detaliile referitor la implementarea sistemului: cum se configurează sistemul, cum el interacționează cu plugin-urile, cum codul sursă este citit și cum sunt scrise fișierele de ieșire.
+În acest capitol nu s-a discutat logica generării codului, deoarece aceasta deja vine din plugin-uri concrete.
+
+Este clar că nu sunt considerate dependențele între proiecte și orice schimbare forțează codul pentru fiecare proiect să fie regenerat.
+Încă, dependențele de fiecare plugin din punct de vedere a tipurilor cu atribute specifice, sau a tipului de output (dependent de totul input, sau pentru un proiect aparte) nu au fost explorate.
+Acestea pot fi folosite pentru a accelera generatorul de cod și mai departe, dar necesită și mai mult cod și timp pentru a le implementa.
+
+S-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
 S-a demonstrat cum generarea codului poate fi incorporată într-un instrument centralizat care poate fi utilizat pentru automatizarea proceselor de dezvoltare a unui sistem informatic.
 
-\chapter*{Concluziile Finale și Recomandările}
+\unnumberedChapter{Concluziile Finale și Recomandările}
 
 În lucrarea aceasta s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
 S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
@@ -1149,6 +1177,7 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 % Bibliography
 \bibliographystyle{plain}
 \bibliography{bibliography}
+\addcontentsline{toc}{chapter}{\bibname}
 
 % Appendices
 \appendix
@@ -1156,11 +1185,17 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 % Number with arabic numbers instead of Roman
 \renewcommand{\thechapter}{\arabic{chapter}}
 % Prepend Anexa to section names, center them
-\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filcenter}{Anexa \thesection.~}{0pt}{}
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries\filcenter}{Anexa \thesection~}{0pt}{}
+
 % Every section on new page
 % \newcommand{\sectionbreak}{\clearpage}
 
-\chapter{Anexe}
+% Since we've got just a single chapter in the appedices,
+% but which is also the name of the Appendix chapter, it should be omitted.
+% Makes little sense, but ok I guess.
+\setcounter{chapter}{1}
+
+\unnumberedChapter{Anexe}
 % insert appendices here
 
 \end{document}
