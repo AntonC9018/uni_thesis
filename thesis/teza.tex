@@ -98,9 +98,13 @@
 
 % https://tex.stackexchange.com/questions/163451/total-number-of-citations
 \usepackage{totcount}
-\newtotcounter{citnum} %From the package documentation
+\newtotcounter{citnum} % From the package documentation
 \def\oldbibitem{} \let\oldbibitem=\bibitem{}
 \def\bibitem{\stepcounter{citnum}\oldbibitem}
+
+\newtotcounter{num_chapters}
+\def\oldchapter{} \let\oldchapter=\chapter{}
+\def\chapter{\stepcounter{num_chapters}\oldchapter}
 
 % Thank you to @paante on LaTeX Discord.
 % Makes it possible to mark pages and then do math on them.
@@ -154,7 +158,7 @@
 \newcommand{\anexeCount}{20} % for now, hardcode this
 \newcommand{\conferencesList}{I don't know what to write here}
 \newcommand{\bibliographyEntryCount}{\total{citnum}}
-\newcommand\chapterConclusionSection[1]{\section{Concluziile la capitol \nameref{#1}}}
+\newcommand\chapterConclusionSection[1]{\section{Concluziile la capitol \arabic{chapter}}}
 
 % Start
 \begin{document}
@@ -200,9 +204,13 @@
   
   \begin{flushleft}
     \begin{tabular}{ p{4cm} p{4cm} p{8cm}}
-      Șef de departament:      & \underscores{4cm} & IDK Who \\
-      Conducătorul științific: & \underscores{4cm} & MARIN Maria \\
-      Autor:                   & \underscores{4cm} & \authorName
+      Șef de departament:      & \underscores{4cm} & CAPCELEA Titu, \\
+                               &                   & doctor în științe fizico-matematice, \\
+                               &                   & conferențiar universitar \\
+      Conducătorul științific: & \underscores{4cm} & MARIN Maria, \\
+                               &                   & doctor, conferențiar universitar \\
+      Autor:                   & \underscores{4cm} & \authorName, \\
+                               &                   & student din grupa IA1901 \\
     \end{tabular}
   \end{flushleft}
 
@@ -216,7 +224,6 @@
 
 \clearpage
 \tableofcontents
-\addcontentsline{toc}{chapter}{\contentsname}
 
 \clearpage
 \unnumberedChapter{Lista Abrevierelor}
@@ -234,7 +241,7 @@
 \textbf{la teza de licență ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
 
 \textbf{Structura tezei.}
-Teza constă din: Introducere, 4 capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} titluri.
+Teza constă din: Introducere, \total{num_chapters} capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} titluri.
 Textul de bază cuprinde \usefulPageCount{} de pagini și \anexeCount{} de anexe.
 
 \textbf{Cuvinte-cheie:}
@@ -262,7 +269,7 @@ dezvoltarea unui sistem de generare a codului extensibil prin plugin-uri și uș
 Rezultatele obținute au fost raportate la Conferința (-ele) \textbf{\conferencesList}.
 
 
-\unnumberedChapter{Introducere}
+\unnumberedChapter{INTRODUCERE}
 
 \markpage{usefulStuffBegin}
 
@@ -290,7 +297,7 @@ Generatorul final poate fi utilizat ușor în mai multe proiecte, poate fi extin
 Se demonstrează niște exemple de utilizare a generatorului de cod.
 Se arată încă cum generatorul de cod poate fi integrat într-o aplicație de linie de comandă centralizată care să se utilizeze într-un pipeline \ac{CI/CD}.
 
-\textbf{Suportul metodologic.}
+\textbf{Suportul metodologic și tehnologic.}
 
 Generatorul de cod este un instrument realizat în limbajul C\#, pe baza platformei {{.}NET} 6 și a lui Roslyn care este un set de librării și instrumente pentru analiza codului sursă C\#.
 Generatorul de cod a fost testat și utilizat în practică în Unity.
@@ -311,6 +318,10 @@ pentru a ușura realizarea scopurilor specifice acestuia.
 
 În această lucrare se argumentează și se elaborează un generator de cod C\# flexibil și extensibil care poate fi utilizat pentru a ușura și a face mai plăcută programarea în C\#, și pentru a spori eficiența programatorului în implementarea unelor soluții.
 
+Primul capitol, \nameref{intro_chapter_title}, aduce informații generale despre limbajul de programare C\#, alude la faptul că experiența programării în C\# poate fi îmbunătățită prin generare a codului repetetiv, și explică istoriografia problemei.
+Al doilea capitol, \nameref{architecture_chapter_title}, concretizează cerințele la generator de cod și prezintă arhitectura generală a lui care reiese logic din cerințele specificate.
+Al treilea capitol, \nameref{implementation_chapter_title}, urmează implementarea generatorului de cod și structura generală a plugin-urilor, precum și aduce niște exemple ale lor.
+
 
 \chapter{Generarea Codului în Limbajul de Programare C\#}\label{intro_chapter_title}
 
@@ -323,8 +334,7 @@ pentru a ușura realizarea scopurilor specifice acestuia.
   \item Tipizarea statică;
   \item Un runtime inteligent;
   \item Un colector de gunoi integrat, util pentru programarea de uz general;
-  \item O librărie de clase extinsă și testată în timp;
-  \item etc.
+  \item O librărie de clase extinsă și testată în timp, etc.
 \end{itemize}
 
 Cu toate că C\# este ``mediul'' acestei lucrări, nu se va descrie în întregime,
@@ -1082,7 +1092,7 @@ De fapt, aceasta a fost implementat în versiunele noi de C\#, anume C\# 9 și C
 Administratorul acestui plugin are aceeași structură ca și administratorul plugin-ului Flags:
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAdministrator.cs
 
-Informațiile colectate au mai multe chestii, ca simbolul tipului, simbolurile pentru câmpurile instance, etc.
+Informațiile colectate au mai multe lucruri, ca simbolul tipului, simbolurile pentru câmpuri instance, etc.
 https://github.com/AntonC9018/Kari/blob/dcfd36eac6de767a922df97a37f009ae12d8cf1f/source/Kari.Plugins/DataObject/DataObjectAnalyzer.cs#L160-L180
 
 Metoda \texttt{CollectSymbols} tot așa colectează simbolurile necesare și le pune în aceste obiecte cu informații suplimentare extrase.
