@@ -83,7 +83,7 @@
 % https://mirror.marwan.ma/ctan/macros/latex/contrib/titlesec/titlesec.pdf#page=4&zoom=200,67,627
 % It gets pretty involved...
 \def\tabSize{1cm}
-\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter~}{\tabSize}{}
+\titleformat{\chapter}[block]{\normalfont\large\bfseries\filcenter}{\thechapter.~}{\tabSize}{}
 \titleformat{\section}[block]{\normalfont\normalsize\bfseries\filright}{\thesection~}{\tabSize}{}
 \titleformat{\subsection}[block]{\normalfont\normalsize\bfseries\filright}{\thesubsection~}{\tabSize}{}
 
@@ -240,33 +240,32 @@
 
 \textbf{la teza de licență ``\thesisTitle'', a studentului \authorName{}, grupa \uniGroupName{}, programul de studii \programulDeStudii.}
 
-\textbf{Structura tezei.}
-Teza constă din: Introducere, \total{num_chapters} capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} titluri.
+\textbf{Teza constă din}: Introducere, \total{num_chapters} capitole, Concluzii generale și recomandări, Bibliografie \bibliographyEntryCount{} titluri.
 Textul de bază cuprinde \usefulPageCount{} de pagini și \anexeCount{} de anexe.
 
 \textbf{Cuvinte-cheie:}
 \textit{Generarea codului, eliminarea codului boilerplate, programarea declarativă,
 jocuri video, eficiență și plăcere a programatorului, Unity, C\#.}
 
-\textbf{Actualitatea.}
-Generarea codului poate face lucrul programatorilor mai plăcut și mai eficient,
-eliminând codul repetativ, complex, sau presupus la erori, poate spori eficiența sau 
+\textbf{Actualitatea tezei} se manifestă în faptul că generarea codului poate face lucrul programatorilor mai plăcut și mai eficient,
+eliminând codul repetitiv, complex, sau presupus la erori, poate spori eficiența sau 
 necesitățile de memorie a programei, în special importante în dezvoltarea jocurilor video.
 
-\textbf{Scopul și obiectivele cercetării}.
-Scopul tezei constă în elaborarea și argumentarea unui generator de cod, folosirea lui pentru programarea jocurilor.
-Obiectivele tezei constau în studiul soluțiilor existente pentru generarea codului,
-identificarea faptului că ele nu corespund cerințelor sau nu sunt practice,
-dezvoltarea unui sistem de generare a codului extensibil prin plugin-uri și ușor de utilizat.
+\textbf{Scopul și obiectivele cercetării} constă în elaborarea și argumentarea unui generator de cod, folosirea lui pentru programarea jocurilor.
+
+Pentru realizarea scopului s-au formulat următoarele obiective:
+\begin{enumerate}
+  \item studiul soluțiilor existente pentru generarea codului,
+  \item identificarea faptului că ele nu corespund cerințelor sau nu sunt practice,
+  \item dezvoltarea unui sistem de generare a codului extensibil prin plugin-uri și ușor de utilizat.
+\end{enumerate}
  
 \textbf{Rezultatele preconizate și obținute} rezumă în (1) analiza soluțiilor existente pentru generarea codului (2) implementarea nucleului generatorului de cod, (3) suportului pentru plugin-uri, (4) demonstrarea unor plugin-uri utile, (5) folosirea generatorului de cod într-un proiect real. 
 
 \textbf{Problemele importante rezolvate} sunt generarea codului repetetiv, complicat sau presupus la erori, dacă scris manual, pe baza codului sursă; lipsa de capacități de metaprogramare în C\#.
 
-\textbf{Valoarea aplicativă.} Generarea codului înlocuiește codul asemănător scris manual, predispus la erori, dificil și anevoios de menținut, deci sporește eficiența și plăcerea programatorului. 
+\textbf{Valoarea aplicativă} constă în faptul că Generarea codului înlocuiește codul asemănător scris manual, predispus la erori, dificil și anevoios de menținut, deci sporește eficiența și plăcerea programatorului. 
 
-
-Rezultatele obținute au fost raportate la Conferința (-ele) \textbf{\conferencesList}.
 
 
 \unnumberedChapter{INTRODUCERE}
@@ -1163,7 +1162,7 @@ Acestea pot fi folosite pentru a accelera generatorul de cod și mai departe, da
 S-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
 S-a demonstrat cum generarea codului poate fi incorporată într-un instrument centralizat care poate fi utilizat pentru automatizarea proceselor de dezvoltare a unui sistem informatic.
 
-\unnumberedChapter{Concluziile Finale și Recomandările}
+\unnumberedChapter{Concluzii Finale și Recomandări}
 
 În lucrarea aceasta s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
 S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
@@ -1188,6 +1187,14 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 \bibliographystyle{plain}
 \bibliography{bibliography}
 \addcontentsline{toc}{chapter}{\bibname}
+
+%
+\section*{Surse bibliografice proprii}
+
+\begin{itemize}
+  \item Generator de cod: https://github.com/AntonC9018/Kari,
+  \item Proiectul de practică: https://github.com/AntonC9018/race,
+\end{itemize}
 
 % Appendices
 \appendix
