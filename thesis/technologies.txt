@@ -1,5 +1,6 @@
 S-au utilizat:
 - .NET6 drept platforma de dezvoltare a generatorului de cod;
+- Librăriile Roslyn pentru analiza codului sursă;
 - Unity pentru dezvoltarea jocurilor cu ajutorul generatorului de cod;
 - IDE-ul Visual Studio Code pentru scrierea codului;
 - LaTeX pentru convertarea markup-ului tezei într-un PDF;
