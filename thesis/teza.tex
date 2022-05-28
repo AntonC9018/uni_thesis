@@ -64,6 +64,7 @@
   fontsize=\footnotesize
   % Prevent it from spilling over margins for especially long lines
   ,breakanywhere=true
+  ,xleftmargin=\parindent
 }
 
 % Chapters should count with roman numerals
@@ -1197,18 +1198,21 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 \section*{Surse bibliografice proprii}
 
 \begin{enumerate}
-  \item Generator de cod: https://github.com/AntonC9018/Kari
-  \item Proiectul de practică: https://github.com/AntonC9018/race
-  \item Proiectul cu sursele tezei de licență: https://github.com/AntonC9018/uni_thesis
-  \item Proiectul cu sursele tezei de an: https://github.com/AntonC9018/Hopper_University_Paper
-  \item Proiectul tezei de an, include versiunea trecută a generatorului de cod: https://github.com/AntonC9018/hopper.cs
+  \item Generator de cod: \url{https://github.com/AntonC9018/Kari}
+  \item Proiectul de practică: \url{https://github.com/AntonC9018/race}
+  \item Proiectul cu sursele tezei de licență: \url{https://github.com/AntonC9018/uni_thesis}
+  \item Proiectul cu sursele tezei de an: \url{https://github.com/AntonC9018/Hopper_University_Paper}
+  \item Proiectul tezei de an, include versiunea trecută a generatorului de cod: \url{https://github.com/AntonC9018/hopper.cs}
   \item Librăria folosită pentru argument parsing în D, scrisă parțial de către autorul tezei: https://github.com/BradleyChatha/JCLI
-  \item Proiectele în care autorul a realizat puterea generării codului: https://github.com/AntonC9018/opengl_experiments, https://github.com/AntonC9018/shader_descriptor
-  \item Realizarea puterei de metacompilare a limbajului D într-o aplicație grafică: https://github.com/AntonC9018/shader_playground
+  \item Proiectele în care autorul a realizat puterea generării codului: \url{https://github.com/AntonC9018/opengl_experiments}, \url{https://github.com/AntonC9018/shader_descriptor}
+  \item Realizarea puterei de metacompilare a limbajului D într-o aplicație grafică: \url{https://github.com/AntonC9018/shader_playground}
 \end{enumerate}
 
 % Appendices
 \appendix
+\setminted{%
+  xleftmargin=0pt
+}
 
 % Number with arabic numbers instead of Roman
 \renewcommand{\thechapter}{\arabic{chapter}}
