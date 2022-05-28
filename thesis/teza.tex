@@ -226,7 +226,7 @@
 \tableofcontents
 
 \clearpage
-\unnumberedChapter{Lista Abrevierelor}
+\unnumberedChapter{Lista abrevierelor}
 \begin{acronym}
   \acro{CI/CD}{Continuous Integration / Continuous Delivery}
   \acro{DSL}{Domain-Specific Language}
@@ -264,7 +264,7 @@ Pentru realizarea scopului s-au formulat următoarele obiective:
 
 \textbf{Problemele importante rezolvate} sunt generarea codului repetetiv, complicat sau presupus la erori, dacă scris manual, pe baza codului sursă; lipsa de capacități de metaprogramare în C\#.
 
-\textbf{Valoarea aplicativă} constă în faptul că Generarea codului înlocuiește codul asemănător scris manual, predispus la erori, dificil și anevoios de menținut, deci sporește eficiența și plăcerea programatorului. 
+\textbf{Valoarea aplicativă} constă în faptul că generarea codului înlocuiește codul asemănător scris manual, predispus la erori, dificil și anevoios de menținut, deci sporește eficiența și plăcerea programatorului. 
 
 
 
@@ -322,7 +322,7 @@ Al doilea capitol, \nameref{architecture_chapter_title}, concretizează cerințe
 Al treilea capitol, \nameref{implementation_chapter_title}, urmează implementarea generatorului de cod și structura generală a plugin-urilor, precum și aduce niște exemple ale lor.
 
 
-\chapter{Generarea Codului în Limbajul de Programare C\#}\label{intro_chapter_title}
+\chapter{Generarea codului în limbajul de programare C\#}\label{intro_chapter_title}
 
 \section{Argumentarea necesității generării codului în C\#}
 
@@ -538,7 +538,7 @@ Message Pack\cite{message_pack_github} care permite emiterea codului IL pentru s
 Încă un exemplu: consola și comenzile integrate în joc\cite{command_terminal}.
 
 
-\section{Istoriografia problemei}
+\section{Istoria problemei}
 
 După ce autorul a început să studieze și să practice programarea independentă în C\#, și anume în proiectul Hopper descris în teză de an, au devenit evidente deficiențele acestui limbaj.
 Folosind o abordare directă, a fost conceput și creat un prototip al generatorului de cod, cuplat cu proiectul în care a fost utilizat.
@@ -574,7 +574,7 @@ Kari, generatorul de cod descris în această lucrare, a fost dezvoltat inițial
 
 Decizia să facă generatorul de cod în C\# a fost o decizie evidentă, deoarece nu există nici o altă librărie care este asemănător de capabilă.
 
-\section{Source Generators în {{.}NET}}
+\section{Source generators în {{.}NET}}
 
 {{.}NET} 5 a introdus un concept nou --- Source Generators (generatori de sursă)\cite{source_generators}.
 Acestea sunt de fapt analizorii care primesc la intrare arborele sintactic, și returnează codul sursă generat.
@@ -622,7 +622,7 @@ Crearea unei soluții personale ar fi mai ușor și mai practic:
 În acest capitol s-a discutat și s-a exemplificat valoarea practică a generatorilor de cod, și s-a argumentat de ce soluțiile existente nu sunt practice.
 A fost introdusă și ideea de fluidizare a procesului utilizând un sistem care să reutilizeze o singură sursă de informație despre structura codului, făcând mai puțin lucru în total, așadar întregul proces să devină mai rapid în general.
 
-\chapter{Arhitectura Aplicației}\label{architecture_chapter_title}
+\chapter{Arhitectura aplicației}\label{architecture_chapter_title}
 
 \section{Concretizarea cerințelor pentru generator de cod}
 
@@ -746,9 +746,9 @@ După aceasta, programul generează codul, ori arată erori, posibil cu mesajul 
 S-a decis că o arhitectură băzată pe plugin-uri, unde orchestratorul dirijează o mulțime de plugin-uri soluționează problema conform cerințelor.
 S-a discutat și fluxul de lucru dorit, mai precis, faptul că va fi o aplicație din linia de comandă.
 
-\chapter{Implementarea Sistemului}\label{implementation_chapter_title}
+\chapter{Implementarea sistemului}\label{implementation_chapter_title}
 
-\section{Implementarea Generatorului de Cod}
+\section{Implementarea generatorului de cod}
 
 \subsection{Configurarea}
 
@@ -919,7 +919,7 @@ Se poate observa că se folosește cod asincron de scriere a datelor în fișier
 Acestea sunt în cea mai mare parte experimentările autorului și de fapt nu accelerează executarea.
 Deci acest cod probabil va fi schimbat când autorul va găsi timpul pentru refactoring.
 
-\section{Programarea Plugin-urilor}
+\section{Programarea plugin-urilor}
 
 \subsection{CodeBuilder}
 
@@ -1162,7 +1162,7 @@ Acestea pot fi folosite pentru a accelera generatorul de cod și mai departe, da
 S-a discutat structura internă a plugin-urilor, și s-a exemplificat modul de utilizare a generatorului de cod cu plugin-uri particulare.
 S-a demonstrat cum generarea codului poate fi incorporată într-un instrument centralizat care poate fi utilizat pentru automatizarea proceselor de dezvoltare a unui sistem informatic.
 
-\unnumberedChapter{Concluzii Finale și Recomandări}
+\unnumberedChapter{Concluzii finale și recomandări}
 
 În lucrarea aceasta s-a argumentat necesitatea unui generator de cod general, creată din cauza limitațiilor limbajului C\#, care este des folosit pentru dezvoltarea jocurilor.
 S-a discutat detaliile de implementare a generatorului de cod Kari, și au fost date unele exemple de plugin-uri utilizate pentru generarea codului.
@@ -1194,6 +1194,12 @@ Au fost discutate și unele direcții potențiale de îmbunătățire a proiectu
 \begin{enumerate}
   \item Generator de cod: https://github.com/AntonC9018/Kari
   \item Proiectul de practică: https://github.com/AntonC9018/race
+  \item Proiectul cu sursele tezei de licență: https://github.com/AntonC9018/uni_thesis
+  \item Proiectul cu sursele tezei de an: https://github.com/AntonC9018/Hopper_University_Paper
+  \item Proiectul tezei de an, include versiunea trecută a generatorului de cod: https://github.com/AntonC9018/hopper.cs
+  \item Librăria folosită pentru argument parsing în D, scrisă parțial de către autorul tezei: https://github.com/BradleyChatha/JCLI
+  \item Proiectele în care autorul a realizat puterea generării codului: https://github.com/AntonC9018/opengl_experiments, https://github.com/AntonC9018/shader_descriptor
+  \item Realizarea puterei de metacompilare a limbajului D într-o aplicație grafică: https://github.com/AntonC9018/shader_playground
 \end{enumerate}
 
 % Appendices
